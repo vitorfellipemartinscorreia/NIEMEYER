@@ -2,7 +2,6 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<!-- Tag viewport configurada para dispositivos móveis -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Sala 3D — Cabeamento Estruturado ISO/IEC 11801 (Mobile)</title>
 <style>
@@ -10,17 +9,10 @@
   html, body { margin: 0; padding: 0; overflow: hidden; background: #1a1a1a; font-family: Arial, sans-serif; width: 100%; height: 100%; }
   #canvas-container { width: 100vw; height: 100vh; display: block; }
   
-  /* Botões sanfona/toggle para mobile */
   .toggle-btn {
     background: #1976d2; color: #fff; border: none; padding: 8px 12px;
     font-size: 12px; font-weight: bold; border-radius: 6px; cursor: pointer;
     box-shadow: 0 2px 5px rgba(0,0,0,0.4); margin-bottom: 4px;
-  }
-
-  #info {
-    position: absolute; top: 10px; left: 10px; color: #eee; font-size: 11px;
-    background: rgba(0,0,0,0.88); padding: 10px 12px; border-radius: 8px; line-height: 1.4;
-    pointer-events: none; border-left: 4px solid #1e88e5; max-width: calc(100vw - 20px); z-index: 5;
   }
   
   #controls-wrapper {
@@ -51,22 +43,40 @@
   .btn-sub-danger { background: #d32f2f; }
   .btn-sub-danger:active { background: #b71c1c; }
 
-  #legend-wrapper {
+  /* Estilos do Modal / Pop-up de Especificações */
+  #spec-btn-wrapper {
     position: absolute; bottom: 10px; left: 10px; z-index: 10;
   }
-  #legend {
-    color: #eee; font-size: 10px; background: rgba(0,0,0,0.88);
-    padding: 8px 12px; border-radius: 8px; line-height: 1.4; max-width: 260px; display: none;
+  
+  .modal-overlay {
+    display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.7); z-index: 100; justify-content: center; align-items: center;
   }
+  
+  .modal-content {
+    background: #222; color: #eee; width: 90%; max-width: 400px; max-height: 80vh;
+    border-radius: 12px; padding: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    overflow-y: auto; border: 1px solid #444; position: relative; font-size: 12px; line-height: 1.5;
+  }
+  
+  .modal-header {
+    display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 1px solid #444; padding-bottom: 8px; margin-bottom: 12px;
+  }
+  
+  .modal-title { font-size: 14px; font-weight: bold; color: #1e88e5; }
+  
+  .modal-close {
+    background: #d32f2f; color: #fff; border: none; border-radius: 50%;
+    width: 24px; height: 24px; font-weight: bold; cursor: pointer; display: flex;
+    align-items: center; justify-content: center; font-size: 12px;
+  }
+
   .dot { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:5px; }
 
-  /* Ajustes responsivos adicionais */
   @media (min-width: 768px) {
-    #info { font-size: 13px; }
     .btn { font-size: 12px; min-width: 190px; }
     .btn-sub { font-size: 11px; }
-    #legend { font-size: 11px; display: block !important; }
-    #legend-toggle { display: none; }
     #controls-ui { display: flex !important; max-height: none; }
     #controls-toggle { display: none; }
   }
@@ -74,11 +84,6 @@
 </head>
 <body>
 <div id="canvas-container"></div>
-
-<div id="info">
-  <strong>Data Center + Escritório (ISO/IEC 11801)</strong><br>
-  <span id="room-status">Dimensões: 14m x 10m x 3.2m | Cap. Máx: 8 Estações</span>
-</div>
 
 <div id="controls-wrapper">
   <button id="controls-toggle" class="toggle-btn" onclick="toggleElement('controls-ui')">⚙️ Controles</button>
@@ -119,14 +124,30 @@
   </div>
 </div>
 
-<div id="legend-wrapper">
-  <button id="legend-toggle" class="toggle-btn" onclick="toggleElement('legend')">🎨 Legenda ISO</button>
-  <div id="legend">
-    <strong>Padrão ISO/IEC 11801:</strong><br>
-    <span class="dot" style="background:#1e88e5"></span>Dados Horiz. (Cat6a)<br>
-    <span class="dot" style="background:#43a047"></span>Gerenciamento OOB<br>
-    <span class="dot" style="background:#fdd835"></span>Fibra Óptica (Backbone)<br>
-    <span class="dot" style="background:#9e9e9e"></span>Patch Cords (Estações)
+<div id="spec-btn-wrapper">
+  <button class="toggle-btn" onclick="openModal()">📋 Especificações</button>
+</div>
+
+<!-- Pop-up / Modal de Especificações -->
+<div id="spec-modal" class="modal-overlay" onclick="closeModalOnOverlay(event)">
+  <div class="modal-content">
+    <div class="modal-header">
+      <span class="modal-title">Especificações ISO/IEC 11801</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <p><strong>Padrão de Cores e Cabeamento:</strong></p>
+    <ul style="padding-left: 18px; margin: 0 0 12px 0;">
+      <li><span class="dot" style="background:#1e88e5"></span><strong>Azul:</strong> Dados Horizontais (Cat6a)</li>
+      <li><span class="dot" style="background:#43a047"></span><strong>Verde:</strong> Gerenciamento OOB e Redes Críticas</li>
+      <li><span class="dot" style="background:#fdd835"></span><strong>Amarelo:</strong> Backbone de Fibra Óptica (OM4/SM)</li>
+      <li><span class="dot" style="background:#9e9e9e"></span><strong>Cinza:</strong> Patch Cords das Estações</li>
+    </ul>
+    <p><strong>Infraestrutura:</strong></p>
+    <ul style="padding-left: 18px; margin: 0;">
+      <li>Data Center com piso elevado e Racks de alta densidade.</li>
+      <li>Eletrocalhas aéreas para distribuição do cabeamento.</li>
+      <li>Consolidação e interconexão via Rack do Escritório.</li>
+    </ul>
   </div>
 </div>
 
@@ -155,6 +176,20 @@ const singleItems = [];
 const cableMeshes = [];
 let stationCounter = 0;
 
+function openModal() {
+  document.getElementById('spec-modal').style.display = 'flex';
+}
+
+function closeModal() {
+  document.getElementById('spec-modal').style.display = 'none';
+}
+
+function closeModalOnOverlay(event) {
+  if (event.target.id === 'spec-modal') {
+    closeModal();
+  }
+}
+
 function toggleElement(id) {
   const el = document.getElementById(id);
   if (el.style.display === 'none' || el.style.display === '') {
@@ -168,12 +203,6 @@ function getMaxCapacity() {
   const usableWidth = roomWidth - 4;
   const usableDepth = roomDepth - 4;
   return Math.max(1, Math.floor((usableWidth * usableDepth) / 5));
-}
-
-function updateStatusUI() {
-  const capacity = getMaxCapacity();
-  document.getElementById('room-status').innerHTML = 
-    `Dim.: ${roomWidth}m x ${roomDepth}m x ${roomHeight.toFixed(1)}m | Cap: ${capacity} | Atuais: ${deskGroups.length}`;
 }
 
 function adjustDimension(param, delta) {
@@ -190,7 +219,6 @@ function adjustDimension(param, delta) {
     officeRackGroup.position.set(roomWidth/2 - 0.8, roomHeight - 1.5, -roomDepth/2 + 0.8);
   }
   applyIsoLayout();
-  updateStatusUI();
 }
 
 function init() {
@@ -243,7 +271,6 @@ function init() {
   scene.add(dcGroup);
 
   rebuildIsoCabling();
-  updateStatusUI();
 
   window.addEventListener('resize', onResize);
   animate();
@@ -460,7 +487,6 @@ function addFullStation() {
   if (deskGroups.length >= getMaxCapacity()) return;
   createWorkstation(0, 0);
   applyIsoLayout();
-  updateStatusUI();
 }
 
 function removeFullStation() {
@@ -468,7 +494,6 @@ function removeFullStation() {
     const station = deskGroups.pop();
     scene.remove(station);
     applyIsoLayout();
-    updateStatusUI();
   }
 }
 
