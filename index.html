@@ -2,94 +2,132 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Sala 3D — Cabeamento Estruturado ISO/IEC 11801</title>
+<!-- Tag viewport configurada para dispositivos móveis -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Sala 3D — Cabeamento Estruturado ISO/IEC 11801 (Mobile)</title>
 <style>
-  html, body { margin: 0; padding: 0; overflow: hidden; background: #1a1a1a; font-family: Arial, sans-serif; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; overflow: hidden; background: #1a1a1a; font-family: Arial, sans-serif; width: 100%; height: 100%; }
   #canvas-container { width: 100vw; height: 100vh; display: block; }
+  
+  /* Botões sanfona/toggle para mobile */
+  .toggle-btn {
+    background: #1976d2; color: #fff; border: none; padding: 8px 12px;
+    font-size: 12px; font-weight: bold; border-radius: 6px; cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.4); margin-bottom: 4px;
+  }
+
   #info {
-    position: absolute; top: 12px; left: 12px; color: #eee; font-size: 13px;
-    background: rgba(0,0,0,0.85); padding: 12px 16px; border-radius: 8px; line-height: 1.5;
-    pointer-events: none; border-left: 4px solid #1e88e5;
+    position: absolute; top: 10px; left: 10px; color: #eee; font-size: 11px;
+    background: rgba(0,0,0,0.88); padding: 10px 12px; border-radius: 8px; line-height: 1.4;
+    pointer-events: none; border-left: 4px solid #1e88e5; max-width: calc(100vw - 20px); z-index: 5;
   }
+  
+  #controls-wrapper {
+    position: absolute; top: 10px; right: 10px; z-index: 10;
+    display: flex; flex-direction: column; align-items: flex-end;
+  }
+
   #controls-ui {
-    position: absolute; top: 12px; right: 12px; z-index: 10;
     display: flex; flex-direction: column; gap: 6px; align-items: flex-end;
+    max-height: 65vh; overflow-y: auto; padding-right: 2px;
   }
+
   .btn {
-    background: #1e88e5; color: #fff; border: none; padding: 8px 12px;
+    background: #1e88e5; color: #fff; border: none; padding: 10px 12px;
     font-size: 11px; font-weight: bold; border-radius: 6px; cursor: pointer;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.3); transition: background 0.2s; min-width: 190px; text-align: left;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.3); transition: background 0.2s; width: 100%; text-align: center;
   }
-  .btn:hover { background: #1565c0; }
+  .btn:active { background: #1565c0; }
+  
   .btn-group {
-    display: flex; gap: 4px; background: rgba(0,0,0,0.6); padding: 4px; border-radius: 6px;
+    display: flex; gap: 4px; background: rgba(0,0,0,0.7); padding: 4px; border-radius: 6px; width: 100%; justify-content: flex-end;
   }
   .btn-sub {
-    background: #424242; color: #fff; border: none; padding: 5px 8px;
-    font-size: 10px; font-weight: bold; border-radius: 4px; cursor: pointer;
+    background: #424242; color: #fff; border: none; padding: 8px 10px;
+    font-size: 10px; font-weight: bold; border-radius: 4px; cursor: pointer; flex: 1; text-align: center;
   }
-  .btn-sub:hover { background: #616161; }
+  .btn-sub:active { background: #616161; }
   .btn-sub-danger { background: #d32f2f; }
-  .btn-sub-danger:hover { background: #b71c1c; }
-  #legend {
-    position: absolute; bottom: 12px; left: 12px; color: #eee; font-size: 11px;
-    background: rgba(0,0,0,0.85); padding: 10px 14px; border-radius: 8px; line-height: 1.5;
+  .btn-sub-danger:active { background: #b71c1c; }
+
+  #legend-wrapper {
+    position: absolute; bottom: 10px; left: 10px; z-index: 10;
   }
-  .dot { display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:6px; }
+  #legend {
+    color: #eee; font-size: 10px; background: rgba(0,0,0,0.88);
+    padding: 8px 12px; border-radius: 8px; line-height: 1.4; max-width: 260px; display: none;
+  }
+  .dot { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:5px; }
+
+  /* Ajustes responsivos adicionais */
+  @media (min-width: 768px) {
+    #info { font-size: 13px; }
+    .btn { font-size: 12px; min-width: 190px; }
+    .btn-sub { font-size: 11px; }
+    #legend { font-size: 11px; display: block !important; }
+    #legend-toggle { display: none; }
+    #controls-ui { display: flex !important; max-height: none; }
+    #controls-toggle { display: none; }
+  }
 </style>
 </head>
 <body>
 <div id="canvas-container"></div>
 
-<div id="controls-ui">
-  <!-- Controles de Dimensão da Sala -->
-  <div class="btn-group">
-    <button class="btn-sub" onclick="adjustDimension('width', 1)">↔️ + Largura</button>
-    <button class="btn-sub btn-sub-danger" onclick="adjustDimension('width', -1)">↔️ - Largura</button>
-  </div>
-  <div class="btn-group">
-    <button class="btn-sub" onclick="adjustDimension('depth', 1)">↕️ + Comprimento</button>
-    <button class="btn-sub btn-sub-danger" onclick="adjustDimension('depth', -1)">↕️ - Comprimento</button>
-  </div>
-  <div class="btn-group">
-    <button class="btn-sub" onclick="adjustDimension('height', 0.5)">⬆️ + Pé-Direito</button>
-    <button class="btn-sub btn-sub-danger" onclick="adjustDimension('height', -0.5)">⬇️ - Pé-Direito</button>
-  </div>
-
-  <button class="btn" onclick="applyIsoLayout()">🔄 Reorganizar Layout (Norte)</button>
-  
-  <div class="btn-group">
-    <button class="btn-sub" onclick="addFullStation()">➕ Estação</button>
-    <button class="btn-sub btn-sub-danger" onclick="removeFullStation()">➖ Estação</button>
-  </div>
-
-  <div class="btn-group">
-    <button class="btn-sub" onclick="addSingleItem('desk')">+ Mesa</button>
-    <button class="btn-sub btn-sub-danger" onclick="removeSingleItem('desk')">- Mesa</button>
-    <button class="btn-sub" onclick="addSingleItem('chair')">+ Cadeira</button>
-    <button class="btn-sub btn-sub-danger" onclick="removeSingleItem('chair')">- Cadeira</button>
-  </div>
-
-  <div class="btn-group">
-    <button class="btn-sub" onclick="addSingleItem('monitor')">+ Monitor</button>
-    <button class="btn-sub btn-sub-danger" onclick="removeSingleItem('monitor')">- Monitor</button>
-    <button class="btn-sub" onclick="addSingleItem('pc')">+ Gabinete</button>
-    <button class="btn-sub btn-sub-danger" onclick="removeSingleItem('pc')">- Gabinete</button>
-  </div>
-</div>
-
 <div id="info">
   <strong>Data Center + Escritório (ISO/IEC 11801)</strong><br>
-  <span id="room-status">Dimensões: 14m x 10m x 3.2m | Cap. Máx: 8 Estações</span><br>
-  <strong>Data Center:</strong> Racks de Servidores, Rede, Nobreak e Cabeamento ISO.
+  <span id="room-status">Dimensões: 14m x 10m x 3.2m | Cap. Máx: 8 Estações</span>
 </div>
 
-<div id="legend">
-  <strong>Padrão de Cores ISO/IEC 11801:</strong><br>
-  <span class="dot" style="background:#1e88e5"></span>ISO: Cabeamento Horizontal de Dados (Cat6a)<br>
-  <span class="dot" style="background:#43a047"></span>ISO: Gerenciamento OOB e Redes Críticas (Verde)<br>
-  <span class="dot" style="background:#fdd835"></span>ISO: Backbone de Fibra Óptica (Monomodo/OM4)<br>
-  <span class="dot" style="background:#9e9e9e"></span>ISO: Patch Cords das Estações (Cinza)
+<div id="controls-wrapper">
+  <button id="controls-toggle" class="toggle-btn" onclick="toggleElement('controls-ui')">⚙️ Controles</button>
+  <div id="controls-ui">
+    <div class="btn-group">
+      <button class="btn-sub" onclick="adjustDimension('width', 1)">↔️ +Largura</button>
+      <button class="btn-sub btn-sub-danger" onclick="adjustDimension('width', -1)">↔️ -Largura</button>
+    </div>
+    <div class="btn-group">
+      <button class="btn-sub" onclick="adjustDimension('depth', 1)">↕️ +Compr.</button>
+      <button class="btn-sub btn-sub-danger" onclick="adjustDimension('depth', -1)">↕️ -Compr.</button>
+    </div>
+    <div class="btn-group">
+      <button class="btn-sub" onclick="adjustDimension('height', 0.5)">⬆️ +Pé-Dir.</button>
+      <button class="btn-sub btn-sub-danger" onclick="adjustDimension('height', -0.5)">⬇️ -Pé-Dir.</button>
+    </div>
+
+    <button class="btn" onclick="applyIsoLayout()">🔄 Layout Norte</button>
+    
+    <div class="btn-group">
+      <button class="btn-sub" onclick="addFullStation()">➕ Estação</button>
+      <button class="btn-sub btn-sub-danger" onclick="removeFullStation()">➖ Estação</button>
+    </div>
+
+    <div class="btn-group">
+      <button class="btn-sub" onclick="addSingleItem('desk')">+ Mesa</button>
+      <button class="btn-sub btn-sub-danger" onclick="removeSingleItem('desk')">- Mesa</button>
+      <button class="btn-sub" onclick="addSingleItem('chair')">+ Cadeira</button>
+      <button class="btn-sub btn-sub-danger" onclick="removeSingleItem('chair')">- Cadeira</button>
+    </div>
+
+    <div class="btn-group">
+      <button class="btn-sub" onclick="addSingleItem('monitor')">+ Mon.</button>
+      <button class="btn-sub btn-sub-danger" onclick="removeSingleItem('monitor')">- Mon.</button>
+      <button class="btn-sub" onclick="addSingleItem('pc')">+ PC</button>
+      <button class="btn-sub btn-sub-danger" onclick="removeSingleItem('pc')">- PC</button>
+    </div>
+  </div>
+</div>
+
+<div id="legend-wrapper">
+  <button id="legend-toggle" class="toggle-btn" onclick="toggleElement('legend')">🎨 Legenda ISO</button>
+  <div id="legend">
+    <strong>Padrão ISO/IEC 11801:</strong><br>
+    <span class="dot" style="background:#1e88e5"></span>Dados Horiz. (Cat6a)<br>
+    <span class="dot" style="background:#43a047"></span>Gerenciamento OOB<br>
+    <span class="dot" style="background:#fdd835"></span>Fibra Óptica (Backbone)<br>
+    <span class="dot" style="background:#9e9e9e"></span>Patch Cords (Estações)
+  </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -117,6 +155,15 @@ const singleItems = [];
 const cableMeshes = [];
 let stationCounter = 0;
 
+function toggleElement(id) {
+  const el = document.getElementById(id);
+  if (el.style.display === 'none' || el.style.display === '') {
+    el.style.display = (id === 'controls-ui') ? 'flex' : 'block';
+  } else {
+    el.style.display = 'none';
+  }
+}
+
 function getMaxCapacity() {
   const usableWidth = roomWidth - 4;
   const usableDepth = roomDepth - 4;
@@ -126,7 +173,7 @@ function getMaxCapacity() {
 function updateStatusUI() {
   const capacity = getMaxCapacity();
   document.getElementById('room-status').innerHTML = 
-    `Dimensões: ${roomWidth}m x ${roomDepth}m x ${roomHeight.toFixed(1)}m | Cap. Máx: ${capacity} Estações | Atuais: ${deskGroups.length}`;
+    `Dim.: ${roomWidth}m x ${roomDepth}m x ${roomHeight.toFixed(1)}m | Cap: ${capacity} | Atuais: ${deskGroups.length}`;
 }
 
 function adjustDimension(param, delta) {
@@ -155,7 +202,8 @@ function init() {
   camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 120);
   camera.position.set(12, 14, 20);
 
-  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -167,6 +215,7 @@ function init() {
   controls.enableDamping = true;
   controls.dampingFactor = 0.08;
   controls.maxPolarAngle = Math.PI / 2.05;
+  controls.touches = { ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN };
   controls.update();
 
   const hemi = new THREE.HemisphereLight(0xffffff, 0x444444, 0.85);
@@ -174,7 +223,7 @@ function init() {
   const dir = new THREE.DirectionalLight(0xffffff, 0.9);
   dir.position.set(10, 16, 10);
   dir.castShadow = true;
-  dir.shadow.mapSize.set(2048, 2048);
+  dir.shadow.mapSize.set(1024, 1024);
   scene.add(dir);
 
   buildOfficeRoom();
@@ -535,7 +584,7 @@ function rebuildIsoCabling() {
     new THREE.Vector3(officeRackPos.x - 2, cableY + 0.3, wallZ),
     officeRackPos
   ]);
-  const backboneGeo = new THREE.TubeGeometry(backboneCurve, 50, 0.02, 8, false);
+  const backboneGeo = new THREE.TubeGeometry(backboneCurve, 32, 0.02, 6, false);
   const backboneMesh = new THREE.Mesh(backboneGeo, new THREE.MeshStandardMaterial({ color: ISO_COLOR_FIBER, roughness: 0.3 }));
   scene.add(backboneMesh);
   cableMeshes.push(backboneMesh);
@@ -554,7 +603,7 @@ function rebuildIsoCabling() {
     cableMeshes.push(conduit);
 
     const patchCurve = new THREE.CatmullRomCurve3([pcPos, new THREE.Vector3(worldPos.x + 0.2, 0.75, worldPos.z), wallOutlet]);
-    const patchGeo = new THREE.TubeGeometry(patchCurve, 16, 0.007, 6, false);
+    const patchGeo = new THREE.TubeGeometry(patchCurve, 12, 0.007, 4, false);
     const patchMesh = new THREE.Mesh(patchGeo, new THREE.MeshStandardMaterial({ color: ISO_COLOR_PATCH, roughness: 0.5 }));
     scene.add(patchMesh);
     cableMeshes.push(patchMesh);
@@ -568,7 +617,7 @@ function rebuildIsoCabling() {
     const rackPort = new THREE.Vector3(rackX, (roomHeight - 1.5) + 0.05 - (i * 0.02), wallZ + 0.1);
 
     const isoCurve = new THREE.CatmullRomCurve3([wallOutlet, pipeTop, trayPoint, rackPoint, rackPort], false, 'catmullrom', 0.15);
-    const isoGeo = new THREE.TubeGeometry(isoCurve, 32, 0.008, 6, false);
+    const isoGeo = new THREE.TubeGeometry(isoCurve, 20, 0.008, 4, false);
     const isoMesh = new THREE.Mesh(isoGeo, new THREE.MeshStandardMaterial({ color: isoColor, roughness: 0.3 }));
     scene.add(isoMesh);
     cableMeshes.push(isoMesh);
@@ -686,7 +735,7 @@ function buildIsoDcCabling(group) {
       new THREE.Vector3(0.0, 2.35, -1.2),
       new THREE.Vector3(0.0, 0.6 + i * 0.25, -0.8)
     ]);
-    const geo = new THREE.TubeGeometry(curve, 20, 0.01, 6, false);
+    const geo = new THREE.TubeGeometry(curve, 16, 0.01, 4, false);
     const mat = new THREE.MeshStandardMaterial({ color: colors[i % 3], roughness: 0.3 });
     const cable = new THREE.Mesh(geo, mat);
     group.add(cable);
@@ -722,12 +771,14 @@ function setSelection(obj) {
 
 function pointerToNDC(event) {
   const rect = renderer.domElement.getBoundingClientRect();
-  pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-  pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+  const clientX = event.touches ? event.touches[0].clientX : event.clientX;
+  const clientY = event.touches ? event.touches[0].clientY : event.clientY;
+  pointer.x = ((clientX - rect.left) / rect.width) * 2 - 1;
+  pointer.y = -((clientY - rect.top) / rect.height) * 2 + 1;
 }
 
 function onPointerDown(event) {
-  if (event.button !== 0) return;
+  if (event.button !== undefined && event.button !== 0) return;
   pointerToNDC(event);
   raycaster.setFromCamera(pointer, camera);
 
@@ -745,7 +796,6 @@ function onPointerDown(event) {
       }
       isDraggingObject = true;
       controls.enabled = false;
-      event.preventDefault();
       return;
     }
   }
@@ -769,10 +819,11 @@ function onPointerUp() {
 }
 
 function enableObjectDragging() {
-  renderer.domElement.addEventListener("pointerdown", onPointerDown);
-  renderer.domElement.addEventListener("pointermove", onPointerMove);
-  renderer.domElement.addEventListener("pointerup", onPointerUp);
-  renderer.domElement.addEventListener("pointercancel", onPointerUp);
+  const dom = renderer.domElement;
+  dom.addEventListener("pointerdown", onPointerDown);
+  dom.addEventListener("pointermove", onPointerMove);
+  dom.addEventListener("pointerup", onPointerUp);
+  dom.addEventListener("pointercancel", onPointerUp);
 }
 
 function animate() {
