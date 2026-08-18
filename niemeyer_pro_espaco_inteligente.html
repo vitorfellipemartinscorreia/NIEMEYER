@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>NIEMEYER PRO — Planejamento de Infraestrutura</title>
+<style>
+:root{
+  --bg:#071018;--panel:#0d1820;--panel2:#101e27;--line:#263640;
+  --text:#e8f0f3;--muted:#82939d;--green:#56e39a;--green2:#8af0b7;
+  --blue:#3aa8ff;--yellow:#ffd166;--red:#ff6b6b;
+}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,Segoe UI,Arial,sans-serif;font-size:13px}
+button,input,select{font:inherit}.app{min-height:100vh;display:grid;grid-template-rows:64px 1fr 36px}
+header{display:flex;align-items:center;gap:28px;padding:0 20px;border-bottom:1px solid var(--line);background:#08131b}
+.brand{display:flex;align-items:center;gap:12px;min-width:225px}.logo{width:34px;height:34px;border:2px solid var(--green);border-radius:9px;display:grid;place-items:center;color:var(--green);font-weight:900;font-size:20px}.brand b{font-size:16px;letter-spacing:.4px}.brand small{display:block;color:var(--muted);margin-top:2px}
+nav{display:flex;gap:24px;flex:1}nav button{background:none;border:0;color:#b8c4c9;cursor:pointer;padding:22px 2px;border-bottom:2px solid transparent}nav button.active,nav button:hover{color:white;border-color:var(--green)}
+.headerRight{display:flex;align-items:center;gap:15px}.saved{color:var(--green);font-size:11px}.export{background:var(--green);color:#062015;border:0;border-radius:6px;padding:9px 14px;font-weight:800;cursor:pointer}
+.workspace{display:grid;grid-template-columns:230px 1fr 265px;min-height:0}.left,.right{background:var(--panel);padding:17px 14px;overflow:auto}.left{border-right:1px solid var(--line)}.right{border-left:1px solid var(--line)}
+.section{border-top:1px solid var(--line);padding:15px 0}.section:first-child{border-top:0;padding-top:0}.section h3{font-size:11px;color:var(--green2);margin:0 0 13px;text-transform:uppercase;letter-spacing:.3px}
+.row{display:flex;align-items:center;justify-content:space-between;margin:11px 0;color:#c4d0d5}.counter{display:flex;align-items:center;gap:5px}.counter button{width:22px;height:22px;background:#13232c;color:#cbd6da;border:1px solid #31434d;border-radius:4px;cursor:pointer}.counter span{min-width:27px;text-align:center}
+.field{display:grid;grid-template-columns:1fr 72px;align-items:center;margin:8px 0;color:#b8c5ca}.field input,.field select{width:72px;background:#0a151d;border:1px solid #344650;color:white;border-radius:4px;padding:6px}
+.check{display:flex;gap:8px;margin:10px 0;color:#b8c5ca}.check input{accent-color:var(--green)}
+.update{width:100%;padding:11px;border:0;border-radius:5px;background:var(--green);color:#062015;font-weight:800;cursor:pointer}
+.center{min-width:0;display:grid;grid-template-rows:auto 1fr auto auto;background:#0a131a}.titlebar{height:55px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid var(--line)}.titlebar b{font-size:13px}.tools{display:flex;gap:3px}.tool{background:#101e27;border:1px solid #344650;color:#d7e1e4;padding:8px 12px;cursor:pointer}.tool.active{background:#1b2e38;color:white}.canvas{position:relative;min-height:520px;margin:0 10px;overflow:hidden;background:#eef1ee}.grid{position:absolute;inset:0;background-image:linear-gradient(#d9e1dc 1px,transparent 1px),linear-gradient(90deg,#d9e1dc 1px,transparent 1px);background-size:24px 24px}
+.plan{position:absolute;left:7%;top:9%;width:78%;height:79%;background:#f7f8f6;border:4px solid #27342f;box-shadow:0 8px 30px #0002}.serverRoom{position:absolute;right:0;top:0;width:23%;height:100%;background:#e8ebe8;border-left:3px solid #27342f}.roomLabel{position:absolute;top:10px;left:14px;font-weight:800;font-size:12px;color:#252c2a}
+.rack2d{position:absolute;right:8%;top:28%;width:25px;height:145px;background:linear-gradient(#222,#080b0c);border:2px solid #333;border-radius:2px;box-shadow:0 0 0 2px #0002}.rack2d:after{content:"";position:absolute;left:5px;right:5px;top:14px;height:5px;background:#26343a;box-shadow:0 18px #26343a,0 36px #26343a,0 54px #26343a,0 72px #26343a,0 90px #26343a,0 108px #26343a}.ac{position:absolute;right:8%;top:10%;width:65px;height:20px;background:white;border:1px solid #ccd4d0;border-radius:4px}.desk{position:absolute;width:76px;height:43px;background:#d2a26b;border:1px solid #a47c4d;border-radius:2px;box-shadow:0 5px 0 -1px #252b29}.desk:after{content:"";position:absolute;width:18px;height:18px;background:#202827;border-radius:3px;left:29px;top:-22px}.d1{left:12%;top:13%}.d2{left:33%;top:13%}.d3{left:54%;top:13%}.d4{left:12%;top:44%}.d5{left:33%;top:44%}.d6{left:54%;top:44%}.d7{left:12%;top:72%}.d8{left:33%;top:72%}.d9{left:54%;top:72%}.d10{left:33%;top:72%}
+.ap{position:absolute;width:34px;height:34px;border-radius:50%;background:#fff;border:2px solid var(--green);box-shadow:0 0 0 28px #56e39a22,0 0 25px #56e39a66}.ap:after{content:"WiFi";position:absolute;top:39px;left:3px;color:#197744;font-size:9px}.ap1{left:7%;top:10%}.ap2{right:27%;top:10%}.ap3{left:7%;bottom:9%}.ap4{right:27%;bottom:9%}
+.cable{position:absolute;height:2px;background:var(--blue);transform-origin:0 50%;z-index:4;box-shadow:0 0 3px #3aa8ff55}.port{position:absolute;width:10px;height:10px;background:#fff;border:2px solid var(--blue);z-index:6}.p1{left:19%;top:22%}.p2{left:40%;top:22%}.p3{left:61%;top:22%}.p4{left:19%;top:53%}.p5{left:40%;top:53%}.p6{left:61%;top:53%}.p7{left:19%;top:81%}.p8{left:40%;top:81%}
+.legend{position:absolute;left:0;right:0;bottom:0;height:39px;background:#0b1820eF;display:flex;align-items:center;gap:20px;padding:0 14px;color:#d6e0e3;font-size:10px}.legend i{display:inline-block;width:17px;height:3px;background:var(--blue);margin-right:5px}.legend .greenDot{width:10px;height:10px;border-radius:50%;background:var(--green)}
+.bottomGrid{display:grid;grid-template-columns:1.15fr 1fr 1fr;gap:10px;padding:10px}.mini{background:var(--panel);border:1px solid var(--line);min-height:150px;padding:12px}.mini h4{color:var(--green2);font-size:10px;margin:0 0 13px;text-transform:uppercase}.topology{display:flex;align-items:center;justify-content:center;gap:12px}.node{padding:8px;border:1px solid #40545e;border-radius:5px;background:#13232c;text-align:center;font-size:9px}.node.core{border-color:var(--green);color:var(--green2)}.links{color:var(--green);font-size:20px}
+.bars{display:grid;gap:10px}.barLabel{display:flex;justify-content:space-between;color:#aebcc2;font-size:10px}.bar{height:6px;background:#23333c;border-radius:9px;overflow:hidden}.bar span{display:block;height:100%;background:var(--green)}
+.devices{display:grid;grid-template-columns:1fr 1fr;gap:7px}.device{padding:8px;background:#101f28;border:1px solid #2c3d45;border-radius:5px;font-size:10px}.device b{display:block;color:white;margin-bottom:3px}.device span{color:var(--muted)}
+.right h2{font-size:12px;margin:0 0 16px}.summary{display:grid;gap:13px}.sum{display:flex;justify-content:space-between;align-items:center}.sum span{color:#aebcc2}.sum b{color:white}.ok{color:var(--green)!important}.recommend{margin-top:18px;border:1px solid #9f7b17;background:#17170d;padding:12px;border-radius:5px;color:#d6c77e;line-height:1.5}.materials{margin-top:18px}.mat{display:grid;grid-template-columns:1fr auto;margin:10px 0;color:#b9c5ca}.mat b{color:white}.total{border-top:1px solid var(--line);padding-top:12px;color:var(--green);display:flex;justify-content:space-between;font-weight:800}
+.statusBar{display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-top:1px solid var(--line);background:#08131b;color:#87979f;font-size:10px}.statusBar b{color:var(--green)}
+.view3d{position:absolute;inset:0;background:#071018;display:none}.view3d.active{display:block}.toggle3d{position:absolute;right:12px;bottom:12px;z-index:10;background:#0e1d25;color:white;border:1px solid #40515a;border-radius:5px;padding:8px 12px;cursor:pointer}
+#three{width:100%;height:100%}
+@media(max-width:1150px){.workspace{grid-template-columns:200px 1fr}.right{display:none}.bottomGrid{grid-template-columns:1fr 1fr}.brand{min-width:180px}}
+@media(max-width:800px){nav{display:none}.workspace{grid-template-columns:1fr}.left{display:none}.bottomGrid{grid-template-columns:1fr}.canvas{min-height:430px}}
+
+.workstation{position:absolute;width:76px;height:43px;background:#d2a26b;border:1px solid #a47c4d;border-radius:2px;box-shadow:0 5px 0 -1px #252b29;z-index:3}
+.workstation .monitor{position:absolute;width:18px;height:15px;background:#202827;border-radius:2px;left:29px;top:-19px;border:1px solid #111}
+.workstation .chair{position:absolute;width:16px;height:16px;background:#242d2b;border-radius:50%;left:30px;top:47px}
+.workstation .person{position:absolute;width:8px;height:8px;background:#56e39a;border-radius:50%;left:34px;top:51px;box-shadow:0 0 0 3px #56e39a22}
+.capacity-note{font-size:10px;color:#82939d;margin-top:8px;line-height:1.4}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div class="brand"><div class="logo">N</div><div><b>NIEMEYER PRO</b><small>Planejamento de Infraestrutura</small></div></div>
+  <nav><button class="active">▣ Projeto</button><button>✎ Editar</button><button>◉ Visualizar</button><button>▤ Dispositivos</button><button>⚒ Ferramentas</button><button>▧ Relatórios</button><button>ⓘ Ajuda</button></nav>
+  <div class="headerRight"><span>Projeto: <b>Empresa Exemplo</b></span><span class="saved">● Salvo</span><button class="export" onclick="exportReport()">⇩ Exportar</button></div>
+</header>
+
+<div class="workspace">
+<aside class="left">
+  <div class="section">
+    <h3>Dispositivos</h3>
+    <div class="row">👤 Funcionários <div class="counter"><button onclick="chg('people',-1)">−</button><span id="people">35</span><button onclick="chg('people',1)">+</button></div></div>
+    <div class="row">▣ Computadores <div class="counter"><button onclick="chg('pc',-1)">−</button><span id="pc">30</span><button onclick="chg('pc',1)">+</button></div></div>
+    <div class="row">▤ Servidores <div class="counter"><button onclick="chg('servers',-1)">−</button><span id="servers">2</span><button onclick="chg('servers',1)">+</button></div></div>
+    <div class="row">◉ Access Points <div class="counter"><button onclick="chg('ap',-1)">−</button><span id="ap">4</span><button onclick="chg('ap',1)">+</button></div></div>
+    <div class="row">▣ Impressoras <div class="counter"><button onclick="chg('printers',-1)">−</button><span id="printers">2</span><button onclick="chg('printers',1)">+</button></div></div>
+  </div>
+  <div class="section">
+    <h3>Dimensões da sala</h3>
+    <div class="field">Largura (m)<input id="w" type="number" value="20"></div>
+    <div class="field">Comprimento (m)<input id="l" type="number" value="15"></div>
+    <div class="field">Pé direito (m)<input id="h" type="number" value="3"></div><div class="capacity-note" id="capacityNote"></div>
+  </div>
+  <div class="section">
+    <h3>Ambiente</h3>
+    <div class="field">Tipo<select><option>Empresa</option><option>Sala de TI</option><option>Clínica</option><option>Escola</option></select></div>
+  </div>
+  <div class="section">
+    <h3>Preferências</h3>
+    <label class="check"><input checked type="checkbox"> Sala de servidores climatizada</label>
+    <label class="check"><input checked type="checkbox"> Calcular metragem de cabeamento</label>
+    <label class="check"><input checked type="checkbox"> Mostrar cobertura Wi-Fi</label>
+    <label class="check"><input checked type="checkbox"> Reservar 10% de portas</label>
+  </div>
+  <button class="update" onclick="updateProject()">Atualizar Projeto ↻</button>
+</aside>
+
+<main class="center">
+  <div class="titlebar"><b>PLANTA FÍSICA — <span id="dim">20m × 15m (300 m²)</span></b><div class="tools"><button class="tool active">⌁ Selecionar</button><button class="tool">✣ Mover</button><button class="tool">⊕ Adicionar</button><button class="tool">⌾ Conectar</button><button class="tool">↔ Medir</button><button class="tool">− 100% +</button><button class="tool">⛶</button></div></div>
+  <div class="canvas" id="canvas">
+    <div class="grid"></div>
+    <div class="plan" id="plan">
+      <div class="serverRoom"><div class="roomLabel">SALA DE SERVIDORES</div><div class="ac"></div><div class="rack2d"></div></div>
+      <div id="furniture"></div>
+      <div class="ap ap1"></div><div class="ap ap2"></div><div class="ap ap3"></div><div class="ap ap4"></div>
+      <div class="port p1"></div><div class="port p2"></div><div class="port p3"></div><div class="port p4"></div><div class="port p5"></div><div class="port p6"></div><div class="port p7"></div><div class="port p8"></div>
+      <div id="cables"></div>
+      <div class="legend"><span>▣ Computador</span><span><i class="greenDot"></i> Access Point</span><span>▤ Rack</span><span>▭ Switch</span><span><i></i> Cabo de rede Cat6</span><span>□ Porta de rede</span></div>
+    </div>
+    <div class="view3d" id="view3d"><div id="three"></div><button class="toggle3d" onclick="toggle3d()">← Voltar para 2D</button></div>
+  </div>
+  <div class="bottomGrid">
+    <div class="mini"><h4>Topologia lógica</h4><div class="topology"><div class="node">Internet<br>◎</div><div class="links">→</div><div class="node">Firewall<br>▣</div><div class="links">→</div><div class="node core">Switch 48p<br>▤</div></div></div>
+    <div class="mini"><h4>Detalhes do dispositivo</h4><div class="device"><b>Computador 08</b><span>IP 192.168.1.108 · 1 Gbps · Cabo 18 m · Porta 08</span></div><div class="device"><b>Servidor 01</b><span>Online · Rack 24U · Ambiente climatizado</span></div></div>
+    <div class="mini"><h4>Métricas do projeto</h4><div class="bars"><div><div class="barLabel"><span>Portas utilizadas</span><b id="used">39 / 48</b></div><div class="bar"><span id="usedbar" style="width:81%"></span></div></div><div><div class="barLabel"><span>Cobertura Wi-Fi</span><b>98%</b></div><div class="bar"><span style="width:98%"></span></div></div><div><div class="barLabel"><span>Cabeamento total</span><b id="meters">582 m</b></div><div class="bar"><span style="width:86%"></span></div></div></div></div>
+  </div>
+</main>
+
+<aside class="right">
+  <h2>RESUMO DO PROJETO</h2>
+  <div class="summary">
+    <div class="sum"><span>👤 Funcionários</span><b id="sPeople">35 pessoas</b></div>
+    <div class="sum"><span>▣ Computadores</span><b id="sPc">30 unidades</b></div>
+    <div class="sum"><span>▤ Servidores</span><b id="sServers">2 unidades</b></div>
+    <div class="sum"><span>◉ Access Points</span><b id="sAp">4 unidades</b></div>
+    <div class="sum"><span>▣ Impressoras</span><b id="sPrinters">2 unidades</b></div>
+    <div class="sum"><span>⌁ Pontos de rede</span><b id="sPoints">40 pontos</b></div>
+    <div class="sum"><span>▭ Switch recomendado</span><b>48 portas</b></div>
+    <div class="sum"><span>▤ Patch Panel</span><b>48 portas</b></div>
+    <div class="sum"><span>━ Cabo de rede (Cat6)</span><b id="sCable">582 m</b></div>
+  </div>
+  <div class="section"><h3>Análise do projeto</h3>
+    <div class="summary">
+      <div class="sum"><span>● Cobertura Wi-Fi</span><b class="ok">98% da área</b></div>
+      <div class="sum"><span>● Portas do switch</span><b class="ok">81% utilizadas</b></div>
+      <div class="sum"><span>● Sala de servidores</span><b class="ok">OK</b></div>
+      <div class="sum"><span>● Temperatura ideal</span><b class="ok">18°C – 22°C</b></div>
+    </div>
+  </div>
+  <div class="recommend"><b>💡 RECOMENDAÇÕES</b><br>Projeto dentro dos padrões recomendados. Infraestrutura adequada para o ambiente.</div>
+  <div class="materials section"><h3>Materiais e equipamentos</h3>
+    <div class="mat"><span>Switch 48 portas Gigabit</span><b>R$ 2.800</b></div>
+    <div class="mat"><span>Patch Panel 48 portas</span><b>R$ 650</b></div>
+    <div class="mat"><span>Cabo Cat6 (caixa 305m) ×2</span><b>R$ 1.500</b></div>
+    <div class="mat"><span>Conector RJ45 Cat6 ×100</span><b>R$ 250</b></div>
+    <div class="mat"><span>Tomada RJ45 ×40</span><b>R$ 600</b></div>
+    <div class="mat"><span>Rack 24U</span><b>R$ 1.200</b></div>
+    <div class="mat"><span>Nobreak 3kVA</span><b>R$ 1.800</b></div>
+    <div class="mat"><span>Access Point Dual Band ×4</span><b>R$ 1.800</b></div>
+    <div class="total"><span>Total Estimado</span><span id="total">R$ 9.420,00</span></div>
+  </div>
+</aside>
+</div>
+<footer class="statusBar"><span><b>●</b> Projeto salvo automaticamente</span><span>Zoom: 100% · Coordenadas: X: 12,45 m | Y: 8,30 m</span><span><b>2D</b> &nbsp; 3D &nbsp; ▣ Relatório Técnico</span></footer>
+</div>
+
+<script>
+const state={people:0,pc:0,servers:2,ap:0,printers:2,desks:0,chairs:0};
+function capacityFromArea(){
+  const w=Math.max(1,+document.getElementById('w').value||20);
+  const l=Math.max(1,+document.getElementById('l').value||15);
+  const area=w*l;
+
+  // Regra de dimensionamento do protótipo:
+  // 1 estação de trabalho para aproximadamente cada 6 m² úteis.
+  // O valor é uma estimativa de projeto, não uma regra normativa.
+  return Math.max(1,Math.floor(area/6));
+}
+function updateCounters(){
+  ['people','pc','ap','desks','chairs'].forEach(k=>{
+    const el=document.getElementById(k);
+    if(el) el.textContent=state[k];
+  });
+}
+function renderFurniture(){
+  const holder=document.getElementById('furniture');
+  if(!holder)return;
+  holder.innerHTML='';
+
+  // Reserva visual da sala de servidores: 23% da largura.
+  const usableX0=8, usableX1=68;
+  const usableY0=10, usableY1=80;
+  const count=state.desks;
+
+  // Grade adaptativa para distribuir as estações conforme o espaço.
+  const cols=Math.max(1,Math.ceil(Math.sqrt(count*1.45)));
+  const rows=Math.max(1,Math.ceil(count/cols));
+  const dx=(usableX1-usableX0)/Math.max(1,cols-1);
+  const dy=(usableY1-usableY0)/Math.max(1,rows-1);
+
+  for(let i=0;i<count;i++){
+    const col=i%cols, row=Math.floor(i/cols);
+    const x=cols===1?(usableX0+usableX1)/2:usableX0+col*dx;
+    const y=rows===1?(usableY0+usableY1)/2:usableY0+row*dy;
+
+    const desk=document.createElement('div');
+    desk.className='workstation';
+    desk.style.left=`${Math.min(65,Math.max(5,x))}%`;
+    desk.style.top=`${Math.min(78,Math.max(8,y))}%`;
+    desk.innerHTML='<div class="monitor"></div><div class="chair"></div><div class="person"></div>';
+    desk.title=`Estação ${i+1}: computador + mesa + cadeira + funcionário`;
+    holder.appendChild(desk);
+  }
+}
+function updateProject(){
+  const w=Math.max(1,+document.getElementById('w').value||20);
+  const l=Math.max(1,+document.getElementById('l').value||15);
+  const area=w*l;
+
+  // Funcionários, computadores, mesas e cadeiras passam a acompanhar
+  // automaticamente a capacidade estimada do ambiente.
+  const capacity=capacityFromArea();
+  state.people=capacity;
+  state.pc=capacity;
+  state.desks=capacity;
+  state.chairs=capacity;
+  state.ap=Math.max(1,Math.ceil(area/75));
+
+  updateCounters();
+  renderFurniture();
+
+  const points=state.pc+state.printers+state.servers*2;
+  const meters=Math.round(area*1.94);
+
+  document.getElementById('dim').textContent=`${w}m × ${l}m (${area} m²)`;
+  document.getElementById('sPeople').textContent=state.people+' pessoas';
+  document.getElementById('sPc').textContent=state.pc+' unidades';
+  document.getElementById('sServers').textContent=state.servers+' unidades';
+  document.getElementById('sAp').textContent=state.ap+' unidades';
+  document.getElementById('sPrinters').textContent=state.printers+' unidades';
+  document.getElementById('sPoints').textContent=points+' pontos';
+  document.getElementById('sCable').textContent=meters+' m';
+  document.getElementById('meters').textContent=meters+' m';
+
+  const used=Math.min(48,points+state.ap);
+  document.getElementById('used').textContent=`${used} / 48`;
+  document.getElementById('usedbar').style.width=(used/48*100)+'%';
+
+  const note=document.getElementById('capacityNote');
+  if(note) note.textContent=`Capacidade estimada: ${capacity} estações de trabalho (${capacity} funcionários, computadores, mesas e cadeiras).`;
+}
+function chg(k,v){
+  // Funcionários, PCs, mesas e cadeiras são vinculados ao espaço.
+  if(['people','pc','desks','chairs'].includes(k)) return;
+  state[k]=Math.max(0,state[k]+v);
+  updateCounters();
+}
+function drawCables(){
+  const target=document.getElementById('cables');
+  target.innerHTML='';
+
+  // Rotas organizadas em 90°: rack → corredor/tronco → ponto de rede.
+  const rack={x:77,y:53};
+  const pts=[
+    [19,22],[40,22],[61,22],
+    [19,53],[40,53],[61,53],
+    [19,81],[40,81]
+  ];
+
+  function segment(x1,y1,x2,y2){
+    const el=document.createElement('div');
+    el.className='cable';
+    const dx=x2-x1, dy=y2-y1;
+    const len=Math.hypot(dx,dy);
+    el.style.left=x1+'%';
+    el.style.top=y1+'%';
+    el.style.width=len+'%';
+    el.style.transform=`rotate(${Math.atan2(dy,dx)*180/Math.PI}deg)`;
+    target.appendChild(el);
+  }
+
+  pts.forEach((p,i)=>{
+    // Cada cabo possui um pequeno corredor próprio para evitar a "teia" de fios.
+    const trunkX=74.5 + i*0.28;
+
+    // Saída do rack para o corredor.
+    segment(rack.x,rack.y,trunkX,rack.y);
+
+    // Subida/descida vertical.
+    segment(trunkX,rack.y,trunkX,p[1]);
+
+    // Trecho horizontal até a tomada.
+    segment(trunkX,p[1],p[0],p[1]);
+  });
+}
+drawCables();
+
+let scene,camera,renderer,room3d;
+function init3D(){
+  if(!window.THREE)return;
+  const host=document.getElementById('three');
+  scene=new THREE.Scene();scene.background=new THREE.Color(0x071018);
+  camera=new THREE.PerspectiveCamera(45,host.clientWidth/host.clientHeight,.1,1000);camera.position.set(14,12,16);
+  renderer=new THREE.WebGLRenderer({antialias:true});renderer.setSize(host.clientWidth,host.clientHeight);renderer.setPixelRatio(devicePixelRatio);host.appendChild(renderer.domElement);
+  scene.add(new THREE.HemisphereLight(0xffffff,0x183326,2));
+  const light=new THREE.DirectionalLight(0xffffff,2);light.position.set(5,12,8);scene.add(light);
+  room3d=new THREE.Group();scene.add(room3d);
+  const floor=new THREE.Mesh(new THREE.BoxGeometry(20,.15,15),new THREE.MeshStandardMaterial({color:0xdfe8e2}));room3d.add(floor);
+  [[0,1.5,-7.5,20,3,.15],[-10,1.5,0,.15,3,15],[10,1.5,0,.15,3,15]].forEach(a=>{const m=new THREE.Mesh(new THREE.BoxGeometry(a[3],a[4],a[5]),new THREE.MeshStandardMaterial({color:0xf5f7f5,transparent:true,opacity:.85}));m.position.set(a[0],a[1],a[2]);room3d.add(m)});
+  const rack=new THREE.Mesh(new THREE.BoxGeometry(1,2.8,1),new THREE.MeshStandardMaterial({color:0x151c20}));rack.position.set(8.2,1.4,4);room3d.add(rack);
+  const count=state.desks;
+  const cols=Math.max(1,Math.ceil(Math.sqrt(count*1.45)));
+  const rows=Math.max(1,Math.ceil(count/cols));
+  for(let i=0;i<count;i++){
+    const col=i%cols,row=Math.floor(i/cols);
+    const x=cols===1?0:-6.5+col*(13/Math.max(1,cols-1));
+    const z=rows===1?0:-5+row*(10/Math.max(1,rows-1));
+    const p=[x,z];
+    const desk=new THREE.Mesh(new THREE.BoxGeometry(2,0.15,1),new THREE.MeshStandardMaterial({color:0xc99a64}));desk.position.set(p[0],.8,p[1]);room3d.add(desk);
+    const mon=new THREE.Mesh(new THREE.BoxGeometry(.6,.45,.08),new THREE.MeshStandardMaterial({color:0x17221c}));mon.position.set(p[0],1.1,p[1]-.2);room3d.add(mon);
+    const start=new THREE.Vector3(8,1.05,4),end=new THREE.Vector3(p[0],1.0,p[1]);
+    const dir=end.clone().sub(start),geo=new THREE.CylinderGeometry(.035,.035,dir.length(),8),mat=new THREE.MeshStandardMaterial({color:0x3aa8ff,emissive:0x062e52,roughness:.7});
+    const cable=new THREE.Mesh(geo,mat);cable.position.copy(start.clone().add(end).multiplyScalar(.5));cable.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),dir.normalize());room3d.add(cable);
+  }
+  animate3D();
+}
+function animate3D(){requestAnimationFrame(animate3D);if(room3d)room3d.rotation.y+=.0015;renderer.render(scene,camera)}
+function toggle3d(){document.getElementById('view3d').classList.toggle('active');if(!scene)init3D()}
+function exportReport(){window.print()}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script>setTimeout(()=>{updateProject(); if(!scene)init3D()},100)</script>
+</body>
+</html>
