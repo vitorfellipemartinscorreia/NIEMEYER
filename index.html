@@ -4,88 +4,99 @@
 <meta charset="UTF-8">
 <title>Sala 3D — Cabeamento Estruturado ISO/IEC 11801</title>
 <style>
-  html, body { margin: 0; padding: 0; overflow: hidden; background: #1a1a1a; font-family: Arial, sans-serif; }
-  #canvas-container { width: 100vw; height: 100vh; display: block; }
-  #controls-ui {
-    position: absolute; top: 12px; right: 12px; z-index: 10;
-    display: flex; flex-direction: column; gap: 6px; align-items: flex-end;
-  }
-  .btn {
-    background: #1e88e5; color: #fff; border: none; padding: 8px 12px;
-    font-size: 11px; font-weight: bold; border-radius: 6px; cursor: pointer;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.3); transition: background 0.2s; min-width: 190px; text-align: left;
-  }
-  .btn:hover { background: #1565c0; }
-  .btn-group {
-    display: flex; gap: 4px; background: rgba(0,0,0,0.6); padding: 4px; border-radius: 6px;
-  }
-  .btn-sub {
-    background: #424242; color: #fff; border: none; padding: 5px 8px;
-    font-size: 10px; font-weight: bold; border-radius: 4px; cursor: pointer;
-  }
-  .btn-sub:hover { background: #616161; }
-  .btn-sub-danger { background: #d32f2f; }
-  .btn-sub-danger:hover { background: #b71c1c; }
-  #legend {
-    position: absolute; bottom: 12px; left: 12px; color: #eee; font-size: 11px;
-    background: rgba(0,0,0,0.85); padding: 10px 14px; border-radius: 8px; line-height: 1.5;
-  }
-  .dot { display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:6px; }
+  html, body { margin: 0; padding: 0; overflow: hidden; background: #1a1a1a; font-family: Arial, sans-serif; }
+  #canvas-container { width: 100vw; height: 100vh; display: block; }
+  #info {
+    position: absolute; top: 12px; left: 12px; color: #eee; font-size: 13px;
+    background: rgba(0,0,0,0.85); padding: 12px 16px; border-radius: 8px; line-height: 1.5;
+    pointer-events: none; border-left: 4px solid #1e88e5;
+  }
+  #controls-ui {
+    position: absolute; top: 12px; right: 12px; z-index: 10;
+    display: flex; flex-direction: column; gap: 6px; align-items: flex-end;
+  }
+  .btn {
+    background: #1e88e5; color: #fff; border: none; padding: 8px 12px;
+    font-size: 11px; font-weight: bold; border-radius: 6px; cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3); transition: background 0.2s; min-width: 190px; text-align: left;
+  }
+  .btn:hover { background: #1565c0; }
+  .btn-group {
+    display: flex; gap: 4px; background: rgba(0,0,0,0.6); padding: 4px; border-radius: 6px;
+  }
+  .btn-sub {
+    background: #424242; color: #fff; border: none; padding: 5px 8px;
+    font-size: 10px; font-weight: bold; border-radius: 4px; cursor: pointer;
+  }
+  .btn-sub:hover { background: #616161; }
+  .btn-sub-danger { background: #d32f2f; }
+  .btn-sub-danger:hover { background: #b71c1c; }
+  #legend {
+    position: absolute; bottom: 12px; left: 12px; color: #eee; font-size: 11px;
+    background: rgba(0,0,0,0.85); padding: 10px 14px; border-radius: 8px; line-height: 1.5;
+  }
+  .dot { display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:6px; }
 </style>
 </head>
 <body>
 <div id="canvas-container"></div>
 
 <div id="controls-ui">
-  <div class="btn-group">
-    <button class="btn-sub" onclick="adjustDimension('width', 1)">↔️ + Largura</button>
-    <button class="btn-sub btn-sub-danger" onclick="adjustDimension('width', -1)">↔️ - Largura</button>
-  </div>
-  <div class="btn-group">
-    <button class="btn-sub" onclick="adjustDimension('depth', 1)">↕️ + Comprimento</button>
-    <button class="btn-sub btn-sub-danger" onclick="adjustDimension('depth', -1)">↕️ - Comprimento</button>
-  </div>
-  <div class="btn-group">
-    <button class="btn-sub" onclick="adjustDimension('height', 0.5)">⬆️ + Pé-Direito</button>
-    <button class="btn-sub btn-sub-danger" onclick="adjustDimension('height', -0.5)">⬇️ - Pé-Direito</button>
-  </div>
+  <div class="btn-group">
+    <button class="btn-sub" onclick="adjustDimension('width', 1)">↔️ + Largura</button>
+    <button class="btn-sub btn-sub-danger" onclick="adjustDimension('width', -1)">↔️ - Largura</button>
+  </div>
+  <div class="btn-group">
+    <button class="btn-sub" onclick="adjustDimension('depth', 1)">↕️ + Comprimento</button>
+    <button class="btn-sub btn-sub-danger" onclick="adjustDimension('depth', -1)">↕️ - Comprimento</button>
+  </div>
+  <div class="btn-group">
+    <button class="btn-sub" onclick="adjustDimension('height', 0.5)">⬆️ + Pé-Direito</button>
+    <button class="btn-sub btn-sub-danger" onclick="adjustDimension('height', -0.5)">⬇️ - Pé-Direito</button>
+  </div>
 
-  <button class="btn" onclick="applyIsoLayout()">🔄 Reorganizar Layout (Norte)</button>
-  
-  <div class="btn-group">
-    <button class="btn-sub" onclick="addFullStation()">➕ Estação</button>
-    <button class="btn-sub btn-sub-danger" onclick="removeFullStation()">➖ Estação</button>
-  </div>
+  <button class="btn" onclick="applyIsoLayout()">🔄 Reorganizar Layout (Norte)</button>
+  
+  <div class="btn-group">
+    <button class="btn-sub" onclick="addFullStation()">➕ Estação</button>
+    <button class="btn-sub btn-sub-danger" onclick="removeFullStation()">➖ Estação</button>
+  </div>
 
-  <div class="btn-group">
-    <button class="btn-sub" onclick="addSingleItem('desk')">+ Mesa</button>
-    <button class="btn-sub btn-sub-danger" onclick="removeSingleItem('desk')">- Mesa</button>
-    <button class="btn-sub" onclick="addSingleItem('chair')">+ Cadeira</button>
-    <button class="btn-sub btn-sub-danger" onclick="removeSingleItem('chair')">- Cadeira</button>
-  </div>
+  <div class="btn-group">
+    <button class="btn-sub" onclick="addSingleItem('desk')">+ Mesa</button>
+    <button class="btn-sub btn-sub-danger" onclick="removeSingleItem('desk')">- Mesa</button>
+    <button class="btn-sub" onclick="addSingleItem('chair')">+ Cadeira</button>
+    <button class="btn-sub btn-sub-danger" onclick="removeSingleItem('chair')">- Cadeira</button>
+  </div>
 
-  <div class="btn-group">
-    <button class="btn-sub" onclick="addSingleItem('monitor')">+ Monitor</button>
-    <button class="btn-sub btn-sub-danger" onclick="removeSingleItem('monitor')">- Monitor</button>
-    <button class="btn-sub" onclick="addSingleItem('pc')">+ Gabinete</button>
-    <button class="btn-sub btn-sub-danger" onclick="removeSingleItem('pc')">- Gabinete</button>
-  </div>
+  <div class="btn-group">
+    <button class="btn-sub" onclick="addSingleItem('monitor')">+ Monitor</button>
+    <button class="btn-sub btn-sub-danger" onclick="removeSingleItem('monitor')">- Monitor</button>
+    <button class="btn-sub" onclick="addSingleItem('pc')">+ Gabinete</button>
+    <button class="btn-sub btn-sub-danger" onclick="removeSingleItem('pc')">- Gabinete</button>
+  </div>
 
-  <div class="btn-group">
-    <button class="btn-sub" onclick="addSingleItem('keyboard')">+ Teclado</button>
-    <button class="btn-sub btn-sub-danger" onclick="removeSingleItem('keyboard')">- Teclado</button>
-    <button class="btn-sub" onclick="addSingleItem('mouse')">+ Mouse</button>
-    <button class="btn-sub btn-sub-danger" onclick="removeSingleItem('mouse')">- Mouse</button>
-  </div>
+  <div class="btn-group">
+    <button class="btn-sub" onclick="addSingleItem('keyboard')">+ Teclado</button>
+    <button class="btn-sub btn-sub-danger" onclick="removeSingleItem('keyboard')">- Teclado</button>
+    <button class="btn-sub" onclick="addSingleItem('mouse')">+ Mouse</button>
+    <button class="btn-sub btn-sub-danger" onclick="removeSingleItem('mouse')">- Mouse</button>
+  </div>
+</div>
+
+<div id="info">
+  <strong>Data Center + Escritório (ISO/IEC 11801)</strong><br>
+  <span id="room-status">Dimensões: 14m x 10m x 3.2m | Cap. Máx: 8 Estações</span><br>
+  <strong>Data Center:</strong> Racks de Servidores, Rede, Nobreak e Cabeamento ISO.
 </div>
 
 <div id="legend">
-  <strong>Padrão de Cores ISO/IEC 11801:</strong><br>
-  <span class="dot" style="background:#1e88e5"></span>ISO: Cabeamento Horizontal de Dados (Cat6a) - <span id="len-data">0.0m</span><br>
-  <span class="dot" style="background:#43a047"></span>ISO: Gerenciamento OOB e Redes Críticas (Verde) - <span id="len-mgmt">0.0m</span><br>
-  <span class="dot" style="background:#fdd835"></span>ISO: Backbone de Fibra Óptica (Monomodo/OM4) - <span id="len-fiber">0.0m</span><br>
-  <span class="dot" style="background:#9e9e9e"></span>ISO: Patch Cords das Estações (Cinza) - <span id="len-patch">0.0m</span><br>
-  <strong>Comprimento Total de Cabos: <span id="len-total" style="color:#1e88e5">0.0m</span></strong>
+  <strong>Padrão de Cores ISO/IEC 11801:</strong><br>
+  <span class="dot" style="background:#1e88e5"></span>ISO: Cabeamento Horizontal de Dados (Cat6a) - <span id="len-data">0.0m</span><br>
+  <span class="dot" style="background:#43a047"></span>ISO: Gerenciamento OOB e Redes Críticas (Verde) - <span id="len-mgmt">0.0m</span><br>
+  <span class="dot" style="background:#fdd835"></span>ISO: Backbone de Fibra Óptica (Monomodo/OM4) - <span id="len-fiber">0.0m</span><br>
+  <span class="dot" style="background:#9e9e9e"></span>ISO: Patch Cords das Estações (Cinza) - <span id="len-patch">0.0m</span><br>
+  <strong>Comprimento Total de Cabos: <span id="len-total" style="color:#1e88e5">0.0m</span></strong>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -114,763 +125,711 @@ const cableMeshes = [];
 let stationCounter = 0;
 
 function getMaxCapacity() {
-  const usableWidth = roomWidth - 4;
-  const usableDepth = roomDepth - 4;
-  return Math.max(1, Math.floor((usableWidth * usableDepth) / 5));
+  const usableWidth = roomWidth - 4;
+  const usableDepth = roomDepth - 4;
+  return Math.max(1, Math.floor((usableWidth * usableDepth) / 5));
 }
 
 function updateStatusUI() {
-  const capacity = getMaxCapacity();
-  let totalLength = 0;
-  cableMeshes.forEach(item => {
-    if (item.userData && item.userData.cableLength) {
-      totalLength += item.userData.cableLength;
-    }
-  });
+  const capacity = getMaxCapacity();
+  let totalLength = 0;
+  cableMeshes.forEach(item => {
+    if (item.userData && item.userData.cableLength) {
+      totalLength += item.userData.cableLength;
+    }
+  });
 
-  const statusElem = document.getElementById('room-status');
-  if (statusElem) {
-    statusElem.innerHTML = 
-      `Dimensões: ${roomWidth}m x ${roomDepth}m x ${roomHeight.toFixed(1)}m | Cap. Máx: ${capacity} Estações | Atuais: ${deskGroups.length} | Cabos Total: ${totalLength.toFixed(2)}m`;
-  }
+  document.getElementById('room-status').innerHTML = 
+    `Dimensões: ${roomWidth}m x ${roomDepth}m x ${roomHeight.toFixed(1)}m | Cap. Máx: ${capacity} Estações | Atuais: ${deskGroups.length} | Cabos Total: ${totalLength.toFixed(2)}m`;
 }
 
 function adjustDimension(param, delta) {
-  if (param === 'width') {
-    roomWidth = Math.max(8, roomWidth + delta);
-  } else if (param === 'depth') {
-    roomDepth = Math.max(6, roomDepth + delta);
-  } else if (param === 'height') {
-    roomHeight = Math.max(2.5, Math.min(6.0, roomHeight + delta));
-  }
-  
-  buildOfficeRoom();
-  if (officeRackGroup) {
-    officeRackGroup.position.set(roomWidth/2 - 0.8, roomHeight - 1.5, -roomDepth/2 + 0.8);
-  }
-  applyIsoLayout();
-  updateStatusUI();
+  if (param === 'width') {
+    roomWidth = Math.max(8, roomWidth + delta);
+  } else if (param === 'depth') {
+    roomDepth = Math.max(6, roomDepth + delta);
+  } else if (param === 'height') {
+    roomHeight = Math.max(2.5, Math.min(6.0, roomHeight + delta));
+  }
+  
+  buildOfficeRoom();
+  if (officeRackGroup) {
+    officeRackGroup.position.set(roomWidth/2 - 0.8, roomHeight - 1.5, -roomDepth/2 + 0.8);
+  }
+  applyIsoLayout();
+  updateStatusUI();
 }
 
 function init() {
-  scene = new THREE.Scene();
-  scene.background = new THREE.Color(0xdbe4ea);
-  scene.fog = new THREE.Fog(0xdbe4ea, 20, 60);
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0xdbe4ea);
+  scene.fog = new THREE.Fog(0xdbe4ea, 20, 60);
 
-  const container = document.getElementById('canvas-container');
-  camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 120);
-  camera.position.set(12, 14, 20);
+  const container = document.getElementById('canvas-container');
+  camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 120);
+  camera.position.set(12, 14, 20);
 
-  renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-  container.appendChild(renderer.domElement);
-  enableObjectDragging();
+  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  container.appendChild(renderer.domElement);
+  enableObjectDragging();
 
-  controls = new THREE.OrbitControls(camera, renderer.domElement);
-  controls.target.set(-2, 1, 0);
-  controls.enableDamping = true;
-  controls.dampingFactor = 0.08;
-  controls.maxPolarAngle = Math.PI / 2.05;
-  controls.update();
+  controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.target.set(-2, 1, 0);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.08;
+  controls.maxPolarAngle = Math.PI / 2.05;
+  controls.update();
 
-  const hemi = new THREE.HemisphereLight(0xffffff, 0x444444, 0.85);
-  scene.add(hemi);
-  const dir = new THREE.DirectionalLight(0xffffff, 0.9);
-  dir.position.set(10, 16, 10);
-  dir.castShadow = true;
-  dir.shadow.mapSize.set(2048, 2048);
-  scene.add(dir);
+  const hemi = new THREE.HemisphereLight(0xffffff, 0x444444, 0.85);
+  scene.add(hemi);
+  const dir = new THREE.DirectionalLight(0xffffff, 0.9);
+  dir.position.set(10, 16, 10);
+  dir.castShadow = true;
+  dir.shadow.mapSize.set(2048, 2048);
+  scene.add(dir);
 
-  buildOfficeRoom();
-  buildFurniture();
-  buildOfficeRack();
+  buildOfficeRoom();
+  buildFurniture();
+  buildOfficeRack();
 
-  const dcGroup = new THREE.Group();
-  dcGroup.position.copy(DC_OFFSET);
-  buildDataCenterRoom(dcGroup);
-  buildRaisedFloorTiles(dcGroup);
+  const dcGroup = new THREE.Group();
+  dcGroup.position.copy(DC_OFFSET);
+  buildDataCenterRoom(dcGroup);
+  buildRaisedFloorTiles(dcGroup);
 
-  buildRack(dcGroup, -1.2, -1.2, 0);
-  buildRack(dcGroup, 0.0, -1.2, 0);
-  buildUpsRack(dcGroup, 1.2, -1.2, 0);
+  buildRack(dcGroup, -1.2, -1.2, 0);
+  buildRack(dcGroup, 0.0, -1.2, 0);
+  buildUpsRack(dcGroup, 1.2, -1.2, 0);
 
-  buildIsoDcCabling(dcGroup);
-  scene.add(dcGroup);
+  buildIsoDcCabling(dcGroup);
+  scene.add(dcGroup);
 
-  rebuildIsoCabling();
-  updateStatusUI();
+  rebuildIsoCabling();
+  updateStatusUI();
 
-  window.addEventListener('resize', onResize);
-  animate();
+  window.addEventListener('resize', onResize);
+  animate();
 }
 
 function onResize() {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updatePrecisionMatrix ? camera.updatePrecisionMatrix() : camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updatePrecisionMatrix ? camera.updatePrecisionMatrix() : camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
 function buildWallWithOpenings(width, height, openings, mat) {
-  const shape = new THREE.Shape();
-  shape.moveTo(-width/2, 0);
-  shape.lineTo(width/2, 0);
-  shape.lineTo(width/2, height);
-  shape.lineTo(-width/2, height);
-  shape.lineTo(-width/2, 0);
-  openings.forEach(o => {
-    const x0 = o.cx - o.w/2, y0 = o.sill, x1 = o.cx + o.w/2, y1 = o.sill + o.h;
-    const hole = new THREE.Path();
-    hole.moveTo(x0, y0); hole.lineTo(x1, y0); hole.lineTo(x1, y1); hole.lineTo(x0, y1); hole.lineTo(x0, y0);
-    shape.holes.push(hole);
-  });
-  const geo = new THREE.ExtrudeGeometry(shape, { depth: WALL_T, bevelEnabled: false });
-  const mesh = new THREE.Mesh(geo, mat);
-  mesh.castShadow = true;
-  mesh.receiveShadow = true;
-  return mesh;
+  const shape = new THREE.Shape();
+  shape.moveTo(-width/2, 0);
+  shape.lineTo(width/2, 0);
+  shape.lineTo(width/2, height);
+  shape.lineTo(-width/2, height);
+  shape.lineTo(-width/2, 0);
+  openings.forEach(o => {
+    const x0 = o.cx - o.w/2, y0 = o.sill, x1 = o.cx + o.w/2, y1 = o.sill + o.h;
+    const hole = new THREE.Path();
+    hole.moveTo(x0, y0); hole.lineTo(x1, y0); hole.lineTo(x1, y1); hole.lineTo(x0, y1); hole.lineTo(x0, y0);
+    shape.holes.push(hole);
+  });
+  const geo = new THREE.ExtrudeGeometry(shape, { depth: WALL_T, bevelEnabled: false });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  return mesh;
 }
 
 function createRealWindowFrame(width, height) {
-  const group = new THREE.Group();
-  const frameMat = new THREE.MeshStandardMaterial({ color: 0x333333, metalness: 0.8, roughness: 0.2 });
-  const glassMat = new THREE.MeshStandardMaterial({ color: 0x88ccee, transparent: true, opacity: 0.4, roughness: 0.1 });
+  const group = new THREE.Group();
+  const frameMat = new THREE.MeshStandardMaterial({ color: 0x333333, metalness: 0.8, roughness: 0.2 });
+  const glassMat = new THREE.MeshStandardMaterial({ color: 0x88ccee, transparent: true, opacity: 0.4, roughness: 0.1 });
 
-  const frameThickness = 0.06;
-  const frameDepth = WALL_T + 0.02;
+  const frameThickness = 0.06;
+  const frameDepth = WALL_T + 0.02;
 
-  const top = new THREE.Mesh(new THREE.BoxGeometry(width, frameThickness, frameDepth), frameMat);
-  top.position.set(0, height/2 - frameThickness/2, 0);
-  const bottom = new THREE.Mesh(new THREE.BoxGeometry(width, frameThickness, frameDepth), frameMat);
-  bottom.position.set(0, -height/2 + frameThickness/2, 0);
-  const left = new THREE.Mesh(new THREE.BoxGeometry(frameThickness, height, frameDepth), frameMat);
-  left.position.set(-width/2 + frameThickness/2, 0, 0);
-  const right = new THREE.Mesh(new THREE.BoxGeometry(frameThickness, height, frameDepth), frameMat);
-  right.position.set(width/2 - frameThickness/2, 0, 0);
+  const top = new THREE.Mesh(new THREE.BoxGeometry(width, frameThickness, frameDepth), frameMat);
+  top.position.set(0, height/2 - frameThickness/2, 0);
+  const bottom = new THREE.Mesh(new THREE.BoxGeometry(width, frameThickness, frameDepth), frameMat);
+  bottom.position.set(0, -height/2 + frameThickness/2, 0);
+  const left = new THREE.Mesh(new THREE.BoxGeometry(frameThickness, height, frameDepth), frameMat);
+  left.position.set(-width/2 + frameThickness/2, 0, 0);
+  const right = new THREE.Mesh(new THREE.BoxGeometry(frameThickness, height, frameDepth), frameMat);
+  right.position.set(width/2 - frameThickness/2, 0, 0);
 
-  const glass = new THREE.Mesh(new THREE.BoxGeometry(width - 0.1, height - 0.1, 0.01), glassMat);
+  const glass = new THREE.Mesh(new THREE.BoxGeometry(width - 0.1, height - 0.1, 0.01), glassMat);
 
-  group.add(top, bottom, left, right, glass);
-  return group;
+  group.add(top, bottom, left, right, glass);
+  return group;
 }
 
 function createRealDoorFrame(width, height, isDouble = false) {
-  const group = new THREE.Group();
-  const frameMat = new THREE.MeshStandardMaterial({ color: 0x2c2c2c, metalness: 0.5, roughness: 0.5 });
-  const doorMat = new THREE.MeshStandardMaterial({ color: 0x5a3d28, roughness: 0.6 });
-  const handleMat = new THREE.MeshStandardMaterial({ color: 0xdddddd, metalness: 0.9, roughness: 0.1 });
+  const group = new THREE.Group();
+  const frameMat = new THREE.MeshStandardMaterial({ color: 0x2c2c2c, metalness: 0.5, roughness: 0.5 });
+  const doorMat = new THREE.MeshStandardMaterial({ color: 0x5a3d28, roughness: 0.6 });
+  const handleMat = new THREE.MeshStandardMaterial({ color: 0xdddddd, metalness: 0.9, roughness: 0.1 });
 
-  const frameT = 0.05;
-  const top = new THREE.Mesh(new THREE.BoxGeometry(width, frameT, WALL_T + 0.02), frameMat);
-  top.position.set(0, height - frameT/2, 0);
-  const left = new THREE.Mesh(new THREE.BoxGeometry(frameT, height, WALL_T + 0.02), frameMat);
-  left.position.set(-width/2 + frameT/2, height/2, 0);
-  const right = new THREE.Mesh(new THREE.BoxGeometry(frameT, height, WALL_T + 0.02), frameMat);
-  right.position.set(width/2 - frameT/2, height/2, 0);
-  group.add(top, left, right);
+  const frameT = 0.05;
+  const top = new THREE.Mesh(new THREE.BoxGeometry(width, frameT, WALL_T + 0.02), frameMat);
+  top.position.set(0, height - frameT/2, 0);
+  const left = new THREE.Mesh(new THREE.BoxGeometry(frameT, height, WALL_T + 0.02), frameMat);
+  left.position.set(-width/2 + frameT/2, height/2, 0);
+  const right = new THREE.Mesh(new THREE.BoxGeometry(frameT, height, WALL_T + 0.02), frameMat);
+  right.position.set(width/2 - frameT/2, height/2, 0);
+  group.add(top, left, right);
 
-  if (!isDouble) {
-    const door = new THREE.Mesh(new THREE.BoxGeometry(width - 0.08, height - 0.05, 0.04), doorMat);
-    door.position.set(0, (height - 0.05)/2, 0);
-    const handle = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.03, 0.08), handleMat);
-    handle.position.set((width/2) - 0.15, 1.0, 0.04);
-    group.add(door, handle);
-  } else {
-    const halfW = (width - 0.1) / 2;
-    const door1 = new THREE.Mesh(new THREE.BoxGeometry(halfW, height - 0.05, 0.04), doorMat);
-    door1.position.set(-halfW/2, (height - 0.05)/2, 0);
-    const door2 = new THREE.Mesh(new THREE.BoxGeometry(halfW, height - 0.05, 0.04), doorMat);
-    door2.position.set(halfW/2, (height - 0.05)/2, 0);
-    group.add(door1, door2);
-  }
-  return group;
+  if (!isDouble) {
+    const door = new THREE.Mesh(new THREE.BoxGeometry(width - 0.08, height - 0.05, 0.04), doorMat);
+    door.position.set(0, (height - 0.05)/2, 0);
+    const handle = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.03, 0.08), handleMat);
+    handle.position.set((width/2) - 0.15, 1.0, 0.04);
+    group.add(door, handle);
+  } else {
+    const halfW = (width - 0.1) / 2;
+    const door1 = new THREE.Mesh(new THREE.BoxGeometry(halfW, height - 0.05, 0.04), doorMat);
+    door1.position.set(-halfW/2, (height - 0.05)/2, 0);
+    const door2 = new THREE.Mesh(new THREE.BoxGeometry(halfW, height - 0.05, 0.04), doorMat);
+    door2.position.set(halfW/2, (height - 0.05)/2, 0);
+    group.add(door1, door2);
+  }
+  return group;
 }
 
 function buildOfficeRoom() {
-  if (roomMeshFloor) scene.remove(roomMeshFloor);
-  if (backWallMesh) scene.remove(backWallMesh);
-  if (leftWallMesh) scene.remove(leftWallMesh);
-  if (rightWallMesh) scene.remove(rightWallMesh);
+  if (roomMeshFloor) scene.remove(roomMeshFloor);
+  if (backWallMesh) scene.remove(backWallMesh);
+  if (leftWallMesh) scene.remove(leftWallMesh);
+  if (rightWallMesh) scene.remove(rightWallMesh);
 
-  windowFrames.forEach(f => scene.remove(f));
-  doorFrames.forEach(f => scene.remove(f));
-  windowFrames = [];
-  doorFrames = [];
+  windowFrames.forEach(f => scene.remove(f));
+  doorFrames.forEach(f => scene.remove(f));
+  windowFrames = [];
+  doorFrames = [];
 
-  const floorMat = new THREE.MeshStandardMaterial({ color: 0xc9bfa5, roughness: 0.8 });
-  roomMeshFloor = new THREE.Mesh(new THREE.PlaneGeometry(roomWidth, roomDepth), floorMat);
-  roomMeshFloor.rotation.x = -Math.PI / 2;
-  roomMeshFloor.receiveShadow = true;
-  scene.add(roomMeshFloor);
+  const floorMat = new THREE.MeshStandardMaterial({ color: 0xc9bfa5, roughness: 0.8 });
+  roomMeshFloor = new THREE.Mesh(new THREE.PlaneGeometry(roomWidth, roomDepth), floorMat);
+  roomMeshFloor.rotation.x = -Math.PI / 2;
+  roomMeshFloor.receiveShadow = true;
+  scene.add(roomMeshFloor);
 
-  const wallMat = new THREE.MeshStandardMaterial({ color: 0xf2efe9, roughness: 0.9 });
-  const winW = 1.6, winH = 1.3, sill = 0.9;
-  const doorW = 1.1, doorH = 2.15;
+  const wallMat = new THREE.MeshStandardMaterial({ color: 0xf2efe9, roughness: 0.9 });
+  const winW = 1.6, winH = 1.3, sill = 0.9;
+  const doorW = 1.1, doorH = 2.15;
 
-  backWallMesh = buildWallWithOpenings(roomWidth, roomHeight, [
-    { cx: -roomWidth/4, w: winW, h: winH, sill },
-    { cx: roomWidth/4,  w: winW, h: winH, sill },
-  ], wallMat);
-  backWallMesh.position.set(0, 0, -roomDepth/2 - WALL_T/2);
-  scene.add(backWallMesh);
+  backWallMesh = buildWallWithOpenings(roomWidth, roomHeight, [
+    { cx: -roomWidth/4, w: winW, h: winH, sill },
+    { cx: roomWidth/4,  w: winW, h: winH, sill },
+  ], wallMat);
+  backWallMesh.position.set(0, 0, -roomDepth/2 - WALL_T/2);
+  scene.add(backWallMesh);
 
-  const win1 = createRealWindowFrame(winW, winH);
-  win1.position.set(-roomWidth/4, sill + winH/2, -roomDepth/2);
-  scene.add(win1);
-  windowFrames.push(win1);
+  const win1 = createRealWindowFrame(winW, winH);
+  win1.position.set(-roomWidth/4, sill + winH/2, -roomDepth/2);
+  scene.add(win1);
+  windowFrames.push(win1);
 
-  const win2 = createRealWindowFrame(winW, winH);
-  win2.position.set(roomWidth/4, sill + winH/2, -roomDepth/2);
-  scene.add(win2);
-  windowFrames.push(win2);
+  const win2 = createRealWindowFrame(winW, winH);
+  win2.position.set(roomWidth/4, sill + winH/2, -roomDepth/2);
+  scene.add(win2);
+  windowFrames.push(win2);
 
-  leftWallMesh = buildWallWithOpenings(roomDepth, roomHeight, [
-    { cx: 0, w: doorW, h: doorH, sill: 0 },
-  ], wallMat);
-  leftWallMesh.rotation.y = Math.PI/2;
-  leftWallMesh.position.set(-roomWidth/2 - WALL_T/2, 0, 0);
-  scene.add(leftWallMesh);
+  leftWallMesh = buildWallWithOpenings(roomDepth, roomHeight, [
+    { cx: 0, w: doorW, h: doorH, sill: 0 },
+  ], wallMat);
+  leftWallMesh.rotation.y = Math.PI/2;
+  leftWallMesh.position.set(-roomWidth/2 - WALL_T/2, 0, 0);
+  scene.add(leftWallMesh);
 
-  const leftDoor = createRealDoorFrame(doorW, doorH);
-  leftDoor.rotation.y = Math.PI/2;
-  leftDoor.position.set(-roomWidth/2, 0, 0);
-  scene.add(leftDoor);
-  doorFrames.push(leftDoor);
+  const leftDoor = createRealDoorFrame(doorW, doorH);
+  leftDoor.rotation.y = Math.PI/2;
+  leftDoor.position.set(-roomWidth/2, 0, 0);
+  scene.add(leftDoor);
+  doorFrames.push(leftDoor);
 
-  rightWallMesh = buildWallWithOpenings(roomDepth, roomHeight, [
-    { cx: 0, w: winW, h: winH, sill },
-  ], wallMat);
-  rightWallMesh.rotation.y = -Math.PI/2;
-  rightWallMesh.position.set(roomWidth/2 + WALL_T/2, 0, 0);
-  scene.add(rightWallMesh);
+  rightWallMesh = buildWallWithOpenings(roomDepth, roomHeight, [
+    { cx: 0, w: winW, h: winH, sill },
+  ], wallMat);
+  rightWallMesh.rotation.y = -Math.PI/2;
+  rightWallMesh.position.set(roomWidth/2 + WALL_T/2, 0, 0);
+  scene.add(rightWallMesh);
 
-  const win3 = createRealWindowFrame(winW, winH);
-  win3.position.set(roomWidth/2, sill + winH/2, 0);
-  win3.rotation.y = -Math.PI/2;
-  scene.add(win3);
-  windowFrames.push(win3);
+  const win3 = createRealWindowFrame(winW, winH);
+  win3.position.set(roomWidth/2, sill + winH/2, 0);
+  win3.rotation.y = -Math.PI/2;
+  scene.add(win3);
+  windowFrames.push(win3);
 }
 
 function buildChairMesh() {
-  const chairMat = new THREE.MeshStandardMaterial({ color: 0x232323, roughness: 0.7 });
-  const chromeMat = new THREE.MeshStandardMaterial({ color: 0xeeeeee, roughness: 0.1, metalness: 0.95 });
-  const wheelDarkMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.4 });
-  const wheelRimMat = new THREE.MeshStandardMaterial({ color: 0xdddddd, roughness: 0.2, metalness: 0.8 });
+  const chairMat = new THREE.MeshStandardMaterial({ color: 0x232323, roughness: 0.7 });
+  const chromeMat = new THREE.MeshStandardMaterial({ color: 0xeeeeee, roughness: 0.1, metalness: 0.95 });
+  const wheelDarkMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.4 });
+  const wheelRimMat = new THREE.MeshStandardMaterial({ color: 0xdddddd, roughness: 0.2, metalness: 0.8 });
 
-  const chairGroup = new THREE.Group();
+  const chairGroup = new THREE.Group();
 
-  const seat = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.06, 0.45), chairMat);
-  seat.position.y = 0.45;
-  seat.castShadow = true;
-  chairGroup.add(seat);
+  const seat = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.06, 0.45), chairMat);
+  seat.position.y = 0.45;
+  seat.castShadow = true;
+  chairGroup.add(seat);
 
-  const back = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.5, 0.06), chairMat);
-  back.position.set(0, 0.7, 0.2);
-  back.castShadow = true;
-  chairGroup.add(back);
+  const back = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.5, 0.06), chairMat);
+  back.position.set(0, 0.7, 0.2);
+  back.castShadow = true;
+  chairGroup.add(back);
 
-  const centerPole = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.25), chromeMat);
-  centerPole.position.y = 0.295;
-  centerPole.castShadow = true;
-  chairGroup.add(centerPole);
+  const centerPole = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.25), chromeMat);
+  centerPole.position.y = 0.295;
+  centerPole.castShadow = true;
+  chairGroup.add(centerPole);
 
-  const baseCenter = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 0.06), chromeMat);
-  baseCenter.position.y = 0.17;
-  chairGroup.add(baseCenter);
+  const baseCenter = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 0.06), chromeMat);
+  baseCenter.position.y = 0.17;
+  chairGroup.add(baseCenter);
 
-  const numLegs = 5;
-  const legRadius = 0.24;
+  const numLegs = 5;
+  const legRadius = 0.24;
 
-  for (let i = 0; i < numLegs; i++) {
-    const angle = (i * Math.PI * 2) / numLegs;
+  for (let i = 0; i < numLegs; i++) {
+    const angle = (i * Math.PI * 2) / numLegs;
 
-    const curve = new THREE.QuadraticBezierCurve3(
-      new THREE.Vector3(0, 0.17, 0),
-      new THREE.Vector3(Math.cos(angle) * (legRadius * 0.5), 0.22, Math.sin(angle) * (legRadius * 0.5)),
-      new THREE.Vector3(Math.cos(angle) * legRadius, 0.08, Math.sin(angle) * legRadius)
-    );
+    const curve = new THREE.QuadraticBezierCurve3(
+      new THREE.Vector3(0, 0.17, 0),
+      new THREE.Vector3(Math.cos(angle) * (legRadius * 0.5), 0.22, Math.sin(angle) * (legRadius * 0.5)),
+      new THREE.Vector3(Math.cos(angle) * legRadius, 0.08, Math.sin(angle) * legRadius)
+    );
 
-    const legGeo = new THREE.TubeGeometry(curve, 12, 0.014, 8, false);
-    const legMesh = new THREE.Mesh(legGeo, chromeMat);
-    legMesh.castShadow = true;
-    chairGroup.add(legMesh);
+    const legGeo = new THREE.TubeGeometry(curve, 12, 0.014, 8, false);
+    const legMesh = new THREE.Mesh(legGeo, chromeMat);
+    legMesh.castShadow = true;
+    chairGroup.add(legMesh);
 
-    const wheelGroup = new THREE.Group();
-    wheelGroup.position.set(Math.cos(angle) * legRadius, 0.04, Math.sin(angle) * legRadius);
+    const wheelGroup = new THREE.Group();
+    wheelGroup.position.set(Math.cos(angle) * legRadius, 0.04, Math.sin(angle) * legRadius);
 
-    const wheelCap = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.03), chromeMat);
-    wheelCap.position.y = 0.025;
-    wheelGroup.add(wheelCap);
+    const wheelCap = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.03), chromeMat);
+    wheelCap.position.y = 0.025;
+    wheelGroup.add(wheelCap);
 
-    const wheelBody = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 0.02), wheelDarkMat);
-    wheelBody.rotation.z = Math.PI / 2;
-    wheelGroup.add(wheelBody);
+    const wheelBody = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 0.02), wheelDarkMat);
+    wheelBody.rotation.z = Math.PI / 2;
+    wheelGroup.add(wheelBody);
 
-    const wheelRim = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.014, 0.022), wheelRimMat);
-    wheelRim.rotation.z = Math.PI / 2;
-    wheelGroup.add(wheelRim);
+    const wheelRim = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.014, 0.022), wheelRimMat);
+    wheelRim.rotation.z = Math.PI / 2;
+    wheelGroup.add(wheelRim);
 
-    wheelGroup.rotation.y = angle;
-    chairGroup.add(wheelGroup);
-  }
+    wheelGroup.rotation.y = angle;
+    chairGroup.add(wheelGroup);
+  }
 
-  return chairGroup;
+  return chairGroup;
 }
 
 function buildKeyboardMesh() {
-  const kbdGroup = new THREE.Group();
-  
-  const bodyMat = new THREE.MeshStandardMaterial({ color: 0x1f2124, roughness: 0.35, metalness: 0.4 });
-  const keyMat = new THREE.MeshStandardMaterial({ color: 0x2b2e33, roughness: 0.5, metalness: 0.1 });
-  const spaceMat = new THREE.MeshStandardMaterial({ color: 0x1a1c1e, roughness: 0.5, metalness: 0.1 });
+  const kbdGroup = new THREE.Group();
+  
+  const bodyMat = new THREE.MeshStandardMaterial({ color: 0x1f2124, roughness: 0.35, metalness: 0.4 });
+  const keyMat = new THREE.MeshStandardMaterial({ color: 0x2b2e33, roughness: 0.5, metalness: 0.1 });
+  const spaceMat = new THREE.MeshStandardMaterial({ color: 0x1a1c1e, roughness: 0.5, metalness: 0.1 });
 
-  const bodyW = 0.44, bodyD = 0.15;
-  const baseGeo = new THREE.BoxGeometry(bodyW, 0.012, bodyD);
-  const base = new THREE.Mesh(baseGeo, bodyMat);
-  base.position.y = 0.006;
-  base.castShadow = true;
-  base.receiveShadow = true;
-  kbdGroup.add(base);
+  const bodyW = 0.44, bodyD = 0.15;
+  const baseGeo = new THREE.BoxGeometry(bodyW, 0.012, bodyD);
+  const base = new THREE.Mesh(baseGeo, bodyMat);
+  base.position.y = 0.006;
+  base.castShadow = true;
+  base.receiveShadow = true;
+  kbdGroup.add(base);
 
-  const topBezel = new THREE.Mesh(new THREE.BoxGeometry(bodyW, 0.005, 0.02), bodyMat);
-  topBezel.position.set(0, 0.0135, -bodyD / 2 + 0.01);
-  kbdGroup.add(topBezel);
+  const topBezel = new THREE.Mesh(new THREE.BoxGeometry(bodyW, 0.005, 0.02), bodyMat);
+  topBezel.position.set(0, 0.0135, -bodyD / 2 + 0.01);
+  kbdGroup.add(topBezel);
 
-  const keyAreaGroup = new THREE.Group();
-  
-  const rows = 5;
-  const cols = 14;
-  const keyW = 0.02, keyD = 0.018, keyH = 0.005;
-  const gapX = 0.003, gapZ = 0.003;
+  const keyAreaGroup = new THREE.Group();
+  
+  const rows = 5;
+  const cols = 14;
+  const keyW = 0.02, keyD = 0.018, keyH = 0.005;
+  const gapX = 0.003, gapZ = 0.003;
 
-  const startX = -((cols * (keyW + gapX)) / 2) + keyW / 2 - 0.025;
-  const startZ = -((rows * (keyD + gapZ)) / 2) + keyD / 2 + 0.005;
+  const startX = -((cols * (keyW + gapX)) / 2) + keyW / 2 - 0.025;
+  const startZ = -((rows * (keyD + gapZ)) / 2) + keyD / 2 + 0.005;
 
-  const keyGeo = new THREE.BoxGeometry(keyW, keyH, keyD);
+  const keyGeo = new THREE.BoxGeometry(keyW, keyH, keyD);
 
-  for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < cols; c++) {
-      if (r === 4 && c >= 3 && c <= 8) continue;
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      if (r === 4 && c >= 3 && c <= 8) continue;
 
-      const key = new THREE.Mesh(keyGeo, keyMat);
-      const posX = startX + c * (keyW + gapX);
-      const posZ = startZ + r * (keyD + gapZ);
-      key.position.set(posX, keyH / 2, posZ);
-      key.castShadow = true;
-      keyAreaGroup.add(key);
-    }
-  }
+      const key = new THREE.Mesh(keyGeo, keyMat);
+      const posX = startX + c * (keyW + gapX);
+      const posZ = startZ + r * (keyD + gapZ);
+      key.position.set(posX, keyH / 2, posZ);
+      key.castShadow = true;
+      keyAreaGroup.add(key);
+    }
+  }
 
-  const spaceW = (keyW + gapX) * 6 - gapX;
-  const spaceBar = new THREE.Mesh(new THREE.BoxGeometry(spaceW, keyH, keyD), spaceMat);
-  const spaceX = startX + 5.5 * (keyW + gapX);
-  const spaceZ = startZ + 4 * (keyD + gapZ);
-  spaceBar.position.set(spaceX, keyH / 2, spaceZ);
-  spaceBar.castShadow = true;
-  keyAreaGroup.add(spaceBar);
+  const spaceW = (keyW + gapX) * 6 - gapX;
+  const spaceBar = new THREE.Mesh(new THREE.BoxGeometry(spaceW, keyH, keyD), spaceMat);
+  const spaceX = startX + 5.5 * (keyW + gapX);
+  const spaceZ = startZ + 4 * (keyD + gapZ);
+  spaceBar.position.set(spaceX, keyH / 2, spaceZ);
+  spaceBar.castShadow = true;
+  keyAreaGroup.add(spaceBar);
 
-  const numCols = 3, numRows = 4;
-  const numStartX = startX + cols * (keyW + gapX) + 0.015;
-  const numGeo = new THREE.BoxGeometry(keyW, keyH, keyD);
-  
-  for (let r = 1; r <= numRows; r++) {
-    for (let c = 0; c < numCols; c++) {
-      const numKey = new THREE.Mesh(numGeo, keyMat);
-      const posX = numStartX + c * (keyW + gapX);
-      const posZ = startZ + r * (keyD + gapZ);
-      numKey.position.set(posX, keyH / 2, posZ);
-      numKey.castShadow = true;
-      keyAreaGroup.add(numKey);
-    }
-  }
+  const numCols = 3, numRows = 4;
+  const numStartX = startX + cols * (keyW + gapX) + 0.015;
+  const numGeo = new THREE.BoxGeometry(keyW, keyH, keyD);
+  
+  for (let r = 1; r <= numRows; r++) {
+    for (let c = 0; c < numCols; c++) {
+      const numKey = new THREE.Mesh(numGeo, keyMat);
+      const posX = numStartX + c * (keyW + gapX);
+      const posZ = startZ + r * (keyD + gapZ);
+      numKey.position.set(posX, keyH / 2, posZ);
+      numKey.castShadow = true;
+      keyAreaGroup.add(numKey);
+    }
+  }
 
-  keyAreaGroup.position.y = 0.012;
-  kbdGroup.add(keyAreaGroup);
+  keyAreaGroup.position.y = 0.012;
+  kbdGroup.add(keyAreaGroup);
 
-  kbdGroup.rotation.x = -0.05;
+  kbdGroup.rotation.x = -0.05;
 
-  return kbdGroup;
+  return kbdGroup;
 }
 
 function buildMouseMesh() {
-  const mouseGroup = new THREE.Group();
+  const mouseGroup = new THREE.Group();
 
-  const bodyMat = new THREE.MeshStandardMaterial({ color: 0x1f2124, roughness: 0.3, metalness: 0.3 });
-  const accentMat = new THREE.MeshStandardMaterial({ color: 0x111214, roughness: 0.6 });
-  const wheelMat = new THREE.MeshStandardMaterial({ color: 0xd0d0d0, metalness: 0.8, roughness: 0.2 });
+  const bodyMat = new THREE.MeshStandardMaterial({ color: 0x1f2124, roughness: 0.3, metalness: 0.3 });
+  const accentMat = new THREE.MeshStandardMaterial({ color: 0x111214, roughness: 0.6 });
+  const wheelMat = new THREE.MeshStandardMaterial({ color: 0xd0d0d0, metalness: 0.8, roughness: 0.2 });
 
-  const mouseW = 0.065, mouseH = 0.032, mouseL = 0.11;
+  const mouseW = 0.065, mouseH = 0.032, mouseL = 0.11;
 
-  const mainBodyGeo = new THREE.SphereGeometry(mouseL / 2, 16, 16);
-  mainBodyGeo.scale(mouseW / mouseL, mouseH / (mouseL / 2), 1.0);
-  
-  const mainBody = new THREE.Mesh(mainBodyGeo, bodyMat);
-  mainBody.position.y = mouseH / 2 - 0.003;
-  mainBody.castShadow = true;
-  mainBody.receiveShadow = true;
-  mouseGroup.add(mainBody);
+  const mainBodyGeo = new THREE.SphereGeometry(mouseL / 2, 16, 16);
+  mainBodyGeo.scale(mouseW / mouseL, mouseH / (mouseL / 2), 1.0);
+  
+  const mainBody = new THREE.Mesh(mainBodyGeo, bodyMat);
+  mainBody.position.y = mouseH / 2 - 0.003;
+  mainBody.castShadow = true;
+  mainBody.receiveShadow = true;
+  mouseGroup.add(mainBody);
 
-  const leftButtonGeo = new THREE.BoxGeometry(mouseW * 0.44, 0.005, mouseL * 0.38);
-  const leftButton = new THREE.Mesh(leftButtonGeo, bodyMat);
-  leftButton.position.set(-mouseW * 0.24, mouseH * 0.75, -mouseL * 0.22);
-  leftButton.rotation.x = -0.12;
-  leftButton.castShadow = true;
-  mouseGroup.add(leftButton);
+  const leftButtonGeo = new THREE.BoxGeometry(mouseW * 0.44, 0.005, mouseL * 0.38);
+  const leftButton = new THREE.Mesh(leftButtonGeo, bodyMat);
+  leftButton.position.set(-mouseW * 0.24, mouseH * 0.75, -mouseL * 0.22);
+  leftButton.rotation.x = -0.12;
+  leftButton.castShadow = true;
+  mouseGroup.add(leftButton);
 
-  const rightButton = new THREE.Mesh(leftButtonGeo, bodyMat);
-  rightButton.position.set(mouseW * 0.24, mouseH * 0.75, -mouseL * 0.22);
-  rightButton.rotation.x = -0.12;
-  rightButton.castShadow = true;
-  mouseGroup.add(rightButton);
+  const rightButton = new THREE.Mesh(leftButtonGeo, bodyMat);
+  rightButton.position.set(mouseW * 0.24, mouseH * 0.75, -mouseL * 0.22);
+  rightButton.rotation.x = -0.12;
+  rightButton.castShadow = true;
+  mouseGroup.add(rightButton);
 
-  const gap = new THREE.Mesh(new THREE.BoxGeometry(0.003, 0.008, mouseL * 0.4), accentMat);
-  gap.position.set(0, mouseH * 0.72, -mouseL * 0.2);
-  mouseGroup.add(gap);
+  const gap = new THREE.Mesh(new THREE.BoxGeometry(0.003, 0.008, mouseL * 0.4), accentMat);
+  gap.position.set(0, mouseH * 0.72, -mouseL * 0.2);
+  mouseGroup.add(gap);
 
-  const scrollWheelGeo = new THREE.CylinderGeometry(0.006, 0.006, 0.005, 16);
-  const scrollWheel = new THREE.Mesh(scrollWheelGeo, wheelMat);
-  scrollWheel.rotation.z = Math.PI / 2;
-  scrollWheel.position.set(0, mouseH * 0.82, -mouseL * 0.22);
-  scrollWheel.castShadow = true;
-  mouseGroup.add(scrollWheel);
+  const scrollWheelGeo = new THREE.CylinderGeometry(0.006, 0.006, 0.005, 16);
+  const scrollWheel = new THREE.Mesh(scrollWheelGeo, wheelMat);
+  scrollWheel.rotation.z = Math.PI / 2;
+  scrollWheel.position.set(0, mouseH * 0.82, -mouseL * 0.22);
+  scrollWheel.castShadow = true;
+  mouseGroup.add(scrollWheel);
 
-  const palmGrip = new THREE.Mesh(new THREE.SphereGeometry(mouseW * 0.42, 12, 12), accentMat);
-  palmGrip.scale.set(1.0, 0.3, 1.2);
-  palmGrip.position.set(0, mouseH * 0.45, mouseL * 0.15);
-  mouseGroup.add(palmGrip);
+  const palmGrip = new THREE.Mesh(new THREE.SphereGeometry(mouseW * 0.42, 12, 12), accentMat);
+  palmGrip.scale.set(1.0, 0.3, 1.2);
+  palmGrip.position.set(0, mouseH * 0.45, mouseL * 0.15);
+  mouseGroup.add(palmGrip);
 
-  return mouseGroup;
+  return mouseGroup;
 }
 
 function createWorkstation(x, z, id) {
-  stationCounter++;
-  const stationGroup = new THREE.Group();
-  stationGroup.userData = { editable: true, type: "station", label: id || `Estação ${stationCounter}` };
+  stationCounter++;
+  const stationGroup = new THREE.Group();
+  stationGroup.userData = { editable: true, type: "station", label: id || `Estação ${stationCounter}` };
 
-  const w = 1.4, d = 0.7;
-  const topMat = new THREE.MeshStandardMaterial({ color: 0x8b5a2b, roughness: 0.6 });
-  const legMat = new THREE.MeshStandardMaterial({ color: 0x2c2c2c, roughness: 0.5, metalness: 0.4 });
+  const w = 1.4, d = 0.7;
+  const topMat = new THREE.MeshStandardMaterial({ color: 0x8b5a2b, roughness: 0.6 });
+  const legMat = new THREE.MeshStandardMaterial({ color: 0x2c2c2c, roughness: 0.5, metalness: 0.4 });
 
-  const top = new THREE.Mesh(new THREE.BoxGeometry(w, 0.06, d), topMat);
-  top.position.y = 0.75;
-  top.castShadow = true; top.receiveShadow = true;
-  stationGroup.add(top);
+  const top = new THREE.Mesh(new THREE.BoxGeometry(w, 0.06, d), topMat);
+  top.position.y = 0.75;
+  top.castShadow = true; top.receiveShadow = true;
+  stationGroup.add(top);
 
-  const legGeo = new THREE.BoxGeometry(0.05, 0.75, 0.05);
-  [[-w/2 + 0.05, -d/2 + 0.05], [w/2 - 0.05, -d/2 + 0.05], [-w/2 + 0.05, d/2 - 0.05], [w/2 - 0.05, d/2 - 0.05]].forEach(([lx, lz]) => {
-    const leg = new THREE.Mesh(legGeo, legMat);
-    leg.position.set(lx, 0.375, lz);
-    leg.castShadow = true;
-    stationGroup.add(leg);
-  });
+  const legGeo = new THREE.BoxGeometry(0.05, 0.75, 0.05);
+  [[-w/2 + 0.05, -d/2 + 0.05], [w/2 - 0.05, -d/2 + 0.05], [-w/2 + 0.05, d/2 - 0.05], [w/2 - 0.05, d/2 - 0.05]].forEach(([lx, lz]) => {
+    const leg = new THREE.Mesh(legGeo, legMat);
+    leg.position.set(lx, 0.375, lz);
+    leg.castShadow = true;
+    stationGroup.add(leg);
+  });
 
-  const pcMat = new THREE.MeshStandardMaterial({ color: 0x1f1f1f, roughness: 0.4, metalness: 0.6 });
-  const pcBody = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.42, 0.45), pcMat);
-  pcBody.position.set(w/2 - 0.2, 0.78 + 0.21, 0);
-  pcBody.castShadow = true;
-  stationGroup.add(pcBody);
-  stationGroup.userData.pcMesh = pcBody;
+  const pcMat = new THREE.MeshStandardMaterial({ color: 0x1f1f1f, roughness: 0.4, metalness: 0.6 });
+  const pcBody = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.42, 0.45), pcMat);
+  pcBody.position.set(w/2 - 0.2, 0.78 + 0.21, 0);
+  pcBody.castShadow = true;
+  stationGroup.add(pcBody);
+  stationGroup.userData.pcMesh = pcBody;
 
-  const monMat = new THREE.MeshStandardMaterial({ color: 0x111111 });
-  const monitor = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.32, 0.03), monMat);
-  monitor.position.set(-0.1, 0.78 + 0.25, -d/4);
-  monitor.castShadow = true;
-  stationGroup.add(monitor);
+  const monMat = new THREE.MeshStandardMaterial({ color: 0x111111 });
+  const monitor = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.32, 0.03), monMat);
+  monitor.position.set(-0.1, 0.78 + 0.25, -d/4);
+  monitor.castShadow = true;
+  stationGroup.add(monitor);
 
-  const stand = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.1, 0.08), monMat);
-  stand.position.set(-0.1, 0.78 + 0.05, -d/4);
-  stationGroup.add(stand);
+  const stand = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.1, 0.08), monMat);
+  stand.position.set(-0.1, 0.78 + 0.05, -d/4);
+  stationGroup.add(stand);
 
-  const keyboard = buildKeyboardMesh();
-  keyboard.position.set(-0.1, 0.78, 0.05);
-  stationGroup.add(keyboard);
+  const keyboard = buildKeyboardMesh();
+  keyboard.position.set(-0.1, 0.78, 0.05);
+  stationGroup.add(keyboard);
 
-  const mouse = buildMouseMesh();
-  mouse.position.set(0.25, 0.78, 0.05);
-  stationGroup.add(mouse);
+  const mouse = buildMouseMesh();
+  mouse.position.set(0.25, 0.78, 0.05);
+  stationGroup.add(mouse);
 
-  const chairGroup = buildChairMesh();
-  chairGroup.position.set(-0.1, 0, d/2 + 0.3);
-  stationGroup.add(chairGroup);
+  const chairGroup = buildChairMesh();
+  chairGroup.position.set(-0.1, 0, d/2 + 0.3);
+  stationGroup.add(chairGroup);
 
-  stationGroup.position.set(x, 0, z);
-  stationGroup.rotation.y = 0; 
+  stationGroup.position.set(x, 0, z);
+  stationGroup.rotation.y = 0; 
 
-  scene.add(stationGroup);
-  deskGroups.push(stationGroup);
-  return stationGroup;
+  scene.add(stationGroup);
+  deskGroups.push(stationGroup);
+  return stationGroup;
 }
 
 function addFullStation() {
-  if (deskGroups.length >= getMaxCapacity()) return;
-  createWorkstation(0, 0);
-  applyIsoLayout();
-  updateStatusUI();
+  if (deskGroups.length >= getMaxCapacity()) return;
+  createWorkstation(0, 0);
+  applyIsoLayout();
+  updateStatusUI();
 }
 
 function removeFullStation() {
-  if (deskGroups.length > 0) {
-    const station = deskGroups.pop();
-    scene.remove(station);
-    applyIsoLayout();
-    updateStatusUI();
-  }
+  if (deskGroups.length > 0) {
+    const station = deskGroups.pop();
+    scene.remove(station);
+    applyIsoLayout();
+    updateStatusUI();
+  }
 }
 
 function addSingleItem(type) {
-  const itemGroup = new THREE.Group();
-  itemGroup.userData = { editable: true, type: type };
+  const itemGroup = new THREE.Group();
+  itemGroup.userData = { editable: true, type: type };
 
-  if (type === 'desk') {
-    const w = 1.4, d = 0.7;
-    const top = new THREE.Mesh(new THREE.BoxGeometry(w, 0.06, d), new THREE.MeshStandardMaterial({ color: 0x8b5a2b, roughness: 0.6 }));
-    top.position.y = 0.75;
-    top.castShadow = true;
-    top.receiveShadow = true;
-    itemGroup.add(top);
+  if (type === 'desk') {
+    const w = 1.4, d = 0.7;
+    const top = new THREE.Mesh(new THREE.BoxGeometry(w, 0.06, d), new THREE.MeshStandardMaterial({ color: 0x8b5a2b, roughness: 0.6 }));
+    top.position.y = 0.75;
+    top.castShadow = true;
+    top.receiveShadow = true;
+    itemGroup.add(top);
 
-    const legMat = new THREE.MeshStandardMaterial({ color: 0x2c2c2c, roughness: 0.5, metalness: 0.4 });
-    const legGeo = new THREE.BoxGeometry(0.05, 0.75, 0.05);
-    [[-w/2 + 0.05, -d/2 + 0.05], [w/2 - 0.05, -d/2 + 0.05], [-w/2 + 0.05, d/2 - 0.05], [w/2 - 0.05, d/2 - 0.05]].forEach(([lx, lz]) => {
-      const leg = new THREE.Mesh(legGeo, legMat);
-      leg.position.set(lx, 0.375, lz);
-      leg.castShadow = true;
-      itemGroup.add(leg);
-    });
-  } else if (type === 'chair') {
-    const chairMesh = buildChairMesh();
-    itemGroup.add(chairMesh);
-  } else if (type === 'monitor') {
-    const monitor = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.32, 0.03), new THREE.MeshStandardMaterial({ color: 0x111111 }));
-    monitor.position.y = 0.85;
-    itemGroup.add(monitor);
-  } else if (type === 'pc') {
-    const pcBody = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.42, 0.45), new THREE.MeshStandardMaterial({ color: 0x1f1f1f }));
-    pcBody.position.y = 0.21;
-    itemGroup.add(pcBody);
-  } else if (type === 'keyboard') {
-    const kbd = buildKeyboardMesh();
-    kbd.position.y = 0.001;
-    itemGroup.add(kbd);
-  } else if (type === 'mouse') {
-    const ms = buildMouseMesh();
-    ms.position.y = 0.001;
-    itemGroup.add(ms);
-  }
+    const legMat = new THREE.MeshStandardMaterial({ color: 0x2c2c2c, roughness: 0.5, metalness: 0.4 });
+    const legGeo = new THREE.BoxGeometry(0.05, 0.75, 0.05);
+    [[-w/2 + 0.05, -d/2 + 0.05], [w/2 - 0.05, -d/2 + 0.05], [-w/2 + 0.05, d/2 - 0.05], [w/2 - 0.05, d/2 - 0.05]].forEach(([lx, lz]) => {
+      const leg = new THREE.Mesh(legGeo, legMat);
+      leg.position.set(lx, 0.375, lz);
+      leg.castShadow = true;
+      itemGroup.add(leg);
+    });
+  } else if (type === 'chair') {
+    const chairMesh = buildChairMesh();
+    itemGroup.add(chairMesh);
+  } else if (type === 'monitor') {
+    const monitor = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.32, 0.03), new THREE.MeshStandardMaterial({ color: 0x111111 }));
+    monitor.position.y = 0.85;
+    itemGroup.add(monitor);
+  } else if (type === 'pc') {
+    const pcBody = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.42, 0.45), new THREE.MeshStandardMaterial({ color: 0x1f1f1f }));
+    pcBody.position.y = 0.21;
+    itemGroup.add(pcBody);
+  } else if (type === 'keyboard') {
+    const kbd = buildKeyboardMesh();
+    kbd.position.y = 0.001;
+    itemGroup.add(kbd);
+  } else if (type === 'mouse') {
+    const ms = buildMouseMesh();
+    ms.position.y = 0.001;
+    itemGroup.add(ms);
+  }
 
-  itemGroup.position.set((Math.random() - 0.5) * 3, 0, (Math.random() - 0.5) * 3);
-  scene.add(itemGroup);
-  singleItems.push(itemGroup);
+  itemGroup.position.set((Math.random() - 0.5) * 3, 0, (Math.random() - 0.5) * 3);
+  scene.add(itemGroup);
+  singleItems.push(itemGroup);
 }
 
 function removeSingleItem(type) {
-  const idx = singleItems.findIndex(item => item.userData.type === type);
-  if (idx !== -1) {
-    const item = singleItems.splice(idx, 1)[0];
-    scene.remove(item);
-  }
+  const idx = singleItems.findIndex(item => item.userData.type === type);
+  if (idx !== -1) {
+    const item = singleItems.splice(idx, 1)[0];
+    scene.remove(item);
+  }
 }
 
 function buildFurniture() {
-  for (let i = 0; i < 6; i++) createWorkstation(0, 0);
-  applyIsoLayout();
+  for (let i = 0; i < 6; i++) createWorkstation(0, 0);
+  applyIsoLayout();
 }
 
 function applyIsoLayout() {
-  const cols = Math.max(1, Math.min(4, Math.floor(roomWidth / 3)));
-  const spacingX = 2.4;
-  const spacingZ = 2.4;
-  const startX = -((cols - 1) * spacingX) / 2;
-  const startZ = -1.0;
+  const cols = Math.max(1, Math.min(4, Math.floor(roomWidth / 3)));
+  const spacingX = 2.4;
+  const spacingZ = 2.4;
+  const startX = -((cols - 1) * spacingX) / 2;
+  const startZ = -1.0;
 
-  deskGroups.forEach((group, index) => {
-    const col = index % cols;
-    const row = Math.floor(index / cols);
+  deskGroups.forEach((group, index) => {
+    const col = index % cols;
+    const row = Math.floor(index / cols);
 
-    const x = startX + col * spacingX;
-    const z = startZ + row * spacingZ;
+    const x = startX + col * spacingX;
+    const z = startZ + row * spacingZ;
 
-    group.position.set(x, 0, z);
-    group.rotation.y = 0;
-  });
+    group.position.set(x, 0, z);
+    group.rotation.y = 0;
+  });
 
-  rebuildIsoCabling();
+  rebuildIsoCabling();
 }
 
 function buildOfficeRack() {
-  officeRackGroup = new THREE.Group();
-  const bodyMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.55, metalness: 0.5 });
-  const trimMat = new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.4, metalness: 0.6 });
-  const glassMat = new THREE.MeshStandardMaterial({ color: 0x0a0a0a, roughness: 0.15, transparent: true, opacity: 0.85 });
+  officeRackGroup = new THREE.Group();
+  const bodyMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.55, metalness: 0.5 });
+  const trimMat = new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.4, metalness: 0.6 });
+  const glassMat = new THREE.MeshStandardMaterial({ color: 0x0a0a0a, roughness: 0.15, transparent: true, opacity: 0.85 });
 
-  const w = 0.9, h = 0.85, d = 0.8;
-  const body = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), bodyMat);
-  body.castShadow = true;
-  officeRackGroup.add(body);
+  const w = 0.9, h = 0.85, d = 0.8;
+  const body = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), bodyMat);
+  body.castShadow = true;
+  officeRackGroup.add(body);
 
-  const doorFrame = new THREE.Mesh(new THREE.BoxGeometry(w - 0.04, h - 0.06, 0.03), trimMat);
-  doorFrame.position.set(0, 0, d/2 - 0.02);
-  officeRackGroup.add(doorFrame);
+  const doorFrame = new THREE.Mesh(new THREE.BoxGeometry(w - 0.04, h - 0.06, 0.03), trimMat);
+  doorFrame.position.set(0, 0, d/2 - 0.02);
+  officeRackGroup.add(doorFrame);
 
-  const glass = new THREE.Mesh(new THREE.BoxGeometry(w - 0.14, h - 0.16, 0.015), glassMat);
-  glass.position.set(0, 0, d/2 + 0.01);
-  officeRackGroup.add(glass);
+  const glass = new THREE.Mesh(new THREE.BoxGeometry(w - 0.14, h - 0.16, 0.015), glassMat);
+  glass.position.set(0, 0, d/2 + 0.01);
+  officeRackGroup.add(glass);
 
-  officeRackGroup.position.set(roomWidth/2 - 0.8, roomHeight - 1.5, -roomDepth/2 + 0.8);
-  officeRackGroup.rotation.y = Math.PI;
-  scene.add(officeRackGroup);
+  officeRackGroup.position.set(roomWidth/2 - 0.8, roomHeight - 1.5, -roomDepth/2 + 0.8);
+  officeRackGroup.rotation.y = Math.PI;
+  scene.add(officeRackGroup);
 }
 
 function clearCabling() {
-  cableMeshes.forEach(mesh => scene.remove(mesh));
-  cableMeshes.length = 0;
+  cableMeshes.forEach(mesh => scene.remove(mesh));
+  cableMeshes.length = 0;
 }
 
 function rebuildIsoCabling() {
-  clearCabling();
+  clearCabling();
 
-  const cableY = roomHeight - 0.55;
-  const wallZ = -roomDepth/2 + 0.22;
-  const rackX = roomWidth/2 - 0.8;
+  const cableY = roomHeight - 0.55;
+  const wallZ = -roomDepth/2 + 0.22;
+  const rackX = roomWidth/2 - 0.8;
 
-  const trayMat = new THREE.MeshStandardMaterial({ color: 0xcccccc, metalness: 0.8, roughness: 0.2 });
-  const raceway = new THREE.Mesh(new THREE.BoxGeometry(Math.max(1, roomWidth - 1), 0.06, 0.25), trayMat);
-  raceway.position.set(0, cableY, wallZ);
-  raceway.userData = { editable: true, type: 'raceway' };
-  scene.add(raceway);
-  cableMeshes.push(raceway);
+  const trayMat = new THREE.MeshStandardMaterial({ color: 0xcccccc, metalness: 0.8, roughness: 0.2 });
+  const raceway = new THREE.Mesh(new THREE.BoxGeometry(Math.max(1, roomWidth - 1), 0.06, 0.25), trayMat);
+  raceway.position.set(0, cableY, wallZ);
+  raceway.userData = { editable: true, type: 'raceway' };
+  scene.add(raceway);
+  cableMeshes.push(raceway);
 
-  let sumData = 0, sumMgmt = 0, sumFiber = 0, sumPatch = 0;
+  let sumData = 0, sumMgmt = 0, sumFiber = 0, sumPatch = 0;
 
-  const dcRackPos = new THREE.Vector3(DC_OFFSET.x, 2.3, DC_OFFSET.z - 1.2);
-  const officeRackPos = new THREE.Vector3(rackX, cableY, wallZ);
+  const dcRackPos = new THREE.Vector3(DC_OFFSET.x, 2.3, DC_OFFSET.z - 1.2);
+  const officeRackPos = new THREE.Vector3(rackX, cableY, wallZ);
 
-  const backboneCurve = new THREE.CatmullRomCurve3([
-    dcRackPos,
-    new THREE.Vector3(DC_OFFSET.x + 4, cableY + 0.3, wallZ),
-    new THREE.Vector3(officeRackPos.x - 2, cableY + 0.3, wallZ),
-    officeRackPos
-  ]);
-  const backboneLen = backboneCurve.getLength();
-  sumFiber += backboneLen;
+  const backboneCurve = new THREE.CatmullRomCurve3([
+    dcRackPos,
+    new THREE.Vector3(DC_OFFSET.x + 4, cableY + 0.3, wallZ),
+    new THREE.Vector3(officeRackPos.x - 2, cableY + 0.3, wallZ),
+    officeRackPos
+  ]);
+  const backboneLen = backboneCurve.getLength();
+  sumFiber += backboneLen;
 
-  const backboneGeo = new THREE.TubeGeometry(backboneCurve, 50, 0.02, 8, false);
-  const backboneMesh = new THREE.Mesh(backboneGeo, new THREE.MeshStandardMaterial({ color: ISO_COLOR_FIBER, roughness: 0.3 }));
-  backboneMesh.userData = { editable: true, cableLength: backboneLen, cableType: 'fiber' };
-  scene.add(backboneMesh);
-  cableMeshes.push(backboneMesh);
+  const backboneGeo = new THREE.TubeGeometry(backboneCurve, 50, 0.02, 8, false);
+  const backboneMesh = new THREE.Mesh(backboneGeo, new THREE.MeshStandardMaterial({ color: ISO_COLOR_FIBER, roughness: 0.3 }));
+  backboneMesh.userData = { editable: true, cableLength: backboneLen, cableType: 'fiber' };
+  scene.add(backboneMesh);
+  cableMeshes.push(backboneMesh);
 
-  deskGroups.forEach((station, i) => {
-    const pcPos = new THREE.Vector3();
-    if (station.userData.pcMesh) {
-      station.userData.pcMesh.getWorldPosition(pcPos);
-    } else {
-      station.getWorldPosition(pcPos);
-    }
+  deskGroups.forEach((station, i) => {
+    const pcPos = new THREE.Vector3();
+    if (station.userData.pcMesh) {
+      station.userData.pcMesh.getWorldPosition(pcPos);
+    } else {
+      station.getWorldPosition(pcPos);
+    }
 
-    const pcPort = new THREE.Vector3(pcPos.x, pcPos.y, pcPos.z + 0.2);
+    const pcPort = new THREE.Vector3(pcPos.x, pcPos.y, pcPos.z + 0.2);
 
-    const wallOutlet = new THREE.Vector3(pcPos.x, 0.4, wallZ + 0.05);
-    const pipeTop = new THREE.Vector3(pcPos.x, cableY - 0.05, wallZ + 0.02);
+    const wallOutlet = new THREE.Vector3(pcPos.x, 0.4, wallZ + 0.05);
+    const pipeTop = new THREE.Vector3(pcPos.x, cableY - 0.05, wallZ + 0.02);
 
-    const conduit = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, Math.max(0.1, cableY - 0.4)), trayMat);
-    conduit.position.set(pcPos.x, (cableY + 0.4) / 2, wallZ + 0.02);
-    conduit.userData = { editable: true, type: 'conduit' };
-    scene.add(conduit);
-    cableMeshes.push(conduit);
+    const conduit = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, Math.max(0.1, cableY - 0.4)), trayMat);
+    conduit.position.set(pcPos.x, (cableY + 0.4) / 2, wallZ + 0.02);
+    conduit.userData = { editable: true, type: 'conduit' };
+    scene.add(conduit);
+    cableMeshes.push(conduit);
 
-    const patchCurve = new THREE.CatmullRomCurve3([
-      pcPort,
-      new THREE.Vector3(pcPos.x, Math.max(0.1, pcPos.y - 0.3), pcPos.z + 0.1),
-      wallOutlet
-    ]);
-    const patchLen = patchCurve.getLength();
-    sumPatch += patchLen;
+    const patchCurve = new THREE.CatmullRomCurve3([
+      pcPort,
+      new THREE.Vector3(pcPos.x, Math.max(0.1, pcPos.y - 0.3), pcPos.z + 0.1),
+      wallOutlet
+    ]);
+    const patchLen = patchCurve.getLength();
+    sumPatch += patchLen;
 
-    const patchGeo = new THREE.TubeGeometry(patchCurve, 16, 0.007, 6, false);
-    const patchMesh = new THREE.Mesh(patchGeo, new THREE.MeshStandardMaterial({ color: ISO_COLOR_PATCH, roughness: 0.5 }));
-    patchMesh.userData = { editable: true, cableLength: patchLen, cableType: 'patch' };
-    scene.add(patchMesh);
-    cableMeshes.push(patchMesh);
+    const patchGeo = new THREE.TubeGeometry(patchCurve, 16, 0.007, 6, false);
+    const patchMesh = new THREE.Mesh(patchGeo, new THREE.MeshStandardMaterial({ color: ISO_COLOR_PATCH, roughness: 0.5 }));
+    patchMesh.userData = { editable: true, cableLength: patchLen, cableType: 'patch' };
+    scene.add(patchMesh);
+    cableMeshes.push(patchMesh);
 
-    const isMgmt = (i % 4 === 0);
-    const isoColor = isMgmt ? ISO_COLOR_MGMT : ISO_COLOR_DATA;
-    const offsetY = (i * 0.015);
+    const isMgmt = (i % 4 === 0);
+    const isoColor = isMgmt ? ISO_COLOR_MGMT : ISO_COLOR_DATA;
+    const offsetY = (i * 0.015);
 
-    const trayPoint = new THREE.Vector3(pcPos.x, cableY + offsetY, wallZ);
-    const rackPoint = new THREE.Vector3(rackX, cableY + offsetY, wallZ);
-    const rackPort = new THREE.Vector3(rackX, (roomHeight - 1.5) + 0.05 - (i * 0.02), wallZ + 0.1);
+    const trayPoint = new THREE.Vector3(pcPos.x, cableY + offsetY, wallZ);
+    const rackPoint = new THREE.Vector3(rackX, cableY + offsetY, wallZ);
+    const rackPort = new THREE.Vector3(rackX, (roomHeight - 1.5) + 0.05 - (i * 0.02), wallZ + 0.1);
 
-    const isoCurve = new THREE.CatmullRomCurve3([wallOutlet, pipeTop, trayPoint, rackPoint, rackPort], false, 'catmullrom', 0.15);
-    const isoLen = isoCurve.getLength();
-    if (isMgmt) sumMgmt += isoLen; else sumData += isoLen;
+    const isoCurve = new THREE.CatmullRomCurve3([wallOutlet, pipeTop, trayPoint, rackPoint, rackPort], false, 'catmullrom', 0.15);
+    const isoLen = isoCurve.getLength();
+    if (isMgmt) sumMgmt += isoLen; else sumData += isoLen;
 
-    const isoGeo = new THREE.TubeGeometry(isoCurve, 32, 0.008, 6, false);
-    const isoMesh = new THREE.Mesh(isoGeo, new THREE.MeshStandardMaterial({ color: isoColor, roughness: 0.3 }));
-    isoMesh.userData = { editable: true, cableLength: isoLen, cableType: isMgmt ? 'mgmt' : 'data' };
-    scene.add(isoMesh);
-    cableMeshes.push(isoMesh);
-  });
+    const isoGeo = new THREE.TubeGeometry(isoCurve, 32, 0.008, 6, false);
+    const isoMesh = new THREE.Mesh(isoGeo, new THREE.MeshStandardMaterial({ color: isoColor, roughness: 0.3 }));
+    isoMesh.userData = { editable: true, cableLength: isoLen, cableType: isMgmt ? 'mgmt' : 'data' };
+    scene.add(isoMesh);
+    cableMeshes.push(isoMesh);
+  });
 
-  document.getElementById('len-data').innerText = sumData.toFixed(2) + 'm';
-  document.getElementById('len-mgmt').innerText = sumMgmt.toFixed(2) + 'm';
-  document.getElementById('len-fiber').innerText = sumFiber.toFixed(2) + 'm';
-  document.getElementById('len-patch').innerText = sumPatch.toFixed(2) + 'm';
-  document.getElementById('len-total').innerText = (sumData + sumMgmt + sumFiber + sumPatch).toFixed(2) + 'm';
+  document.getElementById('len-data').innerText = sumData.toFixed(2) + 'm';
+  document.getElementById('len-mgmt').innerText = sumMgmt.toFixed(2) + 'm';
+  document.getElementById('len-fiber').innerText = sumFiber.toFixed(2) + 'm';
+  document.getElementById('len-patch').innerText = sumPatch.toFixed(2) + 'm';
+  document.getElementById('len-total').innerText = (sumData + sumMgmt + sumFiber + sumPatch).toFixed(2) + 'm';
 
-  updateStatusUI();
+  updateStatusUI();
 }
 
 function buildDataCenterRoom(group) {
-  const roomW = 6.0, roomD = 5.0, roomH = 3.2;
-  const floorMat = new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.8 });
-  const dcFloor = new THREE.Mesh(new THREE.PlaneGeometry(roomW, roomD), floorMat);
-  dcFloor.rotation.x = -Math.PI / 2;
-  dcFloor.receiveShadow = true;
-  group.add(dcFloor);
-}
-
-function buildRaisedFloorTiles(group) {
-  const gridHelper = new THREE.GridHelper(6, 12, 0x444444, 0x333333);
-  gridHelper.position.y = 0.01;
-  group.add(gridHelper);
-}
-
-function buildRack(group, x, z, rotY) {
-  const rackGroup = new THREE.Group();
-  const rackMat = new THREE.MeshStandardMaterial({ color: 0x111111, metalness: 0.8, roughness: 0.2 });
-  const body = new THREE.Mesh(new THREE.BoxGeometry(0.8, 2.0, 1.0), rackMat);
-  body.position.y = 1.0;
-  body.castShadow = true;
-  rackGroup.add(body);
-  rackGroup.position.set(x, 0, z);
-  rackGroup.rotation.y = rotY;
-  group.add(rackGroup);
-}
-
-function buildUpsRack(group, x, z, rotY) {
-  const upsGroup = new THREE.Group();
-  const upsMat = new THREE.MeshStandardMaterial({ color: 0x333333, metalness: 0.5, roughness: 0.4 });
-  const body = new THREE.Mesh(new THREE.BoxGeometry(0.8, 2.0, 1.0), upsMat);
-  body.position.y = 1.0;
-  body.castShadow = true;
-  upsGroup.add(body);
-  upsGroup.position.set(x, 0, z);
-  upsGroup.rotation.y = rotY;
-  group.add(upsGroup);
-}
-
-function buildIsoDcCabling(group) {}
-function enableObjectDragging() {}
-
-function animate() {
-  requestAnimationFrame(animate);
-  if (controls) controls.update();
-  renderer.render(scene, camera);
-}
-
-window.onload = init;
-</script>
-</body>
-</html>
+  const roomW = 6.0, roomD = 5.0, roomH = 3.2;
+  const floorMat = new THREE.MeshStanda
