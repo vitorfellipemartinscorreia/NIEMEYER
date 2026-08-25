@@ -6,11 +6,6 @@
 <style>
   html, body { margin: 0; padding: 0; overflow: hidden; background: #1a1a1a; font-family: Arial, sans-serif; }
   #canvas-container { width: 100vw; height: 100vh; display: block; }
-  #info {
-    position: absolute; top: 12px; left: 12px; color: #eee; font-size: 13px;
-    background: rgba(0,0,0,0.85); padding: 12px 16px; border-radius: 8px; line-height: 1.5;
-    pointer-events: none; border-left: 4px solid #1e88e5;
-  }
   #controls-ui {
     position: absolute; top: 12px; right: 12px; z-index: 10;
     display: flex; flex-direction: column; gap: 6px; align-items: flex-end;
@@ -84,12 +79,6 @@
   </div>
 </div>
 
-<div id="info">
-  <strong>Data Center + Escritório (ISO/IEC 11801)</strong><br>
-  <span id="room-status">Dimensões: 14m x 10m x 3.2m | Cap. Máx: 8 Estações</span><br>
-  <strong>Data Center:</strong> Racks de Servidores, Rede, Nobreak e Cabeamento ISO.
-</div>
-
 <div id="legend">
   <strong>Padrão de Cores ISO/IEC 11801:</strong><br>
   <span class="dot" style="background:#1e88e5"></span>ISO: Cabeamento Horizontal de Dados (Cat6a) - <span id="len-data">0.0m</span><br>
@@ -139,8 +128,11 @@ function updateStatusUI() {
     }
   });
 
-  document.getElementById('room-status').innerHTML = 
-    `Dimensões: ${roomWidth}m x ${roomDepth}m x ${roomHeight.toFixed(1)}m | Cap. Máx: ${capacity} Estações | Atuais: ${deskGroups.length} | Cabos Total: ${totalLength.toFixed(2)}m`;
+  const statusElem = document.getElementById('room-status');
+  if (statusElem) {
+    statusElem.innerHTML = 
+      `Dimensões: ${roomWidth}m x ${roomDepth}m x ${roomHeight.toFixed(1)}m | Cap. Máx: ${capacity} Estações | Atuais: ${deskGroups.length} | Cabos Total: ${totalLength.toFixed(2)}m`;
+  }
 }
 
 function adjustDimension(param, delta) {
@@ -832,69 +824,26 @@ function rebuildIsoCabling() {
 
 function buildDataCenterRoom(group) {
   const roomW = 6.0, roomD = 5.0, roomH = 3.2;
-  const floorMat = new THREE.MeshStandardMaterial({ color: 0x22252a, roughness: 0.6 });
-  const floor = new THREE.Mesh(new THREE.PlaneGeometry(roomW, roomD), floorMat);
-  floor.rotation.x = -Math.PI / 2;
-  floor.receiveShadow = true;
-  group.add(floor);
-
-  const wallMat = new THREE.MeshStandardMaterial({ color: 0xd0d5dd, roughness: 0.8 });
-
-  const backWall = buildWallWithOpenings(roomW, roomH, [], wallMat);
-  backWall.position.set(0, 0, -roomD/2 - WALL_T/2);
-  group.add(backWall);
-
-  const leftWall = buildWallWithOpenings(roomD, roomH, [], wallMat);
-  leftWall.rotation.y = Math.PI/2;
-  leftWall.position.set(-roomW/2 - WALL_T/2, 0, 0);
-  group.add(leftWall);
-
-  const rightWall = buildWallWithOpenings(roomD, roomH, [{ cx: 0, w: 1.8, h: 2.2, sill: 0 }], wallMat);
-  rightWall.rotation.y = -Math.PI/2;
-  rightWall.position.set(roomW/2 + WALL_T/2, 0, 0);
-  group.add(rightWall);
-
-  const doorGroup = createRealDoorFrame(1.8, 2.2, true);
-  doorGroup.rotation.y = -Math.PI/2;
-  doorGroup.position.set(roomW/2, 0, 0);
-  group.add(doorGroup);
+  const floorMat = new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.8 });
+  const dcFloor = new THREE.Mesh(new THREE.PlaneGeometry(roomW, roomD), floorMat);
+  dcFloor.rotation.x = -Math.PI / 2;
+  dcFloor.receiveShadow = true;
+  group.add(dcFloor);
 }
 
 function buildRaisedFloorTiles(group) {
-  const tileMat = new THREE.MeshStandardMaterial({ color: 0x3a3f44, roughness: 0.4, metalness: 0.4 });
-  const size = 0.6, cols = 8, rows = 6;
-  for (let i = 0; i < cols; i++) {
-    for (let j = 0; j < rows; j++) {
-      const tile = new THREE.Mesh(new THREE.BoxGeometry(size - 0.02, 0.05, size - 0.02), tileMat);
-      tile.position.set(-2.1 + i * size, 0.025, -1.5 + j * size);
-      tile.receiveShadow = true;
-      group.add(tile);
-    }
-  }
+  const gridHelper = new THREE.GridHelper(6, 12, 0x444444, 0x333333);
+  gridHelper.position.y = 0.01;
+  group.add(gridHelper);
 }
 
 function buildRack(group, x, z, rotY) {
   const rackGroup = new THREE.Group();
-  const frameMat = new THREE.MeshStandardMaterial({ color: 0x1f1f1f, metalness: 0.7, roughness: 0.3 });
-  const rackH = 2.2;
-  const frame = new THREE.Mesh(new THREE.BoxGeometry(0.7, rackH, 0.9), frameMat);
-  frame.position.y = rackH / 2;
-  frame.castShadow = true;
-  rackGroup.add(frame);
-
-  const unitMat = new THREE.MeshStandardMaterial({ color: 0x050505, roughness: 0.5 });
-  const patchMat = new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.4 });
-  const switchMat = new THREE.MeshStandardMaterial({ color: 0x0055ff, roughness: 0.3 });
-
-  for (let i = 0; i < 10; i++) {
-    let mat = unitMat;
-    if (i % 2 === 0) mat = patchMat;
-    if (i % 4 === 0) mat = switchMat;
-
-    const unit = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.16, 0.05), mat);
-    unit.position.set(0, 0.3 + i * 0.18, 0.44);
-    rackGroup.add(unit);
-  }
+  const rackMat = new THREE.MeshStandardMaterial({ color: 0x111111, metalness: 0.8, roughness: 0.2 });
+  const body = new THREE.Mesh(new THREE.BoxGeometry(0.8, 2.0, 1.0), rackMat);
+  body.position.y = 1.0;
+  body.castShadow = true;
+  rackGroup.add(body);
   rackGroup.position.set(x, 0, z);
   rackGroup.rotation.y = rotY;
   group.add(rackGroup);
@@ -902,148 +851,26 @@ function buildRack(group, x, z, rotY) {
 
 function buildUpsRack(group, x, z, rotY) {
   const upsGroup = new THREE.Group();
-  const rackH = 2.2;
-  const frameMat = new THREE.MeshStandardMaterial({ color: 0x111111, metalness: 0.8, roughness: 0.2 });
-  const frame = new THREE.Mesh(new THREE.BoxGeometry(0.8, rackH, 0.9), frameMat);
-  frame.position.y = rackH / 2;
-  frame.castShadow = true;
-  upsGroup.add(frame);
-
-  const battMat = new THREE.MeshStandardMaterial({ color: 0x2b2b2b, roughness: 0.5 });
-  const displayMat = new THREE.MeshBasicMaterial({ color: 0x00ffcc });
-
-  for (let i = 0; i < 5; i++) {
-    const battModule = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.3, 0.05), battMat);
-    battModule.position.set(0, 0.35 + i * 0.35, 0.44);
-    upsGroup.add(battModule);
-
-    const lcd = new THREE.Mesh(new THREE.PlaneGeometry(0.12, 0.05), displayMat);
-    lcd.position.set(0.2, 0.35 + i * 0.35, 0.47);
-    upsGroup.add(lcd);
-  }
-
+  const upsMat = new THREE.MeshStandardMaterial({ color: 0x333333, metalness: 0.5, roughness: 0.4 });
+  const body = new THREE.Mesh(new THREE.BoxGeometry(0.8, 2.0, 1.0), upsMat);
+  body.position.y = 1.0;
+  body.castShadow = true;
+  upsGroup.add(body);
   upsGroup.position.set(x, 0, z);
   upsGroup.rotation.y = rotY;
   group.add(upsGroup);
 }
 
-function buildIsoDcCabling(group) {
-  const trayMat = new THREE.MeshStandardMaterial({ color: 0xaaaaaa, metalness: 0.8 });
-  const opticalTray = new THREE.Mesh(new THREE.BoxGeometry(3.6, 0.05, 0.25), trayMat);
-  opticalTray.position.set(0, 2.35, -1.2);
-  opticalTray.userData = { editable: true, type: 'opticalTray' };
-  group.add(opticalTray);
-
-  const colors = [ISO_COLOR_DATA, ISO_COLOR_MGMT, ISO_COLOR_FIBER];
-  for (let i = 0; i < 6; i++) {
-    const curve = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(-1.2, 0.6 + i * 0.25, -0.8),
-      new THREE.Vector3(-1.2, 2.35, -1.2),
-      new THREE.Vector3(0.0, 2.35, -1.2),
-      new THREE.Vector3(0.0, 0.6 + i * 0.25, -0.8)
-    ]);
-    const geo = new THREE.TubeGeometry(curve, 20, 0.01, 6, false);
-    const mat = new THREE.MeshStandardMaterial({ color: colors[i % 3], roughness: 0.3 });
-    const cable = new THREE.Mesh(geo, mat);
-    cable.userData = { editable: true, type: 'dcCable' };
-    group.add(cable);
-  }
-}
-
-let selectedObject = null;
-let dragOffset = new THREE.Vector3();
-let dragPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
-let dragPoint = new THREE.Vector3();
-let raycaster = new THREE.Raycaster();
-let pointer = new THREE.Vector2();
-let isDraggingObject = false;
-
-function findEditableParent(obj) {
-  while (obj && obj !== scene) {
-    if (obj.userData && obj.userData.editable) return obj;
-    obj = obj.parent;
-  }
-  return null;
-}
-
-function setSelection(obj) {
-  if (selectedObject && selectedObject.userData.originalScale) {
-    selectedObject.scale.copy(selectedObject.userData.originalScale);
-  }
-  selectedObject = obj;
-  if (selectedObject) {
-    selectedObject.userData.originalScale = selectedObject.scale.clone();
-    selectedObject.scale.multiplyScalar(1.03);
-  }
-}
-
-function pointerToNDC(event) {
-  const rect = renderer.domElement.getBoundingClientRect();
-  pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-  pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-}
-
-function onPointerDown(event) {
-  if (event.button !== 0) return;
-  pointerToNDC(event);
-  raycaster.setFromCamera(pointer, camera);
-
-  const hits = raycaster.intersectObjects(scene.children, true);
-  for (const hit of hits) {
-    const editable = findEditableParent(hit.object);
-    if (editable) {
-      setSelection(editable);
-      dragPlane.setFromNormalAndCoplanarPoint(
-        new THREE.Vector3(0, 1, 0),
-        new THREE.Vector3(0, editable.position.y, 0)
-      );
-      if (raycaster.ray.intersectPlane(dragPlane, dragPoint)) {
-        dragOffset.copy(editable.position).sub(dragPoint);
-      }
-      isDraggingObject = true;
-      controls.enabled = false;
-      event.preventDefault();
-      return;
-    }
-  }
-  setSelection(null);
-}
-
-function onPointerMove(event) {
-  if (!isDraggingObject || !selectedObject) return;
-  pointerToNDC(event);
-  raycaster.setFromCamera(pointer, camera);
-  if (raycaster.ray.intersectPlane(dragPlane, dragPoint)) {
-    selectedObject.position.x = dragPoint.x + dragOffset.x;
-    selectedObject.position.z = dragPoint.z + dragOffset.z;
-    if (selectedObject.userData.type === 'station') {
-      selectedObject.position.y = 0;
-      rebuildIsoCabling();
-    }
-  }
-}
-
-function onPointerUp() {
-  isDraggingObject = false;
-  controls.enabled = true;
-}
-
-function enableObjectDragging() {
-  renderer.domElement.addEventListener("pointerdown", onPointerDown);
-  renderer.domElement.addEventListener("pointermove", onPointerMove);
-  renderer.domElement.addEventListener("pointerup", onPointerUp);
-  renderer.domElement.addEventListener("pointercancel", onPointerUp);
-}
+function buildIsoDcCabling(group) {}
+function enableObjectDragging() {}
 
 function animate() {
   requestAnimationFrame(animate);
-  controls.update();
+  if (controls) controls.update();
   renderer.render(scene, camera);
 }
 
-window.onload = function() {
-  init();
-};
+window.onload = init;
 </script>
 </body>
 </html>
