@@ -2,44 +2,164 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Sala 3D — Cabeamento Estruturado ISO/IEC 11801</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>NIEMEYER — Sala 3D — Cabeamento Estruturado ISO/IEC 11801</title>
 <style>
-  html, body { margin: 0; padding: 0; overflow: hidden; background: #1a1a1a; font-family: Arial, sans-serif; }
-  #canvas-container { width: 100vw; height: 100vh; display: block; }
+  html, body { 
+    margin: 0; 
+    padding: 0; 
+    overflow: hidden; 
+    background: #1a1a1a; 
+    font-family: Arial, sans-serif; 
+    touch-action: none;
+  }
+  
+  #canvas-container { 
+    width: 100vw; 
+    height: 100vh; 
+    display: block; 
+  }
+  
   #info {
-    position: absolute; top: 12px; left: 12px; color: #eee; font-size: 13px;
-    background: rgba(0,0,0,0.85); padding: 12px 16px; border-radius: 8px; line-height: 1.5;
-    pointer-events: none; border-left: 4px solid #1e88e5;
+    position: absolute; 
+    top: 12px; 
+    left: 12px; 
+    color: #eee; 
+    font-size: 12px;
+    background: rgba(0,0,0,0.85); 
+    padding: 10px 14px; 
+    border-radius: 8px; 
+    line-height: 1.4;
+    pointer-events: none; 
+    border-left: 4px solid #1e88e5; 
+    max-width: calc(100vw - 24px); 
+    box-sizing: border-box;
+    z-index: 5;
   }
+
+  #info h1 {
+    margin: 0 0 4px 0;
+    font-size: 18px;
+    letter-spacing: 1px;
+    color: #ffffff;
+    text-transform: uppercase;
+  }
+
   #controls-ui {
-    position: absolute; top: 12px; right: 12px; z-index: 10;
-    display: flex; flex-direction: column; gap: 6px; align-items: flex-end;
+    position: absolute; 
+    top: 130px; 
+    right: 12px; 
+    z-index: 10;
+    display: flex; 
+    flex-direction: column; 
+    gap: 8px; 
+    align-items: flex-end;
+    max-height: calc(100vh - 240px); 
+    overflow-y: auto; 
+    padding-right: 4px;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
   }
+
   .btn {
-    background: #1e88e5; color: #fff; border: none; padding: 8px 12px;
-    font-size: 11px; font-weight: bold; border-radius: 6px; cursor: pointer;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.3); transition: background 0.2s; min-width: 190px; text-align: left;
+    background: #1e88e5; 
+    color: #fff; 
+    border: none; 
+    padding: 12px 16px;
+    font-size: 13px; 
+    font-weight: bold; 
+    border-radius: 6px; 
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3); 
+    transition: background 0.2s; 
+    min-width: 220px; 
+    text-align: center;
+    touch-action: manipulation;
   }
   .btn:hover { background: #1565c0; }
+  
   .btn-group {
-    display: flex; gap: 4px; background: rgba(0,0,0,0.6); padding: 4px; border-radius: 6px;
+    display: flex; 
+    gap: 6px; 
+    background: rgba(0,0,0,0.6); 
+    padding: 6px; 
+    border-radius: 6px;
   }
+  
   .btn-sub {
-    background: #424242; color: #fff; border: none; padding: 5px 8px;
-    font-size: 10px; font-weight: bold; border-radius: 4px; cursor: pointer;
+    background: #424242; 
+    color: #fff; 
+    border: none; 
+    padding: 10px 14px;
+    font-size: 12px; 
+    font-weight: bold; 
+    border-radius: 4px; 
+    cursor: pointer;
+    touch-action: manipulation;
   }
   .btn-sub:hover { background: #616161; }
   .btn-sub-danger { background: #d32f2f; }
   .btn-sub-danger:hover { background: #b71c1c; }
+
   #legend {
-    position: absolute; bottom: 12px; left: 12px; color: #eee; font-size: 11px;
-    background: rgba(0,0,0,0.85); padding: 10px 14px; border-radius: 8px; line-height: 1.5;
+    position: absolute; 
+    bottom: 12px; 
+    left: 12px; 
+    color: #eee; 
+    font-size: 10px;
+    background: rgba(0,0,0,0.85); 
+    padding: 8px 12px; 
+    border-radius: 8px; 
+    line-height: 1.4;
+    max-width: calc(100vw - 24px); 
+    box-sizing: border-box; 
+    pointer-events: none;
+    z-index: 5;
   }
-  .dot { display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:6px; }
+  .dot { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:5px; }
+
+  @media (max-width: 600px) {
+    #info { 
+      top: 8px; 
+      left: 8px; 
+      font-size: 10px; 
+      padding: 6px 8px; 
+    }
+    #info h1 {
+      font-size: 14px;
+    }
+    #controls-ui { 
+      top: 100px; 
+      right: 6px; 
+      max-height: calc(100vh - 200px); 
+    }
+    #legend { 
+      bottom: 8px; 
+      left: 8px; 
+      font-size: 8.5px; 
+      padding: 6px 8px; 
+    }
+    .btn { 
+      min-width: 150px; 
+      font-size: 11px; 
+      padding: 10px 8px; 
+    }
+    .btn-sub { 
+      padding: 8px 8px; 
+      font-size: 10px; 
+    }
+  }
 </style>
 </head>
 <body>
 <div id="canvas-container"></div>
+
+<div id="info">
+  <h1>NIEMEYER</h1>
+  <strong>Data Center + Escritório (ISO/IEC 11801)</strong><br>
+  <span id="room-status">Dimensões: 14m x 10m x 3.2m | Cap. Máx: 8 Estações</span><br>
+  <strong>Data Center:</strong> Racks, Rede, Nobreak e Cabeamento.
+</div>
 
 <div id="controls-ui">
   <div class="btn-group">
@@ -55,7 +175,7 @@
     <button class="btn-sub btn-sub-danger" onclick="adjustDimension('height', -0.5)">⬇️ - Pé-Direito</button>
   </div>
 
-  <button class="btn" onclick="applyIsoLayout()">🔄 Reorganizar Layout (Norte)</button>
+  <button id="btnReorganizar" class="btn">🔄 Reorganizar Layout (ISO)</button>
   
   <div class="btn-group">
     <button class="btn-sub" onclick="addFullStation()">➕ Estação</button>
@@ -84,23 +204,18 @@
   </div>
 </div>
 
-<div id="info">
-  <strong>Data Center + Escritório (ISO/IEC 11801)</strong><br>
-  <span id="room-status">Dimensões: 14m x 10m x 3.2m | Cap. Máx: 8 Estações</span><br>
-  <strong>Data Center:</strong> Racks de Servidores, Rede, Nobreak e Cabeamento ISO.
-</div>
-
 <div id="legend">
   <strong>Padrão de Cores ISO/IEC 11801:</strong><br>
-  <span class="dot" style="background:#1e88e5"></span>ISO: Cabeamento Horizontal de Dados (Cat6a) - <span id="len-data">0.0m</span><br>
-  <span class="dot" style="background:#43a047"></span>ISO: Gerenciamento OOB e Redes Críticas (Verde) - <span id="len-mgmt">0.0m</span><br>
-  <span class="dot" style="background:#fdd835"></span>ISO: Backbone de Fibra Óptica (Monomodo/OM4) - <span id="len-fiber">0.0m</span><br>
-  <span class="dot" style="background:#9e9e9e"></span>ISO: Patch Cords das Estações (Cinza) - <span id="len-patch">0.0m</span><br>
-  <strong>Comprimento Total de Cabos: <span id="len-total" style="color:#1e88e5">0.0m</span></strong>
+  <span class="dot" style="background:#1e88e5"></span>ISO: Cabeamento Dados (Cat6a) - <span id="len-data">0.0m</span><br>
+  <span class="dot" style="background:#43a047"></span>ISO: Gerenciamento OOB (Verde) - <span id="len-mgmt">0.0m</span><br>
+  <span class="dot" style="background:#fdd835"></span>ISO: Backbone Fibra Óptica - <span id="len-fiber">0.0m</span><br>
+  <span class="dot" style="background:#9e9e9e"></span>ISO: Patch Cords (Cinza) - <span id="len-patch">0.0m</span><br>
+  <strong>Total de Cabos: <span id="len-total" style="color:#1e88e5">0.0m</span></strong>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
 <script>
 let scene, camera, renderer, controls;
 const WALL_T = 0.15;
@@ -110,6 +225,8 @@ const ISO_COLOR_DATA = 0x1e88e5;
 const ISO_COLOR_MGMT = 0x43a047;
 const ISO_COLOR_FIBER = 0xfdd835;
 const ISO_COLOR_PATCH = 0x9e9e9e;
+
+const SINGLE_DESK_WIDTH = 0.8;
 
 let roomWidth = 14;
 let roomDepth = 10;
@@ -171,6 +288,7 @@ function init() {
 
   renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   container.appendChild(renderer.domElement);
@@ -188,7 +306,7 @@ function init() {
   const dir = new THREE.DirectionalLight(0xffffff, 0.9);
   dir.position.set(10, 16, 10);
   dir.castShadow = true;
-  dir.shadow.mapSize.set(2048, 2048);
+  dir.shadow.mapSize.set(1024, 1024);
   scene.add(dir);
 
   buildOfficeRoom();
@@ -218,6 +336,7 @@ function onResize() {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 }
 
 function buildWallWithOpenings(width, height, openings, mat) {
@@ -551,58 +670,85 @@ function buildMouseMesh() {
   return mouseGroup;
 }
 
-function createWorkstation(x, z, id) {
-  stationCounter++;
-  const stationGroup = new THREE.Group();
-  stationGroup.userData = { editable: true, type: "station", label: id || `Estação ${stationCounter}` };
-
-  const w = 1.4, d = 0.7;
+function buildDeskMeshOnly() {
+  const w = SINGLE_DESK_WIDTH, d = 0.7;
+  const deskGroup = new THREE.Group();
   const topMat = new THREE.MeshStandardMaterial({ color: 0x8b5a2b, roughness: 0.6 });
   const legMat = new THREE.MeshStandardMaterial({ color: 0x2c2c2c, roughness: 0.5, metalness: 0.4 });
 
   const top = new THREE.Mesh(new THREE.BoxGeometry(w, 0.06, d), topMat);
   top.position.y = 0.75;
   top.castShadow = true; top.receiveShadow = true;
-  stationGroup.add(top);
+  deskGroup.add(top);
 
   const legGeo = new THREE.BoxGeometry(0.05, 0.75, 0.05);
   [[-w/2 + 0.05, -d/2 + 0.05], [w/2 - 0.05, -d/2 + 0.05], [-w/2 + 0.05, d/2 - 0.05], [w/2 - 0.05, d/2 - 0.05]].forEach(([lx, lz]) => {
     const leg = new THREE.Mesh(legGeo, legMat);
     leg.position.set(lx, 0.375, lz);
     leg.castShadow = true;
-    stationGroup.add(leg);
+    deskGroup.add(leg);
   });
+  return deskGroup;
+}
 
+function buildPcMeshOnly() {
   const pcMat = new THREE.MeshStandardMaterial({ color: 0x1f1f1f, roughness: 0.4, metalness: 0.6 });
   const pcBody = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.42, 0.45), pcMat);
-  pcBody.position.set(w/2 - 0.2, 0.78 + 0.21, 0);
+  pcBody.position.y = 0.21;
   pcBody.castShadow = true;
+  return pcBody;
+}
+
+function buildMonitorMeshOnly() {
+  const monGroup = new THREE.Group();
+  const monMat = new THREE.MeshStandardMaterial({ color: 0x111111 });
+  const monitor = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.32, 0.03), monMat);
+  monitor.position.y = 0.25;
+  monitor.castShadow = true;
+  monGroup.add(monitor);
+
+  const stand = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.1, 0.08), monMat);
+  stand.position.y = 0.05;
+  monGroup.add(stand);
+  return monGroup;
+}
+
+function createWorkstation(x, z, id, y = 0) {
+  stationCounter++;
+  const stationGroup = new THREE.Group();
+  
+  stationGroup.userData = { 
+    editable: true, 
+    type: "station", 
+    label: id || `Estação ${stationCounter}` 
+  };
+
+  const w = SINGLE_DESK_WIDTH, d = 0.7;
+  const desk = buildDeskMeshOnly();
+  stationGroup.add(desk);
+
+  const pcBody = buildPcMeshOnly();
+  pcBody.position.set(w/2 - 0.15, 0.78 + 0.21, 0);
   stationGroup.add(pcBody);
   stationGroup.userData.pcMesh = pcBody;
 
-  const monMat = new THREE.MeshStandardMaterial({ color: 0x111111 });
-  const monitor = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.32, 0.03), monMat);
-  monitor.position.set(-0.1, 0.78 + 0.25, -d/4);
-  monitor.castShadow = true;
+  const monitor = buildMonitorMeshOnly();
+  monitor.position.set(-0.05, 0.78, -d/4);
   stationGroup.add(monitor);
 
-  const stand = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.1, 0.08), monMat);
-  stand.position.set(-0.1, 0.78 + 0.05, -d/4);
-  stationGroup.add(stand);
-
   const keyboard = buildKeyboardMesh();
-  keyboard.position.set(-0.1, 0.78, 0.05);
+  keyboard.position.set(-0.05, 0.78, 0.05);
   stationGroup.add(keyboard);
 
   const mouse = buildMouseMesh();
-  mouse.position.set(0.25, 0.78, 0.05);
+  mouse.position.set(0.2, 0.78, 0.05);
   stationGroup.add(mouse);
 
   const chairGroup = buildChairMesh();
-  chairGroup.position.set(-0.1, 0, d/2 + 0.3);
+  chairGroup.position.set(-0.05, 0, d/2 + 0.3);
   stationGroup.add(chairGroup);
 
-  stationGroup.position.set(x, 0, z);
+  stationGroup.position.set(x, y, z);
   stationGroup.rotation.y = 0; 
 
   scene.add(stationGroup);
@@ -610,10 +756,39 @@ function createWorkstation(x, z, id) {
   return stationGroup;
 }
 
+function addStationGroup(centerX, centerZ) {
+  const group = new THREE.Group();
+  group.userData = { editable: true, type: 'stationGroup', label: 'Grupo Quadrivalente' };
+
+  const w = SINGLE_DESK_WIDTH;
+  const d = 0.7;
+
+  const offsets = [
+    { x: -w/2, z: -d/2, rot: 0 },
+    { x:  w/2, z: -d/2, rot: 0 },
+    { x: -w/2, z:  d/2, rot: Math.PI },
+    { x:  w/2, z:  d/2, rot: Math.PI }
+  ];
+
+  offsets.forEach((off, idx) => {
+    const st = createWorkstation(off.x, off.z, `Estação ${stationCounter+1}`, 0);
+    st.rotation.y = off.rot;
+    scene.remove(st);
+    group.add(st);
+  });
+
+  group.position.set(centerX, 0, centerZ);
+  scene.add(group);
+  return group;
+}
+
 function addFullStation() {
-  if (deskGroups.length >= getMaxCapacity()) return;
+  if (deskGroups.length >= getMaxCapacity()) {
+    alert("Limite máximo de estações atingido para o tamanho atual da sala, de acordo com as normas ISO/IEC 11801!");
+    return;
+  }
   createWorkstation(0, 0);
-  applyIsoLayout();
+  rebuildIsoCabling();
   updateStatusUI();
 }
 
@@ -621,86 +796,90 @@ function removeFullStation() {
   if (deskGroups.length > 0) {
     const station = deskGroups.pop();
     scene.remove(station);
-    applyIsoLayout();
+    rebuildIsoCabling();
     updateStatusUI();
   }
 }
 
 function addSingleItem(type) {
-  const itemGroup = new THREE.Group();
-  itemGroup.userData = { editable: true, type: type };
-
+  let mesh;
   if (type === 'desk') {
-    const w = 1.4, d = 0.7;
-    const top = new THREE.Mesh(new THREE.BoxGeometry(w, 0.06, d), new THREE.MeshStandardMaterial({ color: 0x8b5a2b, roughness: 0.6 }));
-    top.position.y = 0.75;
-    top.castShadow = true;
-    top.receiveShadow = true;
-    itemGroup.add(top);
-
-    const legMat = new THREE.MeshStandardMaterial({ color: 0x2c2c2c, roughness: 0.5, metalness: 0.4 });
-    const legGeo = new THREE.BoxGeometry(0.05, 0.75, 0.05);
-    [[-w/2 + 0.05, -d/2 + 0.05], [w/2 - 0.05, -d/2 + 0.05], [-w/2 + 0.05, d/2 - 0.05], [w/2 - 0.05, d/2 - 0.05]].forEach(([lx, lz]) => {
-      const leg = new THREE.Mesh(legGeo, legMat);
-      leg.position.set(lx, 0.375, lz);
-      leg.castShadow = true;
-      itemGroup.add(leg);
-    });
+    mesh = buildDeskMeshOnly();
   } else if (type === 'chair') {
-    const chairMesh = buildChairMesh();
-    itemGroup.add(chairMesh);
+    mesh = buildChairMesh();
   } else if (type === 'monitor') {
-    const monitor = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.32, 0.03), new THREE.MeshStandardMaterial({ color: 0x111111 }));
-    monitor.position.y = 0.85;
-    itemGroup.add(monitor);
+    mesh = buildMonitorMeshOnly();
+    mesh.position.y = 0.78;
   } else if (type === 'pc') {
-    const pcBody = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.42, 0.45), new THREE.MeshStandardMaterial({ color: 0x1f1f1f }));
-    pcBody.position.y = 0.21;
-    itemGroup.add(pcBody);
+    mesh = buildPcMeshOnly();
+    mesh.position.y = 0.78;
   } else if (type === 'keyboard') {
-    const kbd = buildKeyboardMesh();
-    kbd.position.y = 0.001;
-    itemGroup.add(kbd);
+    mesh = buildKeyboardMesh();
+    mesh.position.y = 0.78;
   } else if (type === 'mouse') {
-    const ms = buildMouseMesh();
-    ms.position.y = 0.001;
-    itemGroup.add(ms);
+    mesh = buildMouseMesh();
+    mesh.position.y = 0.78;
   }
 
-  itemGroup.position.set((Math.random() - 0.5) * 3, 0, (Math.random() - 0.5) * 3);
-  scene.add(itemGroup);
-  singleItems.push(itemGroup);
+  if (mesh) {
+    mesh.userData = { editable: true, type: type };
+    mesh.position.set((Math.random() - 0.5) * 2, mesh.position.y, (Math.random() - 0.5) * 2);
+    scene.add(mesh);
+    singleItems.push(mesh);
+  }
 }
 
 function removeSingleItem(type) {
-  const idx = singleItems.findIndex(item => item.userData.type === type);
-  if (idx !== -1) {
-    const item = singleItems.splice(idx, 1)[0];
-    scene.remove(item);
+  for (let i = singleItems.length - 1; i >= 0; i--) {
+    if (singleItems[i].userData.type === type) {
+      scene.remove(singleItems[i]);
+      singleItems.splice(i, 1);
+      break;
+    }
   }
 }
 
 function buildFurniture() {
-  for (let i = 0; i < 6; i++) createWorkstation(0, 0);
-  applyIsoLayout();
+  // Inicialização limpa da sala
 }
 
 function applyIsoLayout() {
-  const cols = Math.max(1, Math.min(4, Math.floor(roomWidth / 3)));
-  const spacingX = 2.4;
-  const spacingZ = 2.4;
-  const startX = -((cols - 1) * spacingX) / 2;
-  const startZ = -1.0;
+  const count = deskGroups.length;
+  if (count === 0) {
+    rebuildIsoCabling();
+    return;
+  }
 
-  deskGroups.forEach((group, index) => {
-    const col = index % cols;
-    const row = Math.floor(index / cols);
+  const groupWidth = SINGLE_DESK_WIDTH * 2 + 0.2;
+  const groupDepth = 0.7 * 2 + 0.2;
+  
+  const cols = Math.max(1, Math.floor((roomWidth - 3) / (groupWidth + 1.0)));
+  const spacingX = groupWidth + 1.2;
+  const spacingZ = groupDepth + 1.2;
 
-    const x = startX + col * spacingX;
-    const z = startZ + row * spacingZ;
+  deskGroups.forEach((station, index) => {
+    const groupIdx = Math.floor(index / 4);
+    const posInGroup = index % 4;
 
-    group.position.set(x, 0, z);
-    group.rotation.y = 0;
+    const col = groupIdx % cols;
+    const row = Math.floor(groupIdx / cols);
+
+    const groupX = -((cols - 1) * spacingX) / 2 + col * spacingX;
+    const groupZ = -roomDepth/2 + 2.5 + row * spacingZ;
+
+    const w = SINGLE_DESK_WIDTH;
+    const d = 0.7;
+
+    const offsets = [
+      { x: -w/2, z: -d/2, rot: 0 },
+      { x:  w/2, z: -d/2, rot: 0 },
+      { x: -w/2, z:  d/2, rot: Math.PI },
+      { x:  w/2, z:  d/2, rot: Math.PI }
+    ];
+
+    const off = offsets[posInGroup];
+    station.position.set(groupX + off.x, 0, groupZ + off.z);
+    station.rotation.y = off.rot;
   });
 
   rebuildIsoCabling();
@@ -979,12 +1158,14 @@ function setSelection(obj) {
 
 function pointerToNDC(event) {
   const rect = renderer.domElement.getBoundingClientRect();
-  pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-  pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+  const clientX = (event.touches && event.touches.length > 0) ? event.touches[0].clientX : event.clientX;
+  const clientY = (event.touches && event.touches.length > 0) ? event.touches[0].clientY : event.clientY;
+  pointer.x = ((clientX - rect.left) / rect.width) * 2 - 1;
+  pointer.y = -((clientY - rect.top) / rect.height) * 2 + 1;
 }
 
 function onPointerDown(event) {
-  if (event.button !== 0) return;
+  if (event.button !== undefined && event.button !== 0) return;
   pointerToNDC(event);
   raycaster.setFromCamera(pointer, camera);
 
@@ -1002,7 +1183,6 @@ function onPointerDown(event) {
       }
       isDraggingObject = true;
       controls.enabled = false;
-      event.preventDefault();
       return;
     }
   }
@@ -1029,10 +1209,16 @@ function onPointerUp() {
 }
 
 function enableObjectDragging() {
-  renderer.domElement.addEventListener("pointerdown", onPointerDown);
-  renderer.domElement.addEventListener("pointermove", onPointerMove);
-  renderer.domElement.addEventListener("pointerup", onPointerUp);
-  renderer.domElement.addEventListener("pointercancel", onPointerUp);
+  const dom = renderer.domElement;
+  
+  dom.addEventListener("pointerdown", onPointerDown);
+  dom.addEventListener("pointermove", onPointerMove);
+  dom.addEventListener("pointerup", onPointerUp);
+  dom.addEventListener("pointercancel", onPointerUp);
+
+  dom.addEventListener("touchstart", onPointerDown, { passive: true });
+  dom.addEventListener("touchmove", onPointerMove, { passive: true });
+  dom.addEventListener("touchend", onPointerUp);
 }
 
 function animate() {
@@ -1043,6 +1229,39 @@ function animate() {
 
 window.onload = function() {
   init();
+
+  const layoutsDisponiveis = [
+    [ { x: -4, z: 0 }, { x: -2, z: 0 }, { x: 0, z: 0 }, { x: 2, z: 0 }, { x: 4, z: 0 } ],
+    [ { x: -1.5, z: -1.5 }, { x: 1.5, z: -1.5 }, { x: -1.5, z: 1.5 }, { x: 1.5, z: 1.5 }, { x: 0, z: 4 } ],
+    [ { x: -3, z: -2 }, { x: -1, z: -2 }, { x: 1, z: -2 }, { x: 1, z: 0 }, { x: 1, z: 2 } ],
+    [ { x: -2, z: -2 }, { x: -2, z: 0 }, { x: 0, z: 1.5 }, { x: 2, z: 0 }, { x: 2, z: -2 } ],
+    [ { x: 0, z: -4 }, { x: 0, z: -2 }, { x: 0, z: 0 }, { x: 0, z: 2 }, { x: 0, z: 4 } ],
+    [ { x: -4, z: -4 }, { x: -2, z: -2 }, { x: 0, z: 0 }, { x: 2, z: 2 }, { x: 4, z: 4 } ],
+    [ { x: 0, z: -3 }, { x: 2.8, z: -0.9 }, { x: 1.7, z: 2.4 }, { x: -1.7, z: 2.4 }, { x: -2.8, z: -0.9 } ],
+    [ { x: -2, z: -2 }, { x: 2, z: -2 }, { x: -3, z: 2 }, { x: 0, z: 2 }, { x: 3, z: 2 } ],
+    [ { x: -3, z: -2 }, { x: -1.5, z: 0 }, { x: 0, z: 2 }, { x: 1.5, z: 0 }, { x: 3, z: -2 } ],
+    [ { x: -2, z: -2 }, { x: 2, z: -2 }, { x: 0, z: 0 }, { x: -2, z: 2 }, { x: 2, z: 2 } ]
+  ];
+
+  let indiceLayoutAtual = 0;
+
+  const btn = document.getElementById("btnReorganizar");
+  if (btn) {
+    btn.addEventListener("click", () => {
+      if (deskGroups.length === 0) return;
+      
+      const layoutAtual = layoutsDisponiveis[indiceLayoutAtual];
+
+      deskGroups.forEach((station, index) => {
+        const pos = layoutAtual[index % layoutAtual.length];
+        station.position.x = pos.x;
+        station.position.z = pos.z;
+      });
+
+      indiceLayoutAtual = (indiceLayoutAtual + 1) % layoutsDisponiveis.length;
+      rebuildIsoCabling();
+    });
+  }
 };
 </script>
 </body>
