@@ -20,10 +20,30 @@
     display: block; 
   }
   
+  #menu-hamburger {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    z-index: 20;
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 8px;
+    background: rgba(0,0,0,0.8);
+    color: #fff;
+    font-size: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    touch-action: manipulation;
+  }
+  #menu-hamburger:hover { background: rgba(0,0,0,0.95); }
+
   #info {
     position: absolute; 
     top: 12px; 
-    left: 12px; 
+    left: 68px; 
     color: #eee; 
     font-size: 12px;
     background: rgba(0,0,0,0.85); 
@@ -119,9 +139,16 @@
   .dot { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:5px; }
 
   @media (max-width: 600px) {
+    #menu-hamburger {
+      top: 8px;
+      left: 8px;
+      width: 42px;
+      height: 42px;
+      font-size: 22px;
+    }
     #info { 
       top: 8px; 
-      left: 8px; 
+      left: 58px; 
       font-size: 10px; 
       padding: 6px 8px; 
     }
@@ -153,6 +180,8 @@
 </head>
 <body>
 <div id="canvas-container"></div>
+
+<button id="menu-hamburger" aria-label="Mostrar ou esconder informações" aria-expanded="true">☰</button>
 
 <div id="info">
   <h1>NIEMEYER</h1>
@@ -1231,16 +1260,58 @@ window.onload = function() {
   init();
 
   const layoutsDisponiveis = [
-    [ { x: -4, z: 0 }, { x: -2, z: 0 }, { x: 0, z: 0 }, { x: 2, z: 0 }, { x: 4, z: 0 } ],
-    [ { x: -1.5, z: -1.5 }, { x: 1.5, z: -1.5 }, { x: -1.5, z: 1.5 }, { x: 1.5, z: 1.5 }, { x: 0, z: 4 } ],
-    [ { x: -3, z: -2 }, { x: -1, z: -2 }, { x: 1, z: -2 }, { x: 1, z: 0 }, { x: 1, z: 2 } ],
-    [ { x: -2, z: -2 }, { x: -2, z: 0 }, { x: 0, z: 1.5 }, { x: 2, z: 0 }, { x: 2, z: -2 } ],
-    [ { x: 0, z: -4 }, { x: 0, z: -2 }, { x: 0, z: 0 }, { x: 0, z: 2 }, { x: 0, z: 4 } ],
-    [ { x: -4, z: -4 }, { x: -2, z: -2 }, { x: 0, z: 0 }, { x: 2, z: 2 }, { x: 4, z: 4 } ],
-    [ { x: 0, z: -3 }, { x: 2.8, z: -0.9 }, { x: 1.7, z: 2.4 }, { x: -1.7, z: 2.4 }, { x: -2.8, z: -0.9 } ],
-    [ { x: -2, z: -2 }, { x: 2, z: -2 }, { x: -3, z: 2 }, { x: 0, z: 2 }, { x: 3, z: 2 } ],
-    [ { x: -3, z: -2 }, { x: -1.5, z: 0 }, { x: 0, z: 2 }, { x: 1.5, z: 0 }, { x: 3, z: -2 } ],
-    [ { x: -2, z: -2 }, { x: 2, z: -2 }, { x: 0, z: 0 }, { x: -2, z: 2 }, { x: 2, z: 2 } ]
+    // 1 - duas fileiras de 5
+    [
+      {x:-4.5,z:-2.2},{x:-2.25,z:-2.2},{x:0,z:-2.2},{x:2.25,z:-2.2},{x:4.5,z:-2.2},
+      {x:-4.5,z:2.2},{x:-2.25,z:2.2},{x:0,z:2.2},{x:2.25,z:2.2},{x:4.5,z:2.2}
+    ],
+    // 2 - duas fileiras desencontradas
+    [
+      {x:-4,z:-3},{x:-2,z:-3},{x:0,z:-3},{x:2,z:-3},{x:4,z:-3},
+      {x:-3,z:2},{x:-1,z:2},{x:1,z:2},{x:3,z:2},{x:5,z:2}
+    ],
+    // 3 - formato U
+    [
+      {x:-4,z:-3},{x:-2,z:-3},{x:0,z:-3},{x:2,z:-3},{x:4,z:-3},
+      {x:-4,z:0},{x:4,z:0},{x:-4,z:3},{x:0,z:3},{x:4,z:3}
+    ],
+    // 4 - formato centralizado
+    [
+      {x:-3.75,z:-2.5},{x:-1.25,z:-2.5},{x:1.25,z:-2.5},{x:3.75,z:-2.5},
+      {x:-3.75,z:2.5},{x:-1.25,z:2.5},{x:1.25,z:2.5},{x:3.75,z:2.5},
+      {x:-1.25,z:0},{x:1.25,z:0}
+    ],
+    // 5 - corredor central
+    [
+      {x:-4,z:-3},{x:-2,z:-3},{x:2,z:-3},{x:4,z:-3},
+      {x:-4,z:0},{x:4,z:0},{x:-4,z:3},{x:-2,z:3},{x:2,z:3},{x:4,z:3}
+    ],
+    // 6 - diagonal
+    [
+      {x:-4.5,z:-3.5},{x:-3,z:-2.3},{x:-1.5,z:-1.1},{x:0,z:0},{x:1.5,z:1.1},
+      {x:3,z:2.3},{x:4.5,z:3.5},{x:-4.5,z:3.5},{x:3,z:-2.3},{x:4.5,z:-3.5}
+    ],
+    // 7 - quatro cantos + centro
+    [
+      {x:-4,z:-3},{x:0,z:-3},{x:4,z:-3},{x:-4,z:3},{x:0,z:3},{x:4,z:3},
+      {x:-2,z:-0.2},{x:0,z:-0.2},{x:2,z:-0.2},{x:0,z:1.8}
+    ],
+    // 8 - zigue-zague
+    [
+      {x:-4.5,z:-3},{x:-2.5,z:-1.5},{x:-0.5,z:-3},{x:1.5,z:-1.5},{x:3.5,z:-3},
+      {x:-3.5,z:3},{x:-1.5,z:1.5},{x:0.5,z:3},{x:2.5,z:1.5},{x:4.5,z:3}
+    ],
+    // 9 - moldura
+    [
+      {x:-4.5,z:-3},{x:-2.25,z:-3},{x:0,z:-3},{x:2.25,z:-3},{x:4.5,z:-3},
+      {x:-4.5,z:0},{x:4.5,z:0},{x:-4.5,z:3},{x:-2.25,z:3},{x:0,z:3}
+    ],
+    // 10 - distribuição alternada
+    [
+      {x:-4,z:-2.8},{x:-1.3,z:-2.8},{x:1.3,z:-2.8},{x:4,z:-2.8},
+      {x:-3.3,z:0},{x:0,z:0},{x:3.3,z:0},
+      {x:-4,z:2.8},{x:-1.3,z:2.8},{x:2.5,z:2.8}
+    ]
   ];
 
   let indiceLayoutAtual = 0;
@@ -1250,19 +1321,48 @@ window.onload = function() {
     btn.addEventListener("click", () => {
       if (deskGroups.length === 0) return;
       
+      const quantidadeMesas = deskGroups.length;
       const layoutAtual = layoutsDisponiveis[indiceLayoutAtual];
 
-      deskGroups.forEach((station, index) => {
-        const pos = layoutAtual[index % layoutAtual.length];
-        station.position.x = pos.x;
-        station.position.z = pos.z;
-      });
+      // Reorganiza somente a quantidade de mesas que o usuário colocou.
+      // Quando houver mais mesas que posições pré-definidas, distribui as
+      // posições automaticamente em uma grade, sem alterar os demais elementos.
+      if (quantidadeMesas <= layoutAtual.length) {
+        deskGroups.forEach((station, index) => {
+          const pos = layoutAtual[index];
+          station.position.x = pos.x;
+          station.position.z = pos.z;
+        });
+      } else {
+        const cols = Math.max(1, Math.ceil(Math.sqrt(quantidadeMesas)));
+        const rows = Math.ceil(quantidadeMesas / cols);
+        const spacingX = Math.max(1.5, (roomWidth - 4) / Math.max(1, cols - 1));
+        const spacingZ = Math.max(1.5, (roomDepth - 4) / Math.max(1, rows - 1));
+
+        deskGroups.forEach((station, index) => {
+          const col = index % cols;
+          const row = Math.floor(index / cols);
+          station.position.x = cols === 1 ? 0 : -(cols - 1) * spacingX / 2 + col * spacingX;
+          station.position.z = rows === 1 ? 0 : -(rows - 1) * spacingZ / 2 + row * spacingZ;
+        });
+      }
 
       indiceLayoutAtual = (indiceLayoutAtual + 1) % layoutsDisponiveis.length;
       rebuildIsoCabling();
     });
   }
 };
+
+  // Menu hambúrguer: mostra/esconde somente o painel de informações.
+  const menuHamburger = document.getElementById("menu-hamburger");
+  const infoPanel = document.getElementById("info");
+  if (menuHamburger && infoPanel) {
+    menuHamburger.addEventListener("click", () => {
+      const escondido = infoPanel.style.display === "none";
+      infoPanel.style.display = escondido ? "block" : "none";
+      menuHamburger.setAttribute("aria-expanded", String(escondido));
+    });
+  }
 </script>
 </body>
 </html>
