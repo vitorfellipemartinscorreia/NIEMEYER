@@ -65,18 +65,42 @@
     text-transform: uppercase;
   }
 
+  /* Menu hambúrguer flutuante para os controles */
+  #menu-controls-hamburger {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 20;
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 8px;
+    background: rgba(0,0,0,0.8);
+    color: #fff;
+    font-size: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    touch-action: manipulation;
+  }
+  #menu-controls-hamburger:hover { background: rgba(0,0,0,0.95); }
+
   #controls-ui {
     position: absolute; 
-    top: 130px; 
+    top: 64px; 
     right: 12px; 
     z-index: 10;
-    display: flex; 
+    display: none; /* Oculto por padrão, alterna com o botão hambúrguer */
     flex-direction: column; 
     gap: 8px; 
     align-items: flex-end;
-    max-height: calc(100vh - 240px); 
+    max-height: calc(100vh - 80px); 
     overflow-y: auto; 
-    padding-right: 4px;
+    padding: 10px;
+    background: rgba(0,0,0,0.85);
+    border-radius: 8px;
+    box-sizing: border-box;
     -webkit-overflow-scrolling: touch;
     touch-action: pan-y;
   }
@@ -148,6 +172,13 @@
       height: 42px;
       font-size: 22px;
     }
+    #menu-controls-hamburger {
+      top: 8px;
+      right: 8px;
+      width: 42px;
+      height: 42px;
+      font-size: 22px;
+    }
     #info { 
       top: 8px; 
       left: 58px; 
@@ -158,9 +189,9 @@
       font-size: 14px;
     }
     #controls-ui { 
-      top: 100px; 
-      right: 6px; 
-      max-height: calc(100vh - 200px); 
+      top: 58px; 
+      right: 8px; 
+      max-height: calc(100vh - 70px); 
     }
     #legend { 
       bottom: 8px; 
@@ -191,6 +222,8 @@
   <span id="room-status">Dimensões: 14m x 10m x 3.2m | Cap. Máx: 8 Estações</span><br>
   <strong>Data Center:</strong> Racks, Rede, Nobreak e Cabeamento.
 </div>
+
+<button id="menu-controls-hamburger" aria-label="Mostrar ou esconder controles" aria-expanded="false">☰</button>
 
 <div id="controls-ui">
   <div class="btn-group">
@@ -1374,6 +1407,16 @@ window.onload = function() {
       const escondido = infoPanel.style.display === "none";
       infoPanel.style.display = escondido ? "block" : "none";
       menuHamburger.setAttribute("aria-expanded", String(escondido));
+    });
+  }
+
+  const menuControlsHamburger = document.getElementById("menu-controls-hamburger");
+  const controlsUi = document.getElementById("controls-ui");
+  if (menuControlsHamburger && controlsUi) {
+    menuControlsHamburger.addEventListener("click", () => {
+      const aberto = controlsUi.style.display === "flex";
+      controlsUi.style.display = aberto ? "none" : "flex";
+      menuControlsHamburger.setAttribute("aria-expanded", String(!aberto));
     });
   }
 </script>
