@@ -133,8 +133,10 @@
     line-height: 1.4;
     max-width: calc(100vw - 24px); 
     box-sizing: border-box; 
-    pointer-events: none;
+    pointer-events: auto;
     z-index: 5;
+    transform-origin: bottom left;
+    transition: transform 0.3s ease;
   }
   .dot { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:5px; }
 
@@ -239,7 +241,8 @@
   <span class="dot" style="background:#43a047"></span>ISO: Gerenciamento OOB (Verde) - <span id="len-mgmt">0.0m</span><br>
   <span class="dot" style="background:#fdd835"></span>ISO: Backbone Fibra Óptica - <span id="len-fiber">0.0m</span><br>
   <span class="dot" style="background:#9e9e9e"></span>ISO: Patch Cords (Cinza) - <span id="len-patch">0.0m</span><br>
-  <strong>Total de Cabos: <span id="len-total" style="color:#1e88e5">0.0m</span></strong>
+  <strong>Total de Cabos: <span id="len-total" style="color:#1e88e5">0.0m</span></strong><br><br>
+  <button id="btn-scale-legend" onclick="toggleLegendScale()" style="background:#1e88e5; color:#fff; border:none; padding:4px 8px; font-size:9px; font-weight:bold; border-radius:4px; cursor:pointer;">🔍 Aumentar 2x</button>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -1256,6 +1259,20 @@ function animate() {
   renderer.render(scene, camera);
 }
 
+let legendScaled = false;
+function toggleLegendScale() {
+  const legend = document.getElementById("legend");
+  const btnScale = document.getElementById("btn-scale-legend");
+  legendScaled = !legendScaled;
+  if (legendScaled) {
+    legend.style.transform = "scale(2)";
+    btnScale.innerText = "🔍 Tamanho Normal";
+  } else {
+    legend.style.transform = "scale(1)";
+    btnScale.innerText = "🔍 Aumentar 2x";
+  }
+}
+
 window.onload = function() {
   init();
 
@@ -1324,9 +1341,6 @@ window.onload = function() {
       const quantidadeMesas = deskGroups.length;
       const layoutAtual = layoutsDisponiveis[indiceLayoutAtual];
 
-      // Reorganiza somente a quantidade de mesas que o usuário colocou.
-      // Quando houver mais mesas que posições pré-definidas, distribui as
-      // posições automaticamente em uma grade, sem alterar os demais elementos.
       if (quantidadeMesas <= layoutAtual.length) {
         deskGroups.forEach((station, index) => {
           const pos = layoutAtual[index];
@@ -1353,7 +1367,6 @@ window.onload = function() {
   }
 };
 
-  // Menu hambúrguer: mostra/esconde somente o painel de informações.
   const menuHamburger = document.getElementById("menu-hamburger");
   const infoPanel = document.getElementById("info");
   if (menuHamburger && infoPanel) {
