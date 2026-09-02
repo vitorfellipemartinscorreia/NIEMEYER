@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Niemeyer - Planejamento de Infraestrutura</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #e6e2df;
+            color: #333;
+            font-size: 12px;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Top Navbar */
+        header {
+            background-color: #fff;
+            border-bottom: 1px solid #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 16px;
+            height: 45px;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            background-color: #5b3929;
+            color: #fff;
+            padding: 6px;
+            font-weight: bold;
+            border-radius: 3px;
+        }
+
+        .logo-text h1 {
+            font-size: 14px;
+            color: #2c2c2c;
+            letter-spacing: 0.5px;
+        }
+
+        .logo-text span {
+            font-size: 9px;
+            color: #666;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-item {
+            text-decoration: none;
+            color: #444;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 8px;
+            border-radius: 3px;
+        }
+
+        .nav-item.active {
+            background-color: #f0e6e0;
+            color: #5b3929;
+            font-weight: bold;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 11px;
+        }
+
+        .status-dot {
+            height: 8px;
+            width: 8px;
+            background-color: #2e7d32;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .btn-export {
+            background-color: #5b3929;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* Main Workspace */
+        .workspace {
+            display: grid;
+            grid-template-columns: 240px 1fr 240px;
+            grid-template-rows: 1fr 140px;
+            flex: 1;
+            gap: 8px;
+            padding: 8px;
+            overflow: hidden;
+        }
+
+        /* Panels Common Style */
+        .panel {
+            background-color: #f4f1ee;
+            border: 1px solid #dcd6d0;
+            border-radius: 4px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .panel-title {
+            font-size: 11px;
+            font-weight: bold;
+            color: #444;
+            border-bottom: 1px solid #dcd6d0;
+            padding-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Left Sidebar: Configurations */
+        .config-sidebar {
+            grid-row: span 2;
+            gap: 12px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .form-group label {
+            font-size: 11px;
+            color: #555;
+        }
+
+        .form-group input, .form-group select {
+            padding: 6px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            background: #fff;
+            font-size: 11px;
+        }
+
+        .btn-update {
+            background-color: #5b3929;
+            color: white;
+            border: none;
+            padding: 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            text-align: center;
+            font-weight: bold;
+            margin-top: auto;
+        }
+
+        /* Center Area: Physical Plan */
+        .center-area {
+            background-color: #f4f1ee;
+            border: 1px solid #dcd6d0;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            padding: 8px;
+            position: relative;
+        }
+
+        .plan-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .plan-toolbar {
+            display: flex;
+            gap: 4px;
+        }
+
+        .tool-btn {
+            background: #fff;
+            border: 1px solid #ccc;
+            padding: 4px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+        .canvas-container {
+            flex: 1;
+            background-color: #fff;
+            border: 1px dashed #ccc;
+            position: relative;
+            background-image: radial-gradient(#d3d3d3 1px, transparent 1px);
+            background-size: 15px 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* Simulated Blueprint Rooms */
+        .blueprint-room {
+            border: 2px solid #333;
+            width: 85%;
+            height: 85%;
+            position: relative;
+            background: #fbf9f7;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .room-label {
+            position: absolute;
+            top: 5px;
+            left: 10px;
+            font-weight: bold;
+            font-size: 10px;
+            color: #555;
+        }
+
+        .lab-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            grid-template-rows: repeat(4, 1fr);
+            gap: 15px;
+            width: 75%;
+            align-self: center;
+        }
+
+        .pc-node {
+            background: #c8b8a6;
+            border: 1px solid #8c7355;
+            padding: 5px;
+            text-align: center;
+            font-size: 9px;
+            border-radius: 2px;
+        }
+
+        .tech-room {
+            border: 1px solid #666;
+            width: 18%;
+            background: #e8e4e0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            gap: 10px;
+        }
+
+        .rack-cabinet {
+            background: #333;
+            width: 30px;
+            height: 120px;
+            border-radius: 2px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            padding: 4px 0;
+        }
+
+        .rack-slot {
+            height: 8px;
+            background: #555;
+            width: 80%;
+            margin: 0 auto;
+        }
+
+        .plan-footer {
+            font-size: 10px;
+            color: #666;
+            margin-top: 6px;
+        }
+
+        /* Right Sidebar: Summary */
+        .summary-sidebar {
+            grid-row: span 2;
+            font-size: 11px;
+            gap: 8px;
+            overflow-y: auto;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 3px 0;
+            border-bottom: 1px dotted #dcd6d0;
+        }
+
+        .alert-box {
+            background-color: #fcf8e3;
+            border: 1px solid #faebcc;
+            padding: 8px;
+            border-radius: 3px;
+            color: #8a6d3b;
+        }
+
+        .standards-list {
+            padding-left: 15px;
+            color: #444;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        /* Bottom Left: Topology */
+        .bottom-topology {
+            grid-column: 1; /* spans inside footer layout */
+        }
+
+        .topology-flow {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            background: #fff;
+            padding: 10px;
+            border: 1px solid #dcd6d0;
+            border-radius: 3px;
+        }
+
+        .topo-box {
+            background: #f4f1ee;
+            border: 1px solid #ccc;
+            padding: 6px 12px;
+            border-radius: 3px;
+            font-size: 10px;
+        }
+
+        /* Bottom Middle: Environment Sectors */
+        .bottom-sectors {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5px;
+        }
+
+        .sector-card {
+            background: #fff;
+            border: 1px solid #dcd6d0;
+            padding: 8px;
+            border-radius: 3px;
+            font-size: 10px;
+            border-left: 3px solid #5b3929;
+        }
+
+        /* Bottom Right: Actions */
+        .bottom-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .action-btn {
+            background: #fff;
+            border: 1px solid #5b3929;
+            color: #5b3929;
+            padding: 8px;
+            border-radius: 3px;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .action-btn.primary {
+            background: #5b3929;
+            color: #fff;
+        }
+
+        /* Footer Grid Areas fix */
+        .bottom-row-container {
+            grid-column: 2;
+            display: grid;
+            grid-template-columns: 1.5fr 1.5fr 1fr;
+            gap: 8px;
+        }
+
+        .bottom-panel {
+            background-color: #f4f1ee;
+            border: 1px solid #dcd6d0;
+            border-radius: 4px;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="logo-area">
+            <div class="logo-icon">N</div>
+            <div class="logo-text">
+                <h1>Niemeyer</h1>
+                <span>Planejamento de Infraestrutura</span>
+            </div>
+        </div>
+        <nav class="nav-menu">
+            <a href="#" class="nav-item">📁 Projeto</a>
+            <a href="#" class="nav-item active">✏️ Editar</a>
+            <a href="#" class="nav-item">👁️ Visualizar</a>
+            <a href="#" class="nav-item">💻 Dispositivos</a>
+            <a href="#" class="nav-item">🛠️ Ferramentas</a>
+            <a href="#" class="nav-item">📊 Relatórios</a>
+        </nav>
+        <div class="nav-right">
+            <span>Projeto: <strong>Projeto Prototipo</strong></span>
+            <span><span class="status-dot"></span> Salvo</span>
+            <button class="btn-export">⬇️ Exportar</button>
+        </div>
+    </header>
+
+    <!-- Main Workspace Grid -->
+    <div class="workspace">
+        
+        <!-- Left Sidebar: Configurations -->
+        <div class="panel config-sidebar">
+            <div class="panel-title">Configurações do Projeto</div>
+            <span style="font-weight: bold; color: #444; margin-top: 4px;">Dimensões da Sala</span>
+            
+            <div class="form-group">
+                <label>Largura (m)</label>
+                <input type="number" value="20">
+            </div>
+            <div class="form-group">
+                <label>Comprimento (m)</label>
+                <input type="number" value="15">
+            </div>
+            <div class="form-group">
+                <label>Pé-direito (m)</label>
+                <input type="number" value="3">
+            </div>
+
+            <span style="font-weight: bold; color: #444; margin-top: 8px;">Ambiente</span>
+            <div class="form-group">
+                <label>Laboratório</label>
+                <select>
+                    <option>Laboratório</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Setor selecionado</label>
+                <select>
+                    <option>Sala de aula</option>
+                </select>
+            </div>
+
+            <button class="btn-update">Atualizar projeto ↻</button>
+        </div>
+
+        <!-- Center Area: Physical Plan -->
+        <div class="center-area">
+            <div class="plan-header">
+                <span style="font-weight: bold; color: #444;">PLANTA FÍSICA — 20 m × 15 m (300 m²)</span>
+                <div class="plan-toolbar">
+                    <button class="tool-btn">📍 Selecionar</button>
+                    <button class="tool-btn">✋ Mover</button>
+                    <button class="tool-btn">🔗 Conectar</button>
+                    <button class="tool-btn">-</button>
+                    <button class="tool-btn">100%</button>
+                    <button class="tool-btn">+</button>
+                </div>
+            </div>
+            
+            <div class="canvas-container">
+                <div class="blueprint-room">
+                    <span class="room-label">LABORATÓRIO</span>
+                    
+                    <div class="lab-grid">
+                        <div class="pc-node">PC 01</div>
+                        <div class="pc-node">PC 02</div>
+                        <div class="pc-node">PC 03</div>
+                        <div class="pc-node">PC 04</div>
+                        <div class="pc-node">PC 05</div>
+                        <div class="pc-node">PC 06</div>
+                        <div class="pc-node">PC 07</div>
+                        <div class="pc-node">PC 08</div>
+                        <div class="pc-node">PC 09</div>
+                        <div class="pc-node">PC 10</div>
+                        <div class="pc-node">PC 11</div>
+                        <div class="pc-node">PC 12</div>
+                        <div class="pc-node">PC 13</div>
+                        <div class="pc-node">PC 14</div>
+                        <div class="pc-node">PC 15</div>
+                        <div class="pc-node">PC 16</div>
+                        <div class="pc-node">PC 17</div>
+                        <div class="pc-node">PC 18</div>
+                        <div class="pc-node">PC 19</div>
+                        <div class="pc-node">PC 20</div>
+                    </div>
+
+                    <div class="tech-room">
+                        <span style="font-size: 8px; font-weight: bold;">SALA TÉCNICA</span>
+                        <div class="rack-cabinet">
+                            <div class="rack-slot"></div>
+                            <div class="rack-slot"></div>
+                            <div class="rack-slot"></div>
+                            <div class="rack-slot"></div>
+                        </div>
+                        <div style="font-size: 7px; line-height: 1.2; text-align: left;">
+                            ▪ Roteador / firewall<br>
+                            ▪ Switch 144 portas<br>
+                            ▪ Patch panel 144 portas<br>
+                            ▪ 4 servidor(es)<br>
+                            ▪ Nobreak 3kVA
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="plan-footer">
+                Mesa com computador &nbsp;&bull;&nbsp; Access Point &nbsp;&bull;&nbsp; Rack &nbsp;&bull;&nbsp; Cabo de rede Cat6 &nbsp;&bull;&nbsp; Setor: Sala de aula
+            </div>
+        </div>
+
+        <!-- Right Sidebar: Summary -->
+        <div class="panel summary-sidebar">
+            <div class="panel-title">Resumo do Projeto</div>
+            
+            <div class="summary-row"><span>Área total</span><strong>300 m²</strong></div>
+            <div class="summary-row"><span>Área por computador</span><strong>3 m² por computador</strong></div>
+            <div class="summary-row"><span>Computadores suportados</span><strong>100 unidades</strong></div>
+            <div class="summary-row"><span>Servidores recomendados</span><strong>4 unidades</strong></div>
+            <div class="summary-row"><span>Access Points recomendados</span><strong>2 unidades</strong></div>
+            <div class="summary-row"><span>Pontos de rede</span><strong>107 pontos</strong></div>
+            <div class="summary-row"><span>Switch recomendado</span><strong>144 portas</strong></div>
+            <div class="summary-row"><span>Cabo Cat6</span><strong>2358 metros</strong></div>
+
+            <div class="panel-title" style="margin-top: 4px;">Análise do projeto</div>
+            <span style="font-size: 10px; line-height: 1.3;">
+                • Cobertura Wi-Fi: 100% da área<br>
+                • Portas do switch: 74% utilizadas
+            </span>
+
+            <div class="alert-box">
+                <span style="font-weight: bold; display: block; margin-bottom: 2px;">Erros e alertas</span>
+                ✓ Projeto compatível com as dimensões informadas.
+            </div>
+
+            <div class="panel-title" style="margin-top: 4px;">Normas reguladoras</div>
+            <div class="standards-list" style="font-size: 10px;">
+                <span>• ABNT NBR 14565</span>
+                <span>• ANSI/TIA-568.2-D</span>
+                <span>• ANSI/TIA-569-D</span>
+                <span>• ISO/IEC 11801</span>
+            </div>
+        </div>
+
+        <!-- Bottom Row Content container bridging columns 1 & 2 -->
+        <div class="bottom-row-container" style="grid-column: 1 / span 2;">
+            
+            <!-- Bottom Left: Topology -->
+            <div class="bottom-panel">
+                <div class="panel-title">Topologia e Conexões</div>
+                <div class="topology-flow">
+                    <div class="topo-box">Internet</div>
+                    <span>→</span>
+                    <div class="topo-box">Firewall</div>
+                    <span>→</span>
+                    <div class="topo-box">Switch</div>
+                    <span>→</span>
+                    <div class="topo-box">Computadores</div>
+                </div>
+            </div>
+
+            <!-- Bottom Middle: Environment Sectors -->
+            <div class="bottom-panel">
+                <div class="panel-title">Setores do Ambiente</div>
+                <div class="bottom-sectors">
+                    <div class="sector-card">Sala de aula</div>
+                    <div class="sector-card">Área de computadores</div>
+                    <div class="sector-card">Recepção</div>
+                    <div class="sector-card">Sala técnica</div>
+                </div>
+            </div>
+
+            <!-- Bottom Right: Actions -->
+            <div class="bottom-panel bottom-actions">
+                <div class="panel-title">Ações</div>
+                <button class="action-btn primary">Gerar plano IP</button>
+                <button class="action-btn primary"><a href="index.html">Modelo 3D</a></button>
+                <button class="action-btn">Solicitar revisão</button>
+                <span style="font-size: 9px; color: #666; text-align: center;">Altere as dimensões e o ambiente para recalcular o projeto.</span>
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+</html>
