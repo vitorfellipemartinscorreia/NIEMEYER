@@ -241,21 +241,90 @@
         }
 
         .lab-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            grid-template-rows: repeat(4, 1fr);
-            gap: 15px;
+            position: relative;
             width: 75%;
-            align-self: center;
+            height: 100%;
+        }
+
+        .cables-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
         }
 
         .pc-node {
-            background: #c8b8a6;
+            position: absolute;
+            width: 58px;
+            height: 48px;
+            background: #d8cdbf;
             border: 1px solid #8c7355;
-            padding: 5px;
+            padding: 2px;
             text-align: center;
-            font-size: 9px;
+            font-size: 8px;
+            border-radius: 4px;
+            cursor: move;
+            user-select: none;
+            box-shadow: 1px 2px 4px rgba(0,0,0,0.15);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            z-index: 10;
+        }
+
+        .pc-node .monitor {
+            width: 32px;
+            height: 5px;
+            background: #333;
+            border-radius: 1px;
+            margin-top: 2px;
+            border-bottom: 2px solid #666;
+        }
+
+        .pc-node .desk-surface {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            margin-top: 3px;
+            width: 100%;
+        }
+
+        .pc-node .keyboard {
+            width: 22px;
+            height: 7px;
+            background: #444;
+            border-radius: 1px;
+        }
+
+        .pc-node .mouse {
+            width: 4px;
+            height: 6px;
+            background: #222;
             border-radius: 2px;
+        }
+
+        .pc-node .chair {
+            position: absolute;
+            bottom: -9px;
+            width: 18px;
+            height: 8px;
+            background: #5b3929;
+            border-radius: 3px 3px 1px 1px;
+            border: 1px solid #333;
+        }
+
+        .pc-node .node-label {
+            position: absolute;
+            top: -12px;
+            font-size: 8px;
+            font-weight: bold;
+            color: #5b3929;
+            white-space: nowrap;
         }
 
         .tech-room {
@@ -268,6 +337,7 @@
             justify-content: center;
             padding: 10px;
             gap: 10px;
+            z-index: 2;
         }
 
         .rack-cabinet {
@@ -405,6 +475,32 @@
             flex-direction: column;
             gap: 6px;
         }
+
+        /* Controls para estações */
+        .station-controls {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 4px;
+        }
+
+        .station-btn {
+            background: #5b3929;
+            color: #fff;
+            border: none;
+            width: 24px;
+            height: 24px;
+            font-weight: bold;
+            border-radius: 3px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .station-btn:hover {
+            background: #43291d;
+        }
     </style>
 </head>
 <body>
@@ -454,6 +550,16 @@
                 <input type="number" value="3">
             </div>
 
+            <span style="font-weight: bold; color: #444; margin-top: 8px;">Estações de Trabalho</span>
+            <div class="form-group">
+                <label>Quantidade de Estações</label>
+                <div class="station-controls">
+                    <button class="station-btn" id="btn-remove-pc">-</button>
+                    <input type="number" id="station-count-input" value="20" style="width: 100%; text-align: center;" readonly>
+                    <button class="station-btn" id="btn-add-pc">+</button>
+                </div>
+            </div>
+
             <span style="font-weight: bold; color: #444; margin-top: 8px;">Ambiente</span>
             <div class="form-group">
                 <label>Laboratório</label>
@@ -486,35 +592,18 @@
             </div>
             
             <div class="canvas-container">
-                <div class="blueprint-room">
+                <div class="blueprint-room" id="blueprint-room">
                     <span class="room-label">LABORATÓRIO</span>
                     
-                    <div class="lab-grid">
-                        <div class="pc-node">PC 01</div>
-                        <div class="pc-node">PC 02</div>
-                        <div class="pc-node">PC 03</div>
-                        <div class="pc-node">PC 04</div>
-                        <div class="pc-node">PC 05</div>
-                        <div class="pc-node">PC 06</div>
-                        <div class="pc-node">PC 07</div>
-                        <div class="pc-node">PC 08</div>
-                        <div class="pc-node">PC 09</div>
-                        <div class="pc-node">PC 10</div>
-                        <div class="pc-node">PC 11</div>
-                        <div class="pc-node">PC 12</div>
-                        <div class="pc-node">PC 13</div>
-                        <div class="pc-node">PC 14</div>
-                        <div class="pc-node">PC 15</div>
-                        <div class="pc-node">PC 16</div>
-                        <div class="pc-node">PC 17</div>
-                        <div class="pc-node">PC 18</div>
-                        <div class="pc-node">PC 19</div>
-                        <div class="pc-node">PC 20</div>
+                    <svg class="cables-svg" id="cables-svg"></svg>
+
+                    <div class="lab-grid" id="lab-grid">
+                        <!-- PCs gerados dinamicamente via JavaScript -->
                     </div>
 
-                    <div class="tech-room">
+                    <div class="tech-room" id="tech-room">
                         <span style="font-size: 8px; font-weight: bold;">SALA TÉCNICA</span>
-                        <div class="rack-cabinet">
+                        <div class="rack-cabinet" id="rack-cabinet">
                             <div class="rack-slot"></div>
                             <div class="rack-slot"></div>
                             <div class="rack-slot"></div>
@@ -609,5 +698,147 @@
 
     </div>
 
+    <script>
+        const labGrid = document.getElementById('lab-grid');
+        const countInput = document.getElementById('station-count-input');
+        const btnAdd = document.getElementById('btn-add-pc');
+        const btnRemove = document.getElementById('btn-remove-pc');
+        const svgCanvas = document.getElementById('cables-svg');
+        const blueprintRoom = document.getElementById('blueprint-room');
+        const rackCabinet = document.getElementById('rack-cabinet');
+
+        let stationCount = 20;
+
+        function getInitialPosition(index) {
+            const cols = 5;
+            const col = index % cols;
+            const row = Math.floor(index / cols);
+            const x = col * 75 + 10;
+            const y = row * 65 + 15;
+            return { x, y };
+        }
+
+        function createStationElement(index) {
+            const pc = document.createElement('div');
+            pc.className = 'pc-node';
+            pc.id = 'pc-' + (index + 1);
+            
+            const pos = getInitialPosition(index);
+            pc.style.left = pos.x + 'px';
+            pc.style.top = pos.y + 'px';
+
+            const num = (index + 1).toString().padStart(2, '0');
+
+            pc.innerHTML = `
+                <span class="node-label">PC ${num}</span>
+                <div class="monitor"></div>
+                <div class="desk-surface">
+                    <div class="keyboard"></div>
+                    <div class="mouse"></div>
+                </div>
+                <div class="chair"></div>
+            `;
+
+            makeDraggable(pc);
+            return pc;
+        }
+
+        function renderStations() {
+            labGrid.innerHTML = '';
+            for (let i = 0; i < stationCount; i++) {
+                const pc = createStationElement(i);
+                labGrid.appendChild(pc);
+            }
+            countInput.value = stationCount;
+            drawCables();
+        }
+
+        function drawCables() {
+            svgCanvas.innerHTML = '';
+            const roomRect = blueprintRoom.getBoundingClientRect();
+            const rackRect = rackCabinet.getBoundingClientRect();
+
+            const rackX = rackRect.left + rackRect.width / 2 - roomRect.left;
+            const rackY = rackRect.top + rackRect.height / 2 - roomRect.top;
+
+            const stations = document.querySelectorAll('.pc-node');
+            stations.forEach(pc => {
+                const pcRect = pc.getBoundingClientRect();
+                const pcX = pcRect.left + pcRect.width / 2 - roomRect.left;
+                const pcY = pcRect.top + pcRect.height / 2 - roomRect.top;
+
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', pcX);
+                line.setAttribute('y1', pcY);
+                line.setAttribute('x2', rackX);
+                line.setAttribute('y2', rackY);
+                line.setAttribute('stroke', '#5b3929');
+                line.setAttribute('stroke-width', '1.5');
+                line.setAttribute('stroke-dasharray', '3,3');
+                line.setAttribute('opacity', '0.6');
+
+                svgCanvas.appendChild(line);
+            });
+        }
+
+        function makeDraggable(element) {
+            let posX = 0, posY = 0, mouseX = 0, mouseY = 0;
+
+            element.onmousedown = dragMouseDown;
+
+            function dragMouseDown(e) {
+                e.preventDefault();
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+                document.onmouseup = closeDragElement;
+                document.onmousemove = elementDrag;
+            }
+
+            function elementDrag(e) {
+                e.preventDefault();
+                posX = mouseX - e.clientX;
+                posY = mouseY - e.clientY;
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+
+                let newTop = element.offsetTop - posY;
+                let newLeft = element.offsetLeft - posX;
+
+                const parentBounds = labGrid.getBoundingClientRect();
+                const maxLeft = parentBounds.width - element.offsetWidth;
+                const maxTop = parentBounds.height - element.offsetHeight;
+
+                if (newLeft < 0) newLeft = 0;
+                if (newTop < 0) newTop = 0;
+                if (newLeft > maxLeft) newLeft = maxLeft;
+                if (newTop > maxTop) newTop = maxTop;
+
+                element.style.top = newTop + "px";
+                element.style.left = newLeft + "px";
+
+                drawCables();
+            }
+
+            function closeDragElement() {
+                document.onmouseup = null;
+                document.onmousemove = null;
+            }
+        }
+
+        btnAdd.addEventListener('click', () => {
+            stationCount++;
+            renderStations();
+        });
+
+        btnRemove.addEventListener('click', () => {
+            if (stationCount > 1) {
+                stationCount--;
+                renderStations();
+            }
+        });
+
+        window.addEventListener('resize', drawCables);
+        renderStations();
+    </script>
 </body>
 </html>
