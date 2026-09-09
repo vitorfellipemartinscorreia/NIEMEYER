@@ -553,8 +553,6 @@ function createRealWindowFrame(width, height) {
 
 function createRealDoorFrame(width, height, isDouble = false) {
   const group = new THREE.Group();
-  group.userData = { isDoorContainer: true };
-
   const frameMat = new THREE.MeshStandardMaterial({ color: 0x2c2c2c, metalness: 0.5, roughness: 0.5 });
   const doorMat = new THREE.MeshStandardMaterial({ color: 0x5a3d28, roughness: 0.6 });
   const handleMat = new THREE.MeshStandardMaterial({ color: 0xdddddd, metalness: 0.9, roughness: 0.1 });
@@ -569,23 +567,11 @@ function createRealDoorFrame(width, height, isDouble = false) {
   group.add(top, left, right);
 
   if (!isDouble) {
-    const doorPivot = new THREE.Group();
-    doorPivot.position.set(-width/2 + 0.04, 0, 0);
-    doorPivot.userData = { isDoor: true, isOpen: false, targetAngle: 0, currentAngle: 0 };
-
-    const doorW = width - 0.08;
-    const doorH = height - 0.05;
-    const door = new THREE.Mesh(new THREE.BoxGeometry(doorW, doorH, 0.04), doorMat);
-    door.position.set(doorW / 2, doorH / 2, 0);
-    door.userData = { isDoor: true };
-    doorPivot.add(door);
-
+    const door = new THREE.Mesh(new THREE.BoxGeometry(width - 0.08, height - 0.05, 0.04), doorMat);
+    door.position.set(0, (height - 0.05)/2, 0);
     const handle = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.03, 0.08), handleMat);
-    handle.position.set(doorW - 0.08, 1.0, 0.04);
-    handle.userData = { isDoor: true };
-    doorPivot.add(handle);
-
-    group.add(doorPivot);
+    handle.position.set((width/2) - 0.15, 1.0, 0.04);
+    group.add(door, handle);
   } else {
     const halfW = (width - 0.1) / 2;
     const door1 = new THREE.Mesh(new THREE.BoxGeometry(halfW, height - 0.05, 0.04), doorMat);
@@ -1298,14 +1284,6 @@ function findEditableParent(obj) {
   return null;
 }
 
-function findDoorParent(obj) {
-  while (obj && obj !== scene) {
-    if (obj.userData && obj.userData.isDoor) return obj;
-    obj = obj.parent;
-  }
-  return null;
-}
-
 function setSelection(obj) {
   if (selectedObject && selectedObject.userData.originalScale) {
     selectedObject.scale.copy(selectedObject.userData.originalScale);
@@ -1332,13 +1310,6 @@ function onPointerDown(event) {
 
   const hits = raycaster.intersectObjects(scene.children, true);
   for (const hit of hits) {
-    const door = findDoorParent(hit.object);
-    if (door) {
-      door.userData.isOpen = !door.userData.isOpen;
-      door.userData.targetAngle = door.userData.isOpen ? Math.PI / 2 : 0;
-      return;
-    }
-
     const editable = findEditableParent(hit.object);
     if (editable) {
       setSelection(editable);
@@ -1391,18 +1362,6 @@ function enableObjectDragging() {
 
 function animate() {
   requestAnimationFrame(animate);
-
-  doorFrames.forEach(doorFrame => {
-    doorFrame.traverse(child => {
-      if (child.userData && child.userData.isDoor && child.userData.targetAngle !== undefined) {
-        if (Math.abs(child.userData.currentAngle - child.userData.targetAngle) > 0.001) {
-          child.userData.currentAngle += (child.userData.targetAngle - child.userData.currentAngle) * 0.1;
-          child.rotation.y = child.userData.currentAngle;
-        }
-      }
-    });
-  });
-
   controls.update();
   renderer.render(scene, camera);
 }
@@ -1424,64 +1383,65 @@ function toggleLegendScale() {
 window.onload = function() {
   init();
 
-  // 10 Layouts predefinidos e em total conformidade com NR-17 (Mín. 0,80m de passagem livre), limites físicos da sala e área livre de passagem na porta
+  // 10 Layouts predefinidos e em total conformidade com NR-17 (Mín. 0,80m de passagem livre) e limites físicos da sala
   const layoutsDisponiveis = [
     // Layout 1: Duas Fileiras Duplas Paralelas
     [
-      {x:-3.2, z:-2.5, r:0}, {x:-1.4, z:-2.5, r:0}, {x:0.4, z:-2.5, r:0}, {x:2.2, z:-2.5, r:0}, {x:4.0, z:-2.5, r:0},
-      {x:-3.2, z: 2.5, r:Math.PI}, {x:-1.4, z: 2.5, r:Math.PI}, {x:0.4, z: 2.5, r:Math.PI}, {x:2.2, z: 2.5, r:Math.PI}, {x:4.0, z: 2.5, r:Math.PI}
+      {x:-4.0, z:-2.5, r:0}, {x:-2.2, z:-2.5, r:0}, {x:0.0, z:-2.5, r:0}, {x:2.2, z:-2.5, r:0}, {x:4.0, z:-2.5, r:0},
+      {x:-4.0, z: 2.5, r:Math.PI}, {x:-2.2, z: 2.5, r:Math.PI}, {x:0.0, z: 2.5, r:Math.PI}, {x:2.2, z: 2.5, r:Math.PI}, {x:4.0, z: 2.5, r:Math.PI}
     ],
     // Layout 2: Ilhas Duplas Opostas (Face-a-Face)
     [
-      {x:-3.2, z:-2.2, r:0}, {x:-3.2, z:-1.0, r:Math.PI}, {x:-1.2, z:-2.2, r:0}, {x:-1.2, z:-1.0, r:Math.PI},
-      {x: 1.2, z:-2.2, r:0}, {x: 1.2, z:-1.0, r:Math.PI}, {x: 3.5, z:-2.2, r:0}, {x: 3.5, z:-1.0, r:Math.PI},
+      {x:-3.5, z:-2.0, r:0}, {x:-3.5, z:-0.8, r:Math.PI}, {x:-1.2, z:-2.0, r:0}, {x:-1.2, z:-0.8, r:Math.PI},
+      {x: 1.2, z:-2.0, r:0}, {x: 1.2, z:-0.8, r:Math.PI}, {x: 3.5, z:-2.0, r:0}, {x: 3.5, z:-0.8, r:Math.PI},
       {x:-1.2, z: 2.2, r:0}, {x: 1.2, z: 2.2, r:Math.PI}
     ],
     // Layout 3: Formato Perimetral Espaçado (Paredes)
     [
-      {x:-3.2, z:-3.2, r:0}, {x:-1.2, z:-3.2, r:0}, {x:0.8, z:-3.2, r:0}, {x: 2.8, z:-3.2, r:0}, {x: 4.8, z:-3.2, r:0},
-      {x:-3.2, z: 3.2, r:Math.PI}, {x:-1.2, z: 3.2, r:Math.PI}, {x:0.8, z: 3.2, r:Math.PI}, {x: 2.8, z: 3.2, r:Math.PI}, {x: 4.8, z: 3.2, r:Math.PI}
+      {x:-5.2, z:-3.2, r:0}, {x:-3.2, z:-3.2, r:0}, {x:-1.2, z:-3.2, r:0}, {x: 1.2, z:-3.2, r:0}, {x: 3.2, z:-3.2, r:0},
+      {x:-5.2, z: 3.2, r:Math.PI}, {x:-3.2, z: 3.2, r:Math.PI}, {x:-1.2, z: 3.2, r:Math.PI}, {x: 1.2, z: 3.2, r:Math.PI}, {x: 3.2, z: 3.2, r:Math.PI}
     ],
     // Layout 4: Disposição Escalonada em "V"
     [
-      {x:-3.2, z:-3.0, r:0}, {x:-1.8, z:-1.8, r:0}, {x:-0.2, z:-0.6, r:0}, {x: 1.8, z:-0.6, r:0}, {x: 3.4, z:-1.8, r:0},
-      {x:-3.2, z: 3.0, r:Math.PI}, {x:-1.8, z: 1.8, r:Math.PI}, {x:-0.2, z: 0.6, r:Math.PI}, {x: 1.8, z: 0.6, r:Math.PI}, {x: 3.4, z: 1.8, r:Math.PI}
+      {x:-4.8, z:-3.0, r:0}, {x:-3.0, z:-1.8, r:0}, {x:-1.2, z:-0.6, r:0}, {x: 1.2, z:-0.6, r:0}, {x: 3.0, z:-1.8, r:0},
+      {x:-4.8, z: 3.0, r:Math.PI}, {x:-3.0, z: 1.8, r:Math.PI}, {x:-1.2, z: 0.6, r:Math.PI}, {x: 1.2, z: 0.6, r:Math.PI}, {x: 3.0, z: 1.8, r:Math.PI}
     ],
     // Layout 5: Blocos de 3 Estações em Estilo Espinha de Peixe
     [
-      {x:-2.8, z:-2.8, r:Math.PI/2}, {x:-2.8, z:-1.0, r:Math.PI/2}, {x:-2.8, z: 0.8, r:Math.PI/2},
-      {x: 0.8, z:-2.8, r:-Math.PI/2}, {x: 0.8, z:-1.0, r:-Math.PI/2}, {x: 0.8, z: 0.8, r:-Math.PI/2},
+      {x:-4.5, z:-2.8, r:Math.PI/2}, {x:-4.5, z:-1.0, r:Math.PI/2}, {x:-4.5, z: 0.8, r:Math.PI/2},
+      {x: 0.0, z:-2.8, r:-Math.PI/2}, {x: 0.0, z:-1.0, r:-Math.PI/2}, {x: 0.0, z: 0.8, r:-Math.PI/2},
       {x: 4.5, z:-2.8, r:Math.PI/2}, {x: 4.5, z:-1.0, r:Math.PI/2}, {x: 4.5, z: 0.8, r:Math.PI/2}, {x: 4.5, z: 2.6, r:Math.PI/2}
     ],
     // Layout 6: Grade Ampla 3x3 com Circulação Central Ampliada
     [
-      {x:-2.8, z:-2.8, r:0}, {x: 0.8, z:-2.8, r:0}, {x: 4.2, z:-2.8, r:0},
-      {x:-2.8, z: 0.0, r:0}, {x: 0.8, z: 0.0, r:0}, {x: 4.2, z: 0.0, r:0},
-      {x:-2.8, z: 2.8, r:0}, {x: 0.8, z: 2.8, r:0}, {x: 4.2, z: 2.8, r:0}, {x: 2.5, z: 2.8, r:0}
+      {x:-4.2, z:-2.8, r:0}, {x: 0.0, z:-2.8, r:0}, {x: 4.2, z:-2.8, r:0},
+      {x:-4.2, z: 0.0, r:0}, {x: 0.0, z: 0.0, r:0}, {x: 4.2, z: 0.0, r:0},
+      {x:-4.2, z: 2.8, r:0}, {x: 0.0, z: 2.8, r:0}, {x: 4.2, z: 2.8, r:0}, {x: 2.0, z: 2.8, r:0}
     ],
     // Layout 7: Ilha Central Quádrupla + Lateral
     [
       {x:-1.2, z:-1.0, r:0}, {x: 1.2, z:-1.0, r:0}, {x:-1.2, z: 0.6, r:Math.PI}, {x: 1.2, z: 0.6, r:Math.PI},
-      {x:-3.2, z:-3.0, r:0}, {x:-3.2, z:-1.2, r:0}, {x:-3.2, z: 0.6, r:0}, {x:-3.2, z: 2.4, r:0},
+      {x:-5.0, z:-3.0, r:0}, {x:-5.0, z:-1.2, r:0}, {x:-5.0, z: 0.6, r:0}, {x:-5.0, z: 2.4, r:0},
       {x: 5.0, z:-2.0, r:0}, {x: 5.0, z: 1.0, r:0}
     ],
     // Layout 8: Formato em "U" Amplo voltado para a Entrada
     [
-      {x:-3.2, z:-3.0, r:0}, {x:-1.2, z:-3.0, r:0}, {x: 0.8, z:-3.0, r:0}, {x: 2.8, z:-3.0, r:0}, {x: 4.8, z:-3.0, r:0},
-      {x:-3.2, z:-1.2, r:Math.PI/2}, {x:-3.2, z: 1.0, r:Math.PI/2}, {x:-3.2, z: 2.8, r:Math.PI/2},
-      {x: 4.8, z:-1.2, r:-Math.PI/2}, {x: 4.8, z: 1.0, r:-Math.PI/2}
+      {x:-4.5, z:-3.0, r:0}, {x:-2.5, z:-3.0, r:0}, {x: 0.0, z:-3.0, r:0}, {x: 2.5, z:-3.0, r:0}, {x: 4.5, z:-3.0, r:0},
+      {x:-4.5, z:-1.2, r:Math.PI/2}, {x:-4.5, z: 0.6, r:Math.PI/2}, {x:-4.5, z: 2.4, r:Math.PI/2},
+      {x: 4.5, z:-1.2, r:-Math.PI/2}, {x: 4.5, z: 0.6, r:-Math.PI/2}
     ],
     // Layout 9: Quatro Mini-Ilhas de Trabalho
     [
-      {x:-2.8, z:-2.2, r:0}, {x:-1.2, z:-2.2, r:Math.PI},
-      {x: 1.8, z:-2.2, r:0}, {x: 3.4, z:-2.2, r:Math.PI},
-      {x:-2.8, z: 2.0, r:0}, {x:-1.2, z: 2.0, r:Math.PI},
-      {x: 1.8, z: 2.0, r:0}, {x: 3.4, z: 2.0, r:Math.PI}, {x: 0.3, z:-0.2, r:0}, {x: 0.3, z: 1.2, r:Math.PI}
+      {x:-3.2, z:-2.2, r:0}, {x:-1.6, z:-2.2, r:Math.PI},
+      {x: 1.6, z:-2.2, r:0}, {x: 3.2, z:-2.2, r:Math.PI},
+      {x:-3.2, z: 2.0, r:0}, {x:-1.6, z: 2.0, r:Math.PI},
+      {x: 1.6, z: 2.0, r:0}, {x: 3.2, z: 2.0, r:Math.PI},
+      {x: 0.0, z:-0.2, r:0}, {x: 0.0, z: 1.2, r:Math.PI}
     ],
     // Layout 10: Colunas Zigue-Zague Ergonomicamente Deslocadas
     [
-      {x:-3.2, z:-3.0, r:0}, {x:-1.2, z:-2.0, r:0}, {x: 0.8, z:-3.0, r:0}, {x: 2.8, z:-2.0, r:0}, {x: 4.8, z:-3.0, r:0},
-      {x:-3.2, z: 2.0, r:Math.PI}, {x:-1.2, z: 3.0, r:Math.PI}, {x: 0.8, z: 2.0, r:Math.PI}, {x: 2.8, z: 3.0, r:Math.PI}, {x: 4.8, z: 2.0, r:Math.PI}
+      {x:-4.2, z:-3.0, r:0}, {x:-2.0, z:-2.0, r:0}, {x: 0.2, z:-3.0, r:0}, {x: 2.4, z:-2.0, r:0}, {x: 4.6, z:-3.0, r:0},
+      {x:-4.2, z: 2.0, r:Math.PI}, {x:-2.0, z: 3.0, r:Math.PI}, {x: 0.2, z: 2.0, r:Math.PI}, {x: 2.4, z: 3.0, r:Math.PI}, {x: 4.6, z: 2.0, r:Math.PI}
     ]
   ];
 
