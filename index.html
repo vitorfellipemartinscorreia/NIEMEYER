@@ -40,7 +40,7 @@
         }
 
         .logo-icon {
-            background-color: #5b3929;
+            background-color: #6e332e;
             color: #fff;
             padding: 6px;
             font-weight: bold;
@@ -76,7 +76,7 @@
 
         .nav-item.active {
             background-color: #f0e6e0;
-            color: #5b3929;
+            color: #6e332e;
             font-weight: bold;
         }
 
@@ -96,7 +96,7 @@
         }
 
         .btn-export {
-            background-color: #5b3929;
+            background-color: #6e332e;
             color: white;
             border: none;
             padding: 6px 12px;
@@ -162,8 +162,30 @@
             font-size: 11px;
         }
 
+        .station-controls {
+            display: flex;
+            gap: 6px;
+            margin-top: 4px;
+        }
+
+        .btn-ctrl {
+            flex: 1;
+            background-color: #6e332e;
+            color: white;
+            border: none;
+            padding: 6px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .btn-ctrl:hover, .btn-update:hover {
+            opacity: 0.9;
+        }
+
         .btn-update {
-            background-color: #5b3929;
+            background-color: #6e332e;
             color: white;
             border: none;
             padding: 8px;
@@ -204,6 +226,7 @@
             border-radius: 3px;
             cursor: pointer;
             font-size: 11px;
+            user-select: none;
         }
 
         .canvas-container {
@@ -222,13 +245,12 @@
         /* Simulated Blueprint Rooms */
         .blueprint-room {
             border: 2px solid #333;
-            width: 85%;
-            height: 85%;
+            width: 90%;
+            height: 90%;
             position: relative;
             background: #fbf9f7;
             padding: 15px;
-            display: flex;
-            justify-content: space-between;
+            overflow: hidden;
         }
 
         .room-label {
@@ -236,17 +258,14 @@
             top: 5px;
             left: 10px;
             font-weight: bold;
-            font-size: 10px;
+            font-size: 11px;
             color: #555;
+            letter-spacing: 0.5px;
+            z-index: 2;
         }
 
-        .lab-grid {
-            position: relative;
-            width: 75%;
-            height: 100%;
-        }
-
-        .cables-svg {
+        /* Overlay Canvas para desenhar Cabos de Rede */
+        #cablesCanvas {
             position: absolute;
             top: 0;
             left: 0;
@@ -256,106 +275,202 @@
             z-index: 1;
         }
 
-        .pc-node {
+        /* Estações Realistas Desenho CSS */
+        .station-node {
             position: absolute;
-            width: 58px;
-            height: 48px;
-            background: #d8cdbf;
-            border: 1px solid #8c7355;
-            padding: 2px;
-            text-align: center;
-            font-size: 8px;
+            width: 72px;
+            height: 52px;
+            background: #d8cfc4;
+            border: 2px solid #6e332e;
             border-radius: 4px;
+            padding: 3px;
             cursor: move;
             user-select: none;
-            box-shadow: 1px 2px 4px rgba(0,0,0,0.15);
+            z-index: 3;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
             display: flex;
             flex-direction: column;
+            justify-content: space-between;
             align-items: center;
-            justify-content: flex-start;
+            transition: box-shadow 0.1s;
+        }
+
+        .station-node:active {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
             z-index: 10;
         }
 
-        .pc-node .monitor {
-            width: 32px;
-            height: 5px;
+        .station-title {
+            font-size: 7px;
+            font-weight: bold;
+            color: #6e332e;
+            text-align: center;
+            line-height: 1;
+            margin-bottom: 1px;
+        }
+
+        .station-desk-setup {
+            width: 100%;
+            height: 38px;
+            background: #f0eae1;
+            border: 1px solid #b5a495;
+            border-radius: 2px;
+            position: relative;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 2px;
+        }
+
+        /* Componentes de HW realistas */
+        .monitor-screen {
+            width: 26px;
+            height: 6px;
+            background: #222;
+            border: 1px solid #000;
+            border-radius: 1px;
+            box-shadow: 0 0 2px rgba(0,255,255,0.3);
+        }
+
+        .keyboard {
+            width: 28px;
+            height: 10px;
             background: #333;
             border-radius: 1px;
             margin-top: 2px;
-            border-bottom: 2px solid #666;
+            background-image: radial-gradient(#666 30%, transparent 30%);
+            background-size: 3px 3px;
         }
 
-        .pc-node .desk-surface {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            margin-top: 3px;
-            width: 100%;
-        }
-
-        .pc-node .keyboard {
-            width: 22px;
-            height: 7px;
-            background: #444;
+        .mousepad {
+            width: 8px;
+            height: 10px;
+            background: #999;
             border-radius: 1px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
-        .pc-node .mouse {
+        .mouse {
             width: 4px;
             height: 6px;
             background: #222;
             border-radius: 2px;
         }
 
-        .pc-node .chair {
-            position: absolute;
-            bottom: -9px;
-            width: 18px;
-            height: 8px;
-            background: #5b3929;
-            border-radius: 3px 3px 1px 1px;
-            border: 1px solid #333;
-        }
-
-        .pc-node .node-label {
-            position: absolute;
-            top: -12px;
-            font-size: 8px;
-            font-weight: bold;
-            color: #5b3929;
-            white-space: nowrap;
-        }
-
-        .tech-room {
-            border: 1px solid #666;
-            width: 18%;
-            background: #e8e4e0;
+        .pc-case {
+            width: 10px;
+            height: 28px;
+            background: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 1px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            padding: 10px;
-            gap: 10px;
+            justify-content: flex-start;
+            padding-top: 2px;
+            gap: 2px;
+        }
+
+        .pc-power-led {
+            width: 3px;
+            height: 3px;
+            background: #00ff00;
+            border-radius: 50%;
+        }
+
+        .pc-drive {
+            width: 6px;
+            height: 2px;
+            background: #444;
+        }
+
+        .screen-keyboard-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .mouse-area {
+            display: flex;
+            align-items: center;
+        }
+
+        /* Sala Técnica Expandida e Mais Visível */
+        .tech-room {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            bottom: 10px;
+            border: 2px solid #6e332e;
+            width: 22%;
+            background: #e1d8d0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 12px 8px;
+            gap: 12px;
             z-index: 2;
+            box-shadow: -2px 0 6px rgba(0,0,0,0.05);
+        }
+
+        .tech-title {
+            font-size: 11px;
+            font-weight: bold;
+            color: #6e332e;
+            background: #f0e6e0;
+            padding: 4px 8px;
+            border-radius: 3px;
+            border: 1px solid #6e332e;
+            text-align: center;
+            width: 100%;
         }
 
         .rack-cabinet {
-            background: #333;
-            width: 30px;
-            height: 120px;
-            border-radius: 2px;
+            background: #1e1e1e;
+            width: 100%;
+            max-width: 90px;
+            flex: 1;
+            border-radius: 3px;
             display: flex;
             flex-direction: column;
             justify-content: space-around;
-            padding: 4px 0;
+            padding: 8px 4px;
+            border: 2px solid #444;
+            box-shadow: inset 0 0 5px #000;
         }
 
         .rack-slot {
-            height: 8px;
-            background: #555;
-            width: 80%;
+            height: 12px;
+            background: #333;
+            width: 90%;
             margin: 0 auto;
+            border: 1px solid #555;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 4px;
+        }
+
+        .rack-led {
+            width: 4px;
+            height: 4px;
+            background: #0288d1;
+            border-radius: 50%;
+        }
+
+        .tech-specs {
+            font-size: 9px;
+            line-height: 1.4;
+            text-align: left;
+            width: 100%;
+            color: #222;
+            background: #fff;
+            padding: 6px;
+            border-radius: 3px;
+            border: 1px solid #ccc;
         }
 
         .plan-footer {
@@ -387,17 +502,41 @@
             color: #8a6d3b;
         }
 
+        /* Normas Reguladoras Expandidas e Maiores */
+        .standards-container {
+            background: #fff;
+            border: 1px solid #6e332e;
+            border-radius: 4px;
+            padding: 8px;
+            margin-top: 4px;
+        }
+
         .standards-list {
-            padding-left: 15px;
-            color: #444;
+            padding-left: 5px;
+            color: #222;
             display: flex;
             flex-direction: column;
-            gap: 3px;
+            gap: 6px;
+            list-style: none;
+        }
+
+        .standards-list li {
+            font-size: 11px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .standards-list li::before {
+            content: "✓";
+            color: #2e7d32;
+            font-weight: bold;
         }
 
         /* Bottom Left: Topology */
         .bottom-topology {
-            grid-column: 1; /* spans inside footer layout */
+            grid-column: 1;
         }
 
         .topology-flow {
@@ -431,7 +570,7 @@
             padding: 8px;
             border-radius: 3px;
             font-size: 10px;
-            border-left: 3px solid #5b3929;
+            border-left: 3px solid #6e332e;
         }
 
         /* Bottom Right: Actions */
@@ -444,8 +583,8 @@
 
         .action-btn {
             background: #fff;
-            border: 1px solid #5b3929;
-            color: #5b3929;
+            border: 1px solid #6e332e;
+            color: #6e332e;
             padding: 8px;
             border-radius: 3px;
             font-weight: bold;
@@ -454,13 +593,12 @@
         }
 
         .action-btn.primary {
-            background: #5b3929;
+            background: #6e332e;
             color: #fff;
         }
 
-        /* Footer Grid Areas fix */
         .bottom-row-container {
-            grid-column: 2;
+            grid-column: 1 / span 2;
             display: grid;
             grid-template-columns: 1.5fr 1.5fr 1fr;
             gap: 8px;
@@ -474,32 +612,6 @@
             display: flex;
             flex-direction: column;
             gap: 6px;
-        }
-
-        /* Controls para estações */
-        .station-controls {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            margin-top: 4px;
-        }
-
-        .station-btn {
-            background: #5b3929;
-            color: #fff;
-            border: none;
-            width: 24px;
-            height: 24px;
-            font-weight: bold;
-            border-radius: 3px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .station-btn:hover {
-            background: #43291d;
         }
     </style>
 </head>
@@ -539,25 +651,21 @@
             
             <div class="form-group">
                 <label>Largura (m)</label>
-                <input type="number" value="20">
+                <input type="number" id="inputWidth" value="20" min="5" max="100">
             </div>
             <div class="form-group">
                 <label>Comprimento (m)</label>
-                <input type="number" value="15">
+                <input type="number" id="inputLength" value="15" min="5" max="100">
             </div>
             <div class="form-group">
                 <label>Pé-direito (m)</label>
                 <input type="number" value="3">
             </div>
 
-            <span style="font-weight: bold; color: #444; margin-top: 8px;">Estações de Trabalho</span>
-            <div class="form-group">
-                <label>Quantidade de Estações</label>
-                <div class="station-controls">
-                    <button class="station-btn" id="btn-remove-pc">-</button>
-                    <input type="number" id="station-count-input" value="20" style="width: 100%; text-align: center;" readonly>
-                    <button class="station-btn" id="btn-add-pc">+</button>
-                </div>
+            <span style="font-weight: bold; color: #444; margin-top: 4px;">Gerenciar Estações</span>
+            <div class="station-controls">
+                <button class="btn-ctrl" id="btnAddStation">+ Adicionar</button>
+                <button class="btn-ctrl" id="btnRemoveStation">- Remover</button>
             </div>
 
             <span style="font-weight: bold; color: #444; margin-top: 8px;">Ambiente</span>
@@ -574,42 +682,42 @@
                 </select>
             </div>
 
-            <button class="btn-update">Atualizar projeto ↻</button>
+            <button class="btn-update" id="btnUpdateProject">Atualizar projeto ↻</button>
         </div>
 
         <!-- Center Area: Physical Plan -->
         <div class="center-area">
             <div class="plan-header">
-                <span style="font-weight: bold; color: #444;">PLANTA FÍSICA — 20 m × 15 m (300 m²)</span>
+                <span id="planTitle" style="font-weight: bold; color: #444;">PLANTA FÍSICA — 20 m × 15 m (300 m²)</span>
                 <div class="plan-toolbar">
                     <button class="tool-btn">📍 Selecionar</button>
                     <button class="tool-btn">✋ Mover</button>
                     <button class="tool-btn">🔗 Conectar</button>
-                    <button class="tool-btn">-</button>
+                    <button class="tool-btn" id="btnQuickRemove" title="Remover Estação">- Estação</button>
                     <button class="tool-btn">100%</button>
-                    <button class="tool-btn">+</button>
+                    <button class="tool-btn" id="btnQuickAdd" title="Adicionar Estação">+ Estação</button>
                 </div>
             </div>
             
-            <div class="canvas-container">
-                <div class="blueprint-room" id="blueprint-room">
-                    <span class="room-label">LABORATÓRIO</span>
+            <div class="canvas-container" id="canvasContainer">
+                <div class="blueprint-room" id="blueprintRoom">
+                    <span class="room-label">LABORATÓRIO DE ESTAÇÕES</span>
                     
-                    <svg class="cables-svg" id="cables-svg"></svg>
+                    <!-- Canvas para linhas dos cabos conectando à sala técnica -->
+                    <canvas id="cablesCanvas"></canvas>
 
-                    <div class="lab-grid" id="lab-grid">
-                        <!-- PCs gerados dinamicamente via JavaScript -->
-                    </div>
-
-                    <div class="tech-room" id="tech-room">
-                        <span style="font-size: 8px; font-weight: bold;">SALA TÉCNICA</span>
-                        <div class="rack-cabinet" id="rack-cabinet">
-                            <div class="rack-slot"></div>
-                            <div class="rack-slot"></div>
-                            <div class="rack-slot"></div>
-                            <div class="rack-slot"></div>
+                    <!-- Sala Técnica em Maior Destaque -->
+                    <div class="tech-room" id="techRoom">
+                        <div class="tech-title">SALA TÉCNICA</div>
+                        <div class="rack-cabinet">
+                            <div class="rack-slot"><div class="rack-led"></div><div class="rack-led"></div></div>
+                            <div class="rack-slot"><div class="rack-led"></div></div>
+                            <div class="rack-slot"><div class="rack-led"></div><div class="rack-led"></div></div>
+                            <div class="rack-slot"><div class="rack-led"></div></div>
+                            <div class="rack-slot"><div class="rack-led"></div></div>
                         </div>
-                        <div style="font-size: 7px; line-height: 1.2; text-align: left;">
+                        <div class="tech-specs">
+                            <strong>Equipamentos:</strong><br>
                             ▪ Roteador / firewall<br>
                             ▪ Switch 144 portas<br>
                             ▪ Patch panel 144 portas<br>
@@ -621,7 +729,7 @@
             </div>
             
             <div class="plan-footer">
-                Mesa com computador &nbsp;&bull;&nbsp; Access Point &nbsp;&bull;&nbsp; Rack &nbsp;&bull;&nbsp; Cabo de rede Cat6 &nbsp;&bull;&nbsp; Setor: Sala de aula
+                Estações com Computador &nbsp;&bull;&nbsp; Access Point &nbsp;&bull;&nbsp; Rack &nbsp;&bull;&nbsp; Cabo de rede Cat6 &nbsp;&bull;&nbsp; Setor: Sala de aula
             </div>
         </div>
 
@@ -629,19 +737,19 @@
         <div class="panel summary-sidebar">
             <div class="panel-title">Resumo do Projeto</div>
             
-            <div class="summary-row"><span>Área total</span><strong>300 m²</strong></div>
-            <div class="summary-row"><span>Área por computador</span><strong>3 m² por computador</strong></div>
-            <div class="summary-row"><span>Computadores suportados</span><strong>100 unidades</strong></div>
+            <div class="summary-row"><span>Área total</span><strong id="sumArea">300 m²</strong></div>
+            <div class="summary-row"><span>Área por estação</span><strong id="sumAreaPerStation">15.0 m² / estação</strong></div>
+            <div class="summary-row"><span>Estações instaladas</span><strong id="sumStationCount">20 unidades</strong></div>
             <div class="summary-row"><span>Servidores recomendados</span><strong>4 unidades</strong></div>
             <div class="summary-row"><span>Access Points recomendados</span><strong>2 unidades</strong></div>
-            <div class="summary-row"><span>Pontos de rede</span><strong>107 pontos</strong></div>
+            <div class="summary-row"><span>Pontos de rede</span><strong id="sumNetworkPoints">27 pontos</strong></div>
             <div class="summary-row"><span>Switch recomendado</span><strong>144 portas</strong></div>
-            <div class="summary-row"><span>Cabo Cat6</span><strong>2358 metros</strong></div>
+            <div class="summary-row"><span>Cabo Cat6 estimado</span><strong id="sumCableLength">450 metros</strong></div>
 
             <div class="panel-title" style="margin-top: 4px;">Análise do projeto</div>
             <span style="font-size: 10px; line-height: 1.3;">
                 • Cobertura Wi-Fi: 100% da área<br>
-                • Portas do switch: 74% utilizadas
+                • Portas do switch: Em conformidade
             </span>
 
             <div class="alert-box">
@@ -649,17 +757,20 @@
                 ✓ Projeto compatível com as dimensões informadas.
             </div>
 
-            <div class="panel-title" style="margin-top: 4px;">Normas reguladoras</div>
-            <div class="standards-list" style="font-size: 10px;">
-                <span>• ABNT NBR 14565</span>
-                <span>• ANSI/TIA-568.2-D</span>
-                <span>• ANSI/TIA-569-D</span>
-                <span>• ISO/IEC 11801</span>
+            <!-- Normas Reguladoras Expandidas e Destacadas -->
+            <div class="panel-title" style="margin-top: 4px;">Normas Reguladoras</div>
+            <div class="standards-container">
+                <ul class="standards-list">
+                    <li>ABNT NBR 14565 (Cabeamento Estruturado)</li>
+                    <li>ANSI/TIA-568.2-D (Telecomunicações)</li>
+                    <li>ANSI/TIA-569-D (Espaços e Vias)</li>
+                    <li>ISO/IEC 11801 (Generic Cabling)</li>
+                </ul>
             </div>
         </div>
 
-        <!-- Bottom Row Content container bridging columns 1 & 2 -->
-        <div class="bottom-row-container" style="grid-column: 1 / span 2;">
+        <!-- Bottom Row Content -->
+        <div class="bottom-row-container">
             
             <!-- Bottom Left: Topology -->
             <div class="bottom-panel">
@@ -671,7 +782,7 @@
                     <span>→</span>
                     <div class="topo-box">Switch</div>
                     <span>→</span>
-                    <div class="topo-box">Computadores</div>
+                    <div class="topo-box">Estações</div>
                 </div>
             </div>
 
@@ -680,7 +791,7 @@
                 <div class="panel-title">Setores do Ambiente</div>
                 <div class="bottom-sectors">
                     <div class="sector-card">Sala de aula</div>
-                    <div class="sector-card">Área de computadores</div>
+                    <div class="sector-card">Área de estações</div>
                     <div class="sector-card">Recepção</div>
                     <div class="sector-card">Sala técnica</div>
                 </div>
@@ -699,146 +810,222 @@
     </div>
 
     <script>
-        const labGrid = document.getElementById('lab-grid');
-        const countInput = document.getElementById('station-count-input');
-        const btnAdd = document.getElementById('btn-add-pc');
-        const btnRemove = document.getElementById('btn-remove-pc');
-        const svgCanvas = document.getElementById('cables-svg');
-        const blueprintRoom = document.getElementById('blueprint-room');
-        const rackCabinet = document.getElementById('rack-cabinet');
+        // Lógica de Interatividade do Blueprint
+        const blueprintRoom = document.getElementById('blueprintRoom');
+        const techRoom = document.getElementById('techRoom');
+        const canvas = document.getElementById('cablesCanvas');
+        const ctx = canvas.getContext('2d');
 
-        let stationCount = 20;
+        const inputWidth = document.getElementById('inputWidth');
+        const inputLength = document.getElementById('inputLength');
+        const btnUpdateProject = document.getElementById('btnUpdateProject');
+        const planTitle = document.getElementById('planTitle');
 
-        function getInitialPosition(index) {
-            const cols = 5;
-            const col = index % cols;
-            const row = Math.floor(index / cols);
-            const x = col * 75 + 10;
-            const y = row * 65 + 15;
-            return { x, y };
-        }
+        const sumArea = document.getElementById('sumArea');
+        const sumAreaPerStation = document.getElementById('sumAreaPerStation');
+        const sumStationCount = document.getElementById('sumStationCount');
+        const sumNetworkPoints = document.getElementById('sumNetworkPoints');
+        const sumCableLength = document.getElementById('sumCableLength');
 
-        function createStationElement(index) {
-            const pc = document.createElement('div');
-            pc.className = 'pc-node';
-            pc.id = 'pc-' + (index + 1);
-            
-            const pos = getInitialPosition(index);
-            pc.style.left = pos.x + 'px';
-            pc.style.top = pos.y + 'px';
+        let stationCount = 0;
+        let activeDragNode = null;
+        let dragOffsetX = 0;
+        let dragOffsetY = 0;
 
-            const num = (index + 1).toString().padStart(2, '0');
-
-            pc.innerHTML = `
-                <span class="node-label">PC ${num}</span>
-                <div class="monitor"></div>
-                <div class="desk-surface">
-                    <div class="keyboard"></div>
-                    <div class="mouse"></div>
-                </div>
-                <div class="chair"></div>
-            `;
-
-            makeDraggable(pc);
-            return pc;
-        }
-
-        function renderStations() {
-            labGrid.innerHTML = '';
-            for (let i = 0; i < stationCount; i++) {
-                const pc = createStationElement(i);
-                labGrid.appendChild(pc);
-            }
-            countInput.value = stationCount;
+        // Ajusta o tamanho do Canvas de linhas
+        function resizeCanvas() {
+            canvas.width = blueprintRoom.clientWidth;
+            canvas.height = blueprintRoom.clientHeight;
             drawCables();
         }
 
-        function drawCables() {
-            svgCanvas.innerHTML = '';
-            const roomRect = blueprintRoom.getBoundingClientRect();
-            const rackRect = rackCabinet.getBoundingClientRect();
+        // Criar elemento visual da Estação com componentes detalhados
+        function createStationElement(idNumber, x, y) {
+            const station = document.createElement('div');
+            station.className = 'station-node';
+            station.id = `station-${idNumber}`;
+            station.style.left = x + 'px';
+            station.style.top = y + 'px';
 
-            const rackX = rackRect.left + rackRect.width / 2 - roomRect.left;
-            const rackY = rackRect.top + rackRect.height / 2 - roomRect.top;
+            station.innerHTML = `
+                <div class="station-title">ESTAÇÃO ${String(idNumber).padStart(2, '0')}</div>
+                <div class="station-desk-setup">
+                    <div class="screen-keyboard-area">
+                        <div class="monitor-screen"></div>
+                        <div class="keyboard"></div>
+                    </div>
+                    <div class="mouse-area">
+                        <div class="mousepad">
+                            <div class="mouse"></div>
+                        </div>
+                    </div>
+                    <div class="pc-case">
+                        <div class="pc-power-led"></div>
+                        <div class="pc-drive"></div>
+                    </div>
+                </div>
+            `;
 
-            const stations = document.querySelectorAll('.pc-node');
-            stations.forEach(pc => {
-                const pcRect = pc.getBoundingClientRect();
-                const pcX = pcRect.left + pcRect.width / 2 - roomRect.left;
-                const pcY = pcRect.top + pcRect.height / 2 - roomRect.top;
-
-                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                line.setAttribute('x1', pcX);
-                line.setAttribute('y1', pcY);
-                line.setAttribute('x2', rackX);
-                line.setAttribute('y2', rackY);
-                line.setAttribute('stroke', '#5b3929');
-                line.setAttribute('stroke-width', '1.5');
-                line.setAttribute('stroke-dasharray', '3,3');
-                line.setAttribute('opacity', '0.6');
-
-                svgCanvas.appendChild(line);
+            // Eventos para Arrastar e Soltar (Móvel Individualmente)
+            station.addEventListener('mousedown', (e) => {
+                activeDragNode = station;
+                const rect = station.getBoundingClientRect();
+                dragOffsetX = e.clientX - rect.left;
+                dragOffsetY = e.clientY - rect.top;
+                e.stopPropagation();
             });
+
+            return station;
         }
 
-        function makeDraggable(element) {
-            let posX = 0, posY = 0, mouseX = 0, mouseY = 0;
+        // Adicionar nova Estação
+        function addStation() {
+            stationCount++;
+            const roomRect = blueprintRoom.getBoundingClientRect();
+            
+            // Posição inicial organizando em grade
+            const cols = 4;
+            const index = stationCount - 1;
+            const col = index % cols;
+            const row = Math.floor(index / cols);
 
-            element.onmousedown = dragMouseDown;
+            let posX = 20 + col * 85;
+            let posY = 35 + row * 65;
 
-            function dragMouseDown(e) {
-                e.preventDefault();
-                mouseX = e.clientX;
-                mouseY = e.clientY;
-                document.onmouseup = closeDragElement;
-                document.onmousemove = elementDrag;
+            // Evitar criar fora dos limites da sala
+            if (posX > roomRect.width * 0.7) {
+                posX = 20 + (Math.random() * 100);
+            }
+            if (posY > roomRect.height - 70) {
+                posY = roomRect.height - 80;
             }
 
-            function elementDrag(e) {
-                e.preventDefault();
-                posX = mouseX - e.clientX;
-                posY = mouseY - e.clientY;
-                mouseX = e.clientX;
-                mouseY = e.clientY;
+            const elem = createStationElement(stationCount, posX, posY);
+            blueprintRoom.appendChild(elem);
+            updateCalculations();
+            drawCables();
+        }
 
-                let newTop = element.offsetTop - posY;
-                let newLeft = element.offsetLeft - posX;
+        // Remover última Estação
+        function removeStation() {
+            if (stationCount > 0) {
+                const lastNode = document.getElementById(`station-${stationCount}`);
+                if (lastNode) {
+                    lastNode.remove();
+                }
+                stationCount--;
+                updateCalculations();
+                drawCables();
+            }
+        }
 
-                const parentBounds = labGrid.getBoundingClientRect();
-                const maxLeft = parentBounds.width - element.offsetWidth;
-                const maxTop = parentBounds.height - element.offsetHeight;
+        // Desenhar Cabos de Conexão das Estações até a Sala Técnica
+        function drawCables() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const techRect = techRoom.getBoundingClientRect();
+            const roomRect = blueprintRoom.getBoundingClientRect();
 
-                if (newLeft < 0) newLeft = 0;
-                if (newTop < 0) newTop = 0;
-                if (newLeft > maxLeft) newLeft = maxLeft;
-                if (newTop > maxTop) newTop = maxTop;
+            // Ponto de entrada dos cabos na Sala Técnica
+            const techX = techRect.left - roomRect.left;
+            const techY = techRect.top - roomRect.top + (techRect.height / 2);
 
-                element.style.top = newTop + "px";
-                element.style.left = newLeft + "px";
+            let totalCableMeters = 0;
+            const nodes = document.querySelectorAll('.station-node');
+
+            nodes.forEach(node => {
+                const nodeRect = node.getBoundingClientRect();
+                const nodeX = (nodeRect.left - roomRect.left) + (nodeRect.width / 2);
+                const nodeY = (nodeRect.top - roomRect.top) + (nodeRect.height / 2);
+
+                // Desenha cabo com curva
+                ctx.beginPath();
+                ctx.moveTo(nodeX, nodeY);
+                
+                // Ponto de controle da curva
+                const controlX = (nodeX + techX) / 2;
+                ctx.quadraticCurveTo(controlX, nodeY, techX, techY);
+                
+                ctx.strokeStyle = '#6e332e';
+                ctx.lineWidth = 1.5;
+                ctx.setLineDash([4, 2]);
+                ctx.stroke();
+
+                // Calcular distância aproximada de cabo (escala pixel -> metro)
+                const distPx = Math.hypot(techX - nodeX, techY - nodeY);
+                totalCableMeters += (distPx * 0.15) + 5; // Margem de sobra
+            });
+
+            sumCableLength.textContent = `${Math.round(totalCableMeters)} metros`;
+        }
+
+        // Movimentação global do mouse
+        document.addEventListener('mousemove', (e) => {
+            if (activeDragNode) {
+                const roomRect = blueprintRoom.getBoundingClientRect();
+                let x = e.clientX - roomRect.left - dragOffsetX;
+                let y = e.clientY - roomRect.top - dragOffsetY;
+
+                // Limite das bordas
+                const maxX = roomRect.width - activeDragNode.offsetWidth - (roomRect.width * 0.23);
+                const maxY = roomRect.height - activeDragNode.offsetHeight - 10;
+
+                x = Math.max(10, Math.min(x, maxX));
+                y = Math.max(10, Math.min(y, maxY));
+
+                activeDragNode.style.left = x + 'px';
+                activeDragNode.style.top = y + 'px';
 
                 drawCables();
             }
+        });
 
-            function closeDragElement() {
-                document.onmouseup = null;
-                document.onmousemove = null;
+        document.addEventListener('mouseup', () => {
+            activeDragNode = null;
+        });
+
+        // Recalcular métricas de área e estações
+        function updateCalculations() {
+            const width = parseFloat(inputWidth.value) || 0;
+            const length = parseFloat(inputLength.value) || 0;
+            const area = width * length;
+
+            planTitle.textContent = `PLANTA FÍSICA — ${width} m × ${length} m (${area} m²)`;
+            sumArea.textContent = `${area} m²`;
+            sumStationCount.textContent = `${stationCount} unidades`;
+            sumNetworkPoints.textContent = `${stationCount + 7} pontos`;
+
+            if (stationCount > 0) {
+                sumAreaPerStation.textContent = `${(area / stationCount).toFixed(1)} m² / estação`;
+            } else {
+                sumAreaPerStation.textContent = `0 m² / estação`;
             }
         }
 
-        btnAdd.addEventListener('click', () => {
-            stationCount++;
-            renderStations();
+        // Listeners dos Botões
+        document.getElementById('btnAddStation').addEventListener('click', addStation);
+        document.getElementById('btnRemoveStation').addEventListener('click', removeStation);
+        document.getElementById('btnQuickAdd').addEventListener('click', addStation);
+        document.getElementById('btnQuickRemove').addEventListener('click', removeStation);
+
+        btnUpdateProject.addEventListener('click', () => {
+            updateCalculations();
+            drawCables();
         });
 
-        btnRemove.addEventListener('click', () => {
-            if (stationCount > 1) {
-                stationCount--;
-                renderStations();
+        inputWidth.addEventListener('input', updateCalculations);
+        inputLength.addEventListener('input', updateCalculations);
+
+        // Inicialização
+        window.addEventListener('resize', resizeCanvas);
+
+        setTimeout(() => {
+            resizeCanvas();
+            // Criar 20 Estações Iniciais
+            for (let i = 0; i < 20; i++) {
+                addStation();
             }
-        });
-
-        window.addEventListener('resize', drawCables);
-        renderStations();
+        }, 100);
     </script>
 </body>
 </html>
