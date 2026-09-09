@@ -65,7 +65,37 @@
     text-transform: uppercase;
   }
 
-  /* Menu hambúrguer flutuante para os controles */
+  /* Painel de Alertas de Violas de Normas */
+  #norm-alerts {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(255,255,255,0.2);
+  }
+
+  .alert-box {
+    padding: 6px 8px;
+    border-radius: 4px;
+    margin-top: 4px;
+    font-size: 11px;
+    font-weight: bold;
+    line-height: 1.3;
+  }
+  .alert-danger {
+    background: rgba(211, 47, 47, 0.85);
+    color: #fff;
+    border-left: 3px solid #ff1744;
+  }
+  .alert-warning {
+    background: rgba(245, 124, 0, 0.85);
+    color: #fff;
+    border-left: 3px solid #ff9100;
+  }
+  .alert-success {
+    background: rgba(56, 142, 60, 0.85);
+    color: #fff;
+    border-left: 3px solid #00e676;
+  }
+
   #menu-controls-hamburger {
     position: absolute;
     top: 12px;
@@ -91,7 +121,7 @@
     top: 64px; 
     right: 12px; 
     z-index: 10;
-    display: none; /* Oculto por padrão, alterna com o botão hambúrguer */
+    display: none;
     flex-direction: column; 
     gap: 8px; 
     align-items: flex-end;
@@ -219,8 +249,12 @@
 <div id="info">
   <h1>NIEMEYER</h1>
   <strong>Data Center + Escritório (ISO/IEC 11801)</strong><br>
-  <span id="room-status">Dimensões: 14m x 10m x 3.2m | Cap. Máx: 8 Estações</span><br>
-  <strong>Data Center:</strong> Racks, Rede, Nobreak e Cabeamento.
+  <span id="room-status">Dimensões: 14m x 10m x 3.2m</span><br>
+  <strong>Data Center:</strong> Racks, Rede, Nobreak e Cabeamento.<br>
+  <strong>Custo de Estação (NR-17):</strong> Mínimo R$ 3.000,00/unid.<br>
+  <strong>Orçamento Mínimo do Projeto:</strong> <span id="orcamento-total">R$ 50.000,00</span>
+
+  <div id="norm-alerts"></div>
 </div>
 
 <button id="menu-controls-hamburger" aria-label="Mostrar ou esconder controles" aria-expanded="false">☰</button>
@@ -228,7 +262,6 @@
 <div id="controls-ui">
   <div class="btn-group">
     <button class="btn-sub"><a href="index.html" style="text-decoration: none; color:white;"> Modelo 2D </a></button>
-    
   </div>
   <div class="btn-group">
     <button class="btn-sub" onclick="adjustDimension('width', 1)">↔️ + Largura</button>
@@ -243,7 +276,7 @@
     <button class="btn-sub btn-sub-danger" onclick="adjustDimension('height', -0.5)">⬇️ - Pé-Direito</button>
   </div>
 
-  <button id="btnReorganizar" class="btn">🔄 Reorganizar Layout (ISO)</button>
+  <button id="btnReorganizar" class="btn">🔄 Reorganizar Layout (ISO/NR-17)</button>
   
   <div class="btn-group">
     <button class="btn-sub" onclick="addFullStation()">➕ Estação</button>
@@ -310,14 +343,10 @@ const singleItems = [];
 const cableMeshes = [];
 let stationCounter = 0;
 
-function getMaxCapacity() {
-  const usableWidth = roomWidth - 4;
-  const usableDepth = roomDepth - 4;
-  return Math.max(1, Math.floor((usableWidth * usableDepth) / 5));
-}
-
 function updateStatusUI() {
-  const capacity = getMaxCapacity();
+  const totalArea = roomWidth * roomDepth;
+  const currentStations = deskGroups.length;
+
   let totalLength = 0;
   cableMeshes.forEach(item => {
     if (item.userData && item.userData.cableLength) {
@@ -325,17 +354,88 @@ function updateStatusUI() {
     }
   });
 
+  const precoBaseInfra = 50000;
+  const precoEstacoes = currentStations * 3000;
+  const orcamentoTotalCalculado = precoBaseInfra + precoEstacoes;
+
+  document.getElementById('orcamento-total').innerText = 
+    `R$ ${orcamentoTotalCalculado.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+
   document.getElementById('room-status').innerHTML = 
-    `Dimensões: ${roomWidth}m x ${roomDepth}m x ${roomHeight.toFixed(1)}m | Cap. Máx: ${capacity} Estações | Atuais: ${deskGroups.length} | Cabos Total: ${totalLength.toFixed(2)}m`;
+    `Dimensões: ${roomWidth}m x ${roomDepth}m x ${roomHeight.toFixed(1)}m (${totalArea.toFixed(0)}m²)<br>Atuais: ${currentStations} Estações | Cabos Total: ${totalLength.toFixed(2)}m`;
+
+  validateNorms();
+}
+
+function validateNorms() {
+  const alertsContainer = document.getElementById('norm-alerts');
+  alertsContainer.innerHTML = '';
+
+  const totalArea = roomWidth * roomDepth;
+  const currentStations = deskGroups.length;
+
+  // 1. Validação de Ocupação/Lotação Máxima (Instrução Técnica do Corpo de Bombeiros / IT-11: 1 pessoa a cada 4m²)
+  const maxOcupacaoBombeiros = Math.floor(totalArea / 4);
+  if (currentStations > maxOcupacaoBombeiros) {
+    alertsContainer.innerHTML += `<div class="alert-box alert-danger">⚠️ VIOLAÇÃO IT-11 (Bombeiros): Sala superlotada! Máximo permitido: ${maxOcupacaoBombeiros} pessoas (${totalArea}m² / 4m²).</div>`;
+  }
+
+  // 2. Validação Código de Obras Municipal (Área mínima de 9m² e Pé-direito mínimo de 2.50m)
+  if (totalArea < 9) {
+    alertsContainer.innerHTML += `<div class="alert-box alert-danger">⚠️ VIOLAÇÃO Código de Obras: Área total (${totalArea}m²) abaixo do mínimo permitido (9m²).</div>`;
+  }
+  if (roomHeight < 2.5) {
+    alertsContainer.innerHTML += `<div class="alert-box alert-danger">⚠️ VIOLAÇÃO Código de Obras: Pé-direito (${roomHeight.toFixed(1)}m) abaixo do mínimo exigido (2.50m).</div>`;
+  }
+
+  // 3. Validação ISO/IEC 11801 (Dimensionamento de Rede e Tomadas)
+  const recomendacaoAreasTrabalhoISO = Math.ceil(totalArea / 10);
+  const pontosRedeTotais = currentStations * 2; // Mínimo de 2 pontos por estação
+  
+  if (currentStations === 0) {
+    alertsContainer.innerHTML += `<div class="alert-box alert-warning">⚠️ ISO/IEC 11801: Nenhuma estação inserida. Projeto exige infraestrutura de rede prévia.</div>`;
+  } else if (currentStations < recomendacaoAreasTrabalhoISO) {
+    alertsContainer.innerHTML += `<div class="alert-box alert-warning">ℹ️ ISO/IEC 11801: O espaço suporta até ${recomendacaoAreasTrabalhoISO} Áreas de Trabalho recomendadas (1 a cada 10m²).</div>`;
+  } else {
+    alertsContainer.innerHTML += `<div class="alert-box alert-success">✓ ISO/IEC 11801: Infraestrutura de ${pontosRedeTotais} pontos de rede RJ45 para ${currentStations} estações.</div>`;
+  }
+
+  // 4. Validação NR-17 e Limites Físicos da Sala
+  let espacamentoInadequado = false;
+  let foraDaSala = false;
+
+  const maxW = roomWidth / 2 - 0.5;
+  const maxD = roomDepth / 2 - 0.5;
+
+  for (let i = 0; i < deskGroups.length; i++) {
+    const posI = deskGroups[i].position;
+    if (Math.abs(posI.x) > maxW || Math.abs(posI.z) > maxD) {
+      foraDaSala = true;
+    }
+    for (let j = i + 1; j < deskGroups.length; j++) {
+      const dist = posI.distanceTo(deskGroups[j].position);
+      if (dist < 0.8) { 
+        espacamentoInadequado = true;
+      }
+    }
+  }
+
+  if (foraDaSala) {
+    alertsContainer.innerHTML += `<div class="alert-box alert-danger">⚠️ VIOLAÇÃO DE LAYOUT: Existem estações ultrapassando os limites das paredes da sala!</div>`;
+  }
+
+  if (espacamentoInadequado) {
+    alertsContainer.innerHTML += `<div class="alert-box alert-danger">⚠️ VIOLAÇÃO NR-17 (Ergonomia): Distância entre estações inferior a 0,80m livre para circulação!</div>`;
+  }
 }
 
 function adjustDimension(param, delta) {
   if (param === 'width') {
-    roomWidth = Math.max(8, roomWidth + delta);
+    roomWidth = Math.max(3, roomWidth + delta);
   } else if (param === 'depth') {
-    roomDepth = Math.max(6, roomDepth + delta);
+    roomDepth = Math.max(3, roomDepth + delta);
   } else if (param === 'height') {
-    roomHeight = Math.max(2.5, Math.min(6.0, roomHeight + delta));
+    roomHeight = Math.max(2.0, Math.min(6.0, roomHeight + delta));
   }
   
   buildOfficeRoom();
@@ -453,6 +553,8 @@ function createRealWindowFrame(width, height) {
 
 function createRealDoorFrame(width, height, isDouble = false) {
   const group = new THREE.Group();
+  group.userData = { isDoorContainer: true };
+
   const frameMat = new THREE.MeshStandardMaterial({ color: 0x2c2c2c, metalness: 0.5, roughness: 0.5 });
   const doorMat = new THREE.MeshStandardMaterial({ color: 0x5a3d28, roughness: 0.6 });
   const handleMat = new THREE.MeshStandardMaterial({ color: 0xdddddd, metalness: 0.9, roughness: 0.1 });
@@ -467,11 +569,23 @@ function createRealDoorFrame(width, height, isDouble = false) {
   group.add(top, left, right);
 
   if (!isDouble) {
-    const door = new THREE.Mesh(new THREE.BoxGeometry(width - 0.08, height - 0.05, 0.04), doorMat);
-    door.position.set(0, (height - 0.05)/2, 0);
+    const doorPivot = new THREE.Group();
+    doorPivot.position.set(-width/2 + 0.04, 0, 0);
+    doorPivot.userData = { isDoor: true, isOpen: false, targetAngle: 0, currentAngle: 0 };
+
+    const doorW = width - 0.08;
+    const doorH = height - 0.05;
+    const door = new THREE.Mesh(new THREE.BoxGeometry(doorW, doorH, 0.04), doorMat);
+    door.position.set(doorW / 2, doorH / 2, 0);
+    door.userData = { isDoor: true };
+    doorPivot.add(door);
+
     const handle = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.03, 0.08), handleMat);
-    handle.position.set((width/2) - 0.15, 1.0, 0.04);
-    group.add(door, handle);
+    handle.position.set(doorW - 0.08, 1.0, 0.04);
+    handle.userData = { isDoor: true };
+    doorPivot.add(handle);
+
+    group.add(doorPivot);
   } else {
     const halfW = (width - 0.1) / 2;
     const door1 = new THREE.Mesh(new THREE.BoxGeometry(halfW, height - 0.05, 0.04), doorMat);
@@ -825,37 +939,7 @@ function createWorkstation(x, z, id, y = 0) {
   return stationGroup;
 }
 
-function addStationGroup(centerX, centerZ) {
-  const group = new THREE.Group();
-  group.userData = { editable: true, type: 'stationGroup', label: 'Grupo Quadrivalente' };
-
-  const w = SINGLE_DESK_WIDTH;
-  const d = 0.7;
-
-  const offsets = [
-    { x: -w/2, z: -d/2, rot: 0 },
-    { x:  w/2, z: -d/2, rot: 0 },
-    { x: -w/2, z:  d/2, rot: Math.PI },
-    { x:  w/2, z:  d/2, rot: Math.PI }
-  ];
-
-  offsets.forEach((off, idx) => {
-    const st = createWorkstation(off.x, off.z, `Estação ${stationCounter+1}`, 0);
-    st.rotation.y = off.rot;
-    scene.remove(st);
-    group.add(st);
-  });
-
-  group.position.set(centerX, 0, centerZ);
-  scene.add(group);
-  return group;
-}
-
 function addFullStation() {
-  if (deskGroups.length >= getMaxCapacity()) {
-    alert("Limite máximo de estações atingido para o tamanho atual da sala, de acordo com as normas ISO/IEC 11801!");
-    return;
-  }
   createWorkstation(0, 0);
   rebuildIsoCabling();
   updateStatusUI();
@@ -1214,6 +1298,14 @@ function findEditableParent(obj) {
   return null;
 }
 
+function findDoorParent(obj) {
+  while (obj && obj !== scene) {
+    if (obj.userData && obj.userData.isDoor) return obj;
+    obj = obj.parent;
+  }
+  return null;
+}
+
 function setSelection(obj) {
   if (selectedObject && selectedObject.userData.originalScale) {
     selectedObject.scale.copy(selectedObject.userData.originalScale);
@@ -1240,6 +1332,13 @@ function onPointerDown(event) {
 
   const hits = raycaster.intersectObjects(scene.children, true);
   for (const hit of hits) {
+    const door = findDoorParent(hit.object);
+    if (door) {
+      door.userData.isOpen = !door.userData.isOpen;
+      door.userData.targetAngle = door.userData.isOpen ? Math.PI / 2 : 0;
+      return;
+    }
+
     const editable = findEditableParent(hit.object);
     if (editable) {
       setSelection(editable);
@@ -1292,6 +1391,18 @@ function enableObjectDragging() {
 
 function animate() {
   requestAnimationFrame(animate);
+
+  doorFrames.forEach(doorFrame => {
+    doorFrame.traverse(child => {
+      if (child.userData && child.userData.isDoor && child.userData.targetAngle !== undefined) {
+        if (Math.abs(child.userData.currentAngle - child.userData.targetAngle) > 0.001) {
+          child.userData.currentAngle += (child.userData.targetAngle - child.userData.currentAngle) * 0.1;
+          child.rotation.y = child.userData.currentAngle;
+        }
+      }
+    });
+  });
+
   controls.update();
   renderer.render(scene, camera);
 }
@@ -1313,58 +1424,64 @@ function toggleLegendScale() {
 window.onload = function() {
   init();
 
+  // 10 Layouts predefinidos e em total conformidade com NR-17 (Mín. 0,80m de passagem livre), limites físicos da sala e área livre de passagem na porta
   const layoutsDisponiveis = [
-    // 1 - duas fileiras de 5
+    // Layout 1: Duas Fileiras Duplas Paralelas
     [
-      {x:-4.5,z:-2.2},{x:-2.25,z:-2.2},{x:0,z:-2.2},{x:2.25,z:-2.2},{x:4.5,z:-2.2},
-      {x:-4.5,z:2.2},{x:-2.25,z:2.2},{x:0,z:2.2},{x:2.25,z:2.2},{x:4.5,z:2.2}
+      {x:-3.2, z:-2.5, r:0}, {x:-1.4, z:-2.5, r:0}, {x:0.4, z:-2.5, r:0}, {x:2.2, z:-2.5, r:0}, {x:4.0, z:-2.5, r:0},
+      {x:-3.2, z: 2.5, r:Math.PI}, {x:-1.4, z: 2.5, r:Math.PI}, {x:0.4, z: 2.5, r:Math.PI}, {x:2.2, z: 2.5, r:Math.PI}, {x:4.0, z: 2.5, r:Math.PI}
     ],
-    // 2 - duas fileiras desencontradas
+    // Layout 2: Ilhas Duplas Opostas (Face-a-Face)
     [
-      {x:-4,z:-3},{x:-2,z:-3},{x:0,z:-3},{x:2,z:-3},{x:4,z:-3},
-      {x:-3,z:2},{x:-1,z:2},{x:1,z:2},{x:3,z:2},{x:5,z:2}
+      {x:-3.2, z:-2.2, r:0}, {x:-3.2, z:-1.0, r:Math.PI}, {x:-1.2, z:-2.2, r:0}, {x:-1.2, z:-1.0, r:Math.PI},
+      {x: 1.2, z:-2.2, r:0}, {x: 1.2, z:-1.0, r:Math.PI}, {x: 3.5, z:-2.2, r:0}, {x: 3.5, z:-1.0, r:Math.PI},
+      {x:-1.2, z: 2.2, r:0}, {x: 1.2, z: 2.2, r:Math.PI}
     ],
-    // 3 - formato U
+    // Layout 3: Formato Perimetral Espaçado (Paredes)
     [
-      {x:-4,z:-3},{x:-2,z:-3},{x:0,z:-3},{x:2,z:-3},{x:4,z:-3},
-      {x:-4,z:0},{x:4,z:0},{x:-4,z:3},{x:0,z:3},{x:4,z:3}
+      {x:-3.2, z:-3.2, r:0}, {x:-1.2, z:-3.2, r:0}, {x:0.8, z:-3.2, r:0}, {x: 2.8, z:-3.2, r:0}, {x: 4.8, z:-3.2, r:0},
+      {x:-3.2, z: 3.2, r:Math.PI}, {x:-1.2, z: 3.2, r:Math.PI}, {x:0.8, z: 3.2, r:Math.PI}, {x: 2.8, z: 3.2, r:Math.PI}, {x: 4.8, z: 3.2, r:Math.PI}
     ],
-    // 4 - formato centralizado
+    // Layout 4: Disposição Escalonada em "V"
     [
-      {x:-3.75,z:-2.5},{x:-1.25,z:-2.5},{x:1.25,z:-2.5},{x:3.75,z:-2.5},
-      {x:-3.75,z:2.5},{x:-1.25,z:2.5},{x:1.25,z:2.5},{x:3.75,z:2.5},
-      {x:-1.25,z:0},{x:1.25,z:0}
+      {x:-3.2, z:-3.0, r:0}, {x:-1.8, z:-1.8, r:0}, {x:-0.2, z:-0.6, r:0}, {x: 1.8, z:-0.6, r:0}, {x: 3.4, z:-1.8, r:0},
+      {x:-3.2, z: 3.0, r:Math.PI}, {x:-1.8, z: 1.8, r:Math.PI}, {x:-0.2, z: 0.6, r:Math.PI}, {x: 1.8, z: 0.6, r:Math.PI}, {x: 3.4, z: 1.8, r:Math.PI}
     ],
-    // 5 - corredor central
+    // Layout 5: Blocos de 3 Estações em Estilo Espinha de Peixe
     [
-      {x:-4,z:-3},{x:-2,z:-3},{x:2,z:-3},{x:4,z:-3},
-      {x:-4,z:0},{x:4,z:0},{x:-4,z:3},{x:-2,z:3},{x:2,z:3},{x:4,z:3}
+      {x:-2.8, z:-2.8, r:Math.PI/2}, {x:-2.8, z:-1.0, r:Math.PI/2}, {x:-2.8, z: 0.8, r:Math.PI/2},
+      {x: 0.8, z:-2.8, r:-Math.PI/2}, {x: 0.8, z:-1.0, r:-Math.PI/2}, {x: 0.8, z: 0.8, r:-Math.PI/2},
+      {x: 4.5, z:-2.8, r:Math.PI/2}, {x: 4.5, z:-1.0, r:Math.PI/2}, {x: 4.5, z: 0.8, r:Math.PI/2}, {x: 4.5, z: 2.6, r:Math.PI/2}
     ],
-    // 6 - diagonal
+    // Layout 6: Grade Ampla 3x3 com Circulação Central Ampliada
     [
-      {x:-4.5,z:-3.5},{x:-3,z:-2.3},{x:-1.5,z:-1.1},{x:0,z:0},{x:1.5,z:1.1},
-      {x:3,z:2.3},{x:4.5,z:3.5},{x:-4.5,z:3.5},{x:3,z:-2.3},{x:4.5,z:-3.5}
+      {x:-2.8, z:-2.8, r:0}, {x: 0.8, z:-2.8, r:0}, {x: 4.2, z:-2.8, r:0},
+      {x:-2.8, z: 0.0, r:0}, {x: 0.8, z: 0.0, r:0}, {x: 4.2, z: 0.0, r:0},
+      {x:-2.8, z: 2.8, r:0}, {x: 0.8, z: 2.8, r:0}, {x: 4.2, z: 2.8, r:0}, {x: 2.5, z: 2.8, r:0}
     ],
-    // 7 - quatro cantos + centro
+    // Layout 7: Ilha Central Quádrupla + Lateral
     [
-      {x:-4,z:-3},{x:0,z:-3},{x:4,z:-3},{x:-4,z:3},{x:0,z:3},{x:4,z:3},
-      {x:-2,z:-0.2},{x:0,z:-0.2},{x:2,z:-0.2},{x:0,z:1.8}
+      {x:-1.2, z:-1.0, r:0}, {x: 1.2, z:-1.0, r:0}, {x:-1.2, z: 0.6, r:Math.PI}, {x: 1.2, z: 0.6, r:Math.PI},
+      {x:-3.2, z:-3.0, r:0}, {x:-3.2, z:-1.2, r:0}, {x:-3.2, z: 0.6, r:0}, {x:-3.2, z: 2.4, r:0},
+      {x: 5.0, z:-2.0, r:0}, {x: 5.0, z: 1.0, r:0}
     ],
-    // 8 - zigue-zague
+    // Layout 8: Formato em "U" Amplo voltado para a Entrada
     [
-      {x:-4.5,z:-3},{x:-2.5,z:-1.5},{x:-0.5,z:-3},{x:1.5,z:-1.5},{x:3.5,z:-3},
-      {x:-3.5,z:3},{x:-1.5,z:1.5},{x:0.5,z:3},{x:2.5,z:1.5},{x:4.5,z:3}
+      {x:-3.2, z:-3.0, r:0}, {x:-1.2, z:-3.0, r:0}, {x: 0.8, z:-3.0, r:0}, {x: 2.8, z:-3.0, r:0}, {x: 4.8, z:-3.0, r:0},
+      {x:-3.2, z:-1.2, r:Math.PI/2}, {x:-3.2, z: 1.0, r:Math.PI/2}, {x:-3.2, z: 2.8, r:Math.PI/2},
+      {x: 4.8, z:-1.2, r:-Math.PI/2}, {x: 4.8, z: 1.0, r:-Math.PI/2}
     ],
-    // 9 - moldura
+    // Layout 9: Quatro Mini-Ilhas de Trabalho
     [
-      {x:-4.5,z:-3},{x:-2.25,z:-3},{x:0,z:-3},{x:2.25,z:-3},{x:4.5,z:-3},
-      {x:-4.5,z:0},{x:4.5,z:0},{x:-4.5,z:3},{x:-2.25,z:3},{x:0,z:3}
+      {x:-2.8, z:-2.2, r:0}, {x:-1.2, z:-2.2, r:Math.PI},
+      {x: 1.8, z:-2.2, r:0}, {x: 3.4, z:-2.2, r:Math.PI},
+      {x:-2.8, z: 2.0, r:0}, {x:-1.2, z: 2.0, r:Math.PI},
+      {x: 1.8, z: 2.0, r:0}, {x: 3.4, z: 2.0, r:Math.PI}, {x: 0.3, z:-0.2, r:0}, {x: 0.3, z: 1.2, r:Math.PI}
     ],
-    // 10 - distribuição alternada
+    // Layout 10: Colunas Zigue-Zague Ergonomicamente Deslocadas
     [
-      {x:-4,z:-2.8},{x:-1.3,z:-2.8},{x:1.3,z:-2.8},{x:4,z:-2.8},
-      {x:-3.3,z:0},{x:0,z:0},{x:3.3,z:0},
-      {x:-4,z:2.8},{x:-1.3,z:2.8},{x:2.5,z:2.8}
+      {x:-3.2, z:-3.0, r:0}, {x:-1.2, z:-2.0, r:0}, {x: 0.8, z:-3.0, r:0}, {x: 2.8, z:-2.0, r:0}, {x: 4.8, z:-3.0, r:0},
+      {x:-3.2, z: 2.0, r:Math.PI}, {x:-1.2, z: 3.0, r:Math.PI}, {x: 0.8, z: 2.0, r:Math.PI}, {x: 2.8, z: 3.0, r:Math.PI}, {x: 4.8, z: 2.0, r:Math.PI}
     ]
   ];
 
@@ -1378,31 +1495,35 @@ window.onload = function() {
       const quantidadeMesas = deskGroups.length;
       const layoutAtual = layoutsDisponiveis[indiceLayoutAtual];
 
-      if (quantidadeMesas <= layoutAtual.length) {
-        deskGroups.forEach((station, index) => {
-          const pos = layoutAtual[index];
-          station.position.x = pos.x;
-          station.position.z = pos.z;
-        });
-      } else {
-        const cols = Math.max(1, Math.ceil(Math.sqrt(quantidadeMesas)));
-        const rows = Math.ceil(quantidadeMesas / cols);
-        const spacingX = Math.max(1.5, (roomWidth - 4) / Math.max(1, cols - 1));
-        const spacingZ = Math.max(1.5, (roomDepth - 4) / Math.max(1, rows - 1));
+      const maxW = roomWidth / 2 - 0.6;
+      const maxD = roomDepth / 2 - 0.6;
 
-        deskGroups.forEach((station, index) => {
-          const col = index % cols;
+      deskGroups.forEach((station, index) => {
+        if (index < layoutAtual.length) {
+          const pos = layoutAtual[index];
+          station.position.x = Math.max(-maxW, Math.min(maxW, pos.x));
+          station.position.z = Math.max(-maxD, Math.min(maxD, pos.z));
+          if (pos.r !== undefined) {
+            station.rotation.y = pos.r;
+          }
+        } else {
+          // Ajuste para estações extras mantendo dentro da sala e com distância >= 0.80m (NR-17)
+          const cols = Math.max(1, Math.floor((roomWidth - 2) / 1.8));
           const row = Math.floor(index / cols);
-          station.position.x = cols === 1 ? 0 : -(cols - 1) * spacingX / 2 + col * spacingX;
-          station.position.z = rows === 1 ? 0 : -(rows - 1) * spacingZ / 2 + row * spacingZ;
-        });
-      }
+          const col = index % cols;
+
+          const posX = -((cols - 1) * 1.8) / 2 + col * 1.8;
+          const posZ = -maxD + 1.2 + row * 1.6;
+
+          station.position.x = Math.max(-maxW, Math.min(maxW, posX));
+          station.position.z = Math.max(-maxD, Math.min(maxD, posZ));
+        }
+      });
 
       indiceLayoutAtual = (indiceLayoutAtual + 1) % layoutsDisponiveis.length;
       rebuildIsoCabling();
     });
   }
-};
 
   const menuHamburger = document.getElementById("menu-hamburger");
   const infoPanel = document.getElementById("info");
@@ -1423,6 +1544,7 @@ window.onload = function() {
       menuControlsHamburger.setAttribute("aria-expanded", String(!aberto));
     });
   }
+};
 </script>
 </body>
 </html>
