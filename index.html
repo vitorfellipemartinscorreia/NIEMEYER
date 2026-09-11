@@ -1,951 +1,999 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Niemeyer - Planejamento de Infraestrutura (Mobile)</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-        }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Niemeyer - Planejamento de Infraestrutura</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
 
-        body {
-            background-color: #e6e2df;
-            color: #333;
-            font-size: 12px;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
+        body {
+            background-color: #e6e2df;
+            color: #333;
+            font-size: 12px;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
 
-        /* Top Navbar */
-        header {
-            background-color: #fff;
-            border-bottom: 1px solid #ccc;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 8px 12px;
-            height: 50px;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
+        /* Top Navbar */
+        header {
+            background-color: #fff;
+            border-bottom: 1px solid #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 16px;
+            height: 45px;
+        }
 
-        .logo-area {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-        .logo-icon {
-            background-color: #6e332e;
-            color: #fff;
-            padding: 5px 8px;
-            font-weight: bold;
-            border-radius: 3px;
-            font-size: 12px;
-        }
+        .logo-icon {
+            background-color: #6e332e;
+            color: #fff;
+            padding: 6px;
+            font-weight: bold;
+            border-radius: 3px;
+        }
 
-        .logo-text h1 {
-            font-size: 13px;
-            color: #2c2c2c;
-            letter-spacing: 0.5px;
-        }
+        .logo-text h1 {
+            font-size: 14px;
+            color: #2c2c2c;
+            letter-spacing: 0.5px;
+        }
 
-        .logo-text span {
-            font-size: 8px;
-            color: #666;
-            display: block;
-        }
+        .logo-text span {
+            font-size: 9px;
+            color: #666;
+        }
 
-        .nav-menu {
-            display: none; /* Oculto no mobile para economizar espaço, adaptável via menu se necessário */
-        }
+        .nav-menu {
+            display: flex;
+            gap: 20px;
+        }
 
-        .nav-right {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 10px;
-        }
+        .nav-item {
+            text-decoration: none;
+            color: #444;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 8px;
+            border-radius: 3px;
+        }
 
-        .status-dot {
-            height: 6px;
-            width: 6px;
-            background-color: #2e7d32;
-            border-radius: 50%;
-            display: inline-block;
-        }
+        .nav-item.active {
+            background-color: #f0e6e0;
+            color: #6e332e;
+            font-weight: bold;
+        }
 
-        .btn-export {
-            background-color: #6e332e;
-            color: white;
-            border: none;
-            padding: 5px 8px;
-            border-radius: 3px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 10px;
-        }
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 11px;
+        }
 
-        /* Main Workspace - Mobile Stacked Grid */
-        .workspace {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-            gap: 10px;
-            padding: 10px;
-        }
+        .status-dot {
+            height: 8px;
+            width: 8px;
+            background-color: #2e7d32;
+            border-radius: 50%;
+            display: inline-block;
+        }
 
-        /* Panels Common Style */
-        .panel {
-            background-color: #f4f1ee;
-            border: 1px solid #dcd6d0;
-            border-radius: 4px;
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
+        .btn-export {
+            background-color: #6e332e;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-weight: bold;
+        }
 
-        .panel-title {
-            font-size: 11px;
-            font-weight: bold;
-            color: #444;
-            border-bottom: 1px solid #dcd6d0;
-            padding-bottom: 4px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
+        /* Main Workspace */
+        .workspace {
+            display: grid;
+            grid-template-columns: 240px 1fr 240px;
+            grid-template-rows: 1fr 140px;
+            flex: 1;
+            gap: 8px;
+            padding: 8px;
+            overflow: hidden;
+        }
 
-        /* Configurations Sidebar */
-        .config-sidebar {
-            gap: 10px;
-        }
+        /* Panels Common Style */
+        .panel {
+            background-color: #f4f1ee;
+            border: 1px solid #dcd6d0;
+            border-radius: 4px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
 
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 3px;
-        }
+        .panel-title {
+            font-size: 11px;
+            font-weight: bold;
+            color: #444;
+            border-bottom: 1px solid #dcd6d0;
+            padding-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
 
-        .form-group label {
-            font-size: 11px;
-            color: #555;
-        }
+        /* Left Sidebar: Configurations */
+        .config-sidebar {
+            grid-row: span 2;
+            gap: 12px;
+        }
 
-        .form-group input, .form-group select {
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 3px;
-            background: #fff;
-            font-size: 12px;
-            width: 100%;
-        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
 
-        .station-controls {
-            display: flex;
-            gap: 6px;
-            margin-top: 2px;
-        }
+        .form-group label {
+            font-size: 11px;
+            color: #555;
+        }
 
-        .btn-ctrl {
-            flex: 1;
-            background-color: #6e332e;
-            color: white;
-            border: none;
-            padding: 8px;
-            border-radius: 3px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 11px;
-        }
+        .form-group input, .form-group select {
+            padding: 6px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            background: #fff;
+            font-size: 11px;
+        }
 
-        .btn-update {
-            background-color: #6e332e;
-            color: white;
-            border: none;
-            padding: 10px;
-            border-radius: 3px;
-            cursor: pointer;
-            text-align: center;
-            font-weight: bold;
-            font-size: 11px;
-            margin-top: 4px;
-        }
+        .station-controls {
+            display: flex;
+            gap: 6px;
+            margin-top: 4px;
+        }
 
-        /* Center Area: Physical Plan */
-        .center-area {
-            background-color: #f4f1ee;
-            border: 1px solid #dcd6d0;
-            border-radius: 4px;
-            display: flex;
-            flex-direction: column;
-            padding: 8px;
-            position: relative;
-        }
+        .btn-ctrl {
+            flex: 1;
+            background-color: #6e332e;
+            color: white;
+            border: none;
+            padding: 6px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 12px;
+        }
 
-        .plan-header {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            margin-bottom: 8px;
-        }
+        .btn-ctrl:hover, .btn-update:hover {
+            opacity: 0.9;
+        }
 
-        .plan-toolbar {
-            display: flex;
-            gap: 4px;
-            flex-wrap: wrap;
-        }
+        .btn-update {
+            background-color: #6e332e;
+            color: white;
+            border: none;
+            padding: 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            text-align: center;
+            font-weight: bold;
+            margin-top: auto;
+        }
 
-        .tool-btn {
-            background: #fff;
-            border: 1px solid #ccc;
-            padding: 6px 10px;
-            border-radius: 3px;
-            cursor: pointer;
-            font-size: 10px;
-            user-select: none;
-        }
+        /* Center Area: Physical Plan */
+        .center-area {
+            background-color: #f4f1ee;
+            border: 1px solid #dcd6d0;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            padding: 8px;
+            position: relative;
+        }
 
-        .canvas-container {
-            width: 100%;
-            height: 350px;
-            background-color: #fff;
-            border: 1px dashed #ccc;
-            position: relative;
-            background-image: radial-gradient(#d3d3d3 1px, transparent 1px);
-            background-size: 15px 15px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: auto;
-        }
+        .plan-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
 
-        /* Simulated Blueprint Rooms */
-        .blueprint-room {
-            border: 2px solid #333;
-            width: 100%;
-            min-width: 450px;
-            height: 100%;
-            min-height: 330px;
-            position: relative;
-            background: #fbf9f7;
-            padding: 15px;
-        }
+        .plan-toolbar {
+            display: flex;
+            gap: 4px;
+        }
 
-        .room-label {
-            position: absolute;
-            top: 5px;
-            left: 10px;
-            font-weight: bold;
-            font-size: 10px;
-            color: #555;
-            letter-spacing: 0.5px;
-            z-index: 2;
-        }
+        .tool-btn {
+            background: #fff;
+            border: 1px solid #ccc;
+            padding: 4px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 11px;
+            user-select: none;
+        }
 
-        /* Overlay Canvas para desenhar Cabos de Rede */
-        #cablesCanvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 1;
-        }
+        .canvas-container {
+            flex: 1;
+            background-color: #fff;
+            border: 1px dashed #ccc;
+            position: relative;
+            background-image: radial-gradient(#d3d3d3 1px, transparent 1px);
+            background-size: 15px 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
 
-        /* Estações Realistas Desenho CSS */
-        .station-node {
-            position: absolute;
-            width: 65px;
-            height: 48px;
-            background: #d8cfc4;
-            border: 2px solid #6e332e;
-            border-radius: 4px;
-            padding: 2px;
-            cursor: move;
-            user-select: none;
-            z-index: 3;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-        }
+        /* Simulated Blueprint Rooms */
+        .blueprint-room {
+            border: 2px solid #333;
+            width: 90%;
+            height: 90%;
+            position: relative;
+            background: #fbf9f7;
+            padding: 15px;
+            overflow: hidden;
+        }
 
-        .station-title {
-            font-size: 6px;
-            font-weight: bold;
-            color: #6e332e;
-            text-align: center;
-            line-height: 1;
-            margin-bottom: 1px;
-        }
+        .room-label {
+            position: absolute;
+            top: 5px;
+            left: 10px;
+            font-weight: bold;
+            font-size: 11px;
+            color: #555;
+            letter-spacing: 0.5px;
+            z-index: 2;
+        }
 
-        .station-desk-setup {
-            width: 100%;
-            height: 34px;
-            background: #f0eae1;
-            border: 1px solid #b5a495;
-            border-radius: 2px;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            padding: 2px;
-        }
+        /* Overlay Canvas para desenhar Cabos de Rede */
+        #cablesCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
 
-        .monitor-screen {
-            width: 22px;
-            height: 5px;
-            background: #222;
-            border: 1px solid #000;
-            border-radius: 1px;
-        }
+        /* Estações Realistas Desenho CSS */
+        .station-node {
+            position: absolute;
+            width: 72px;
+            height: 52px;
+            background: #d8cfc4;
+            border: 2px solid #6e332e;
+            border-radius: 4px;
+            padding: 3px;
+            cursor: move;
+            user-select: none;
+            z-index: 3;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            transition: box-shadow 0.1s;
+        }
 
-        .keyboard {
-            width: 24px;
-            height: 8px;
-            background: #333;
-            border-radius: 1px;
-            margin-top: 2px;
-        }
+        .station-node:active {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            z-index: 10;
+        }
 
-        .mousepad {
-            width: 6px;
-            height: 8px;
-            background: #999;
-            border-radius: 1px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+        .station-title {
+            font-size: 7px;
+            font-weight: bold;
+            color: #6e332e;
+            text-align: center;
+            line-height: 1;
+            margin-bottom: 1px;
+        }
 
-        .mouse {
-            width: 3px;
-            height: 5px;
-            background: #222;
-            border-radius: 2px;
-        }
+        .station-desk-setup {
+            width: 100%;
+            height: 38px;
+            background: #f0eae1;
+            border: 1px solid #b5a495;
+            border-radius: 2px;
+            position: relative;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 2px;
+        }
 
-        .pc-case {
-            width: 8px;
-            height: 24px;
-            background: #1a1a1a;
-            border: 1px solid #444;
-            border-radius: 1px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding-top: 2px;
-            gap: 2px;
-        }
+        /* Componentes de HW realistas */
+        .monitor-screen {
+            width: 26px;
+            height: 6px;
+            background: #222;
+            border: 1px solid #000;
+            border-radius: 1px;
+            box-shadow: 0 0 2px rgba(0,255,255,0.3);
+        }
 
-        .pc-power-led {
-            width: 2px;
-            height: 2px;
-            background: #00ff00;
-            border-radius: 50%;
-        }
+        .keyboard {
+            width: 28px;
+            height: 10px;
+            background: #333;
+            border-radius: 1px;
+            margin-top: 2px;
+            background-image: radial-gradient(#666 30%, transparent 30%);
+            background-size: 3px 3px;
+        }
 
-        .pc-drive {
-            width: 5px;
-            height: 1px;
-            background: #444;
-        }
+        .mousepad {
+            width: 8px;
+            height: 10px;
+            background: #999;
+            border-radius: 1px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-        .screen-keyboard-area, .mouse-area {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+        .mouse {
+            width: 4px;
+            height: 6px;
+            background: #222;
+            border-radius: 2px;
+        }
 
-        /* Sala Técnica */
-        .tech-room {
-            position: absolute;
-            right: 8px;
-            top: 8px;
-            bottom: 8px;
-            border: 2px solid #6e332e;
-            width: 32%;
-            background: #e1d8d0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            padding: 8px 4px;
-            gap: 8px;
-            z-index: 2;
-        }
+        .pc-case {
+            width: 10px;
+            height: 28px;
+            background: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 1px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding-top: 2px;
+            gap: 2px;
+        }
 
-        .tech-title {
-            font-size: 9px;
-            font-weight: bold;
-            color: #6e332e;
-            background: #f0e6e0;
-            padding: 3px 6px;
-            border-radius: 3px;
-            border: 1px solid #6e332e;
-            text-align: center;
-            width: 100%;
-        }
+        .pc-power-led {
+            width: 3px;
+            height: 3px;
+            background: #00ff00;
+            border-radius: 50%;
+        }
 
-        .rack-cabinet {
-            background: #1e1e1e;
-            width: 100%;
-            flex: 1;
-            border-radius: 3px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-around;
-            padding: 4px 2px;
-            border: 2px solid #444;
-        }
+        .pc-drive {
+            width: 6px;
+            height: 2px;
+            background: #444;
+        }
 
-        .rack-slot {
-            height: 10px;
-            background: #333;
-            width: 90%;
-            margin: 0 auto;
-            border: 1px solid #555;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 2px;
-        }
+        .screen-keyboard-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-        .rack-led {
-            width: 3px;
-            height: 3px;
-            background: #0288d1;
-            border-radius: 50%;
-        }
+        .mouse-area {
+            display: flex;
+            align-items: center;
+        }
 
-        .tech-specs {
-            font-size: 8px;
-            line-height: 1.3;
-            text-align: left;
-            width: 100%;
-            color: #222;
-            background: #fff;
-            padding: 4px;
-            border-radius: 3px;
-            border: 1px solid #ccc;
-        }
+        /* Sala Técnica Expandida e Mais Visível */
+        .tech-room {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            bottom: 10px;
+            border: 2px solid #6e332e;
+            width: 22%;
+            background: #e1d8d0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 12px 8px;
+            gap: 12px;
+            z-index: 2;
+            box-shadow: -2px 0 6px rgba(0,0,0,0.05);
+        }
 
-        .plan-footer {
-            font-size: 9px;
-            color: #666;
-            margin-top: 6px;
-            text-align: center;
-        }
+        .tech-title {
+            font-size: 11px;
+            font-weight: bold;
+            color: #6e332e;
+            background: #f0e6e0;
+            padding: 4px 8px;
+            border-radius: 3px;
+            border: 1px solid #6e332e;
+            text-align: center;
+            width: 100%;
+        }
 
-        /* Right Sidebar: Summary */
-        .summary-sidebar {
-            font-size: 11px;
-            gap: 6px;
-        }
+        .rack-cabinet {
+            background: #1e1e1e;
+            width: 100%;
+            max-width: 90px;
+            flex: 1;
+            border-radius: 3px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            padding: 8px 4px;
+            border: 2px solid #444;
+            box-shadow: inset 0 0 5px #000;
+        }
 
-        .summary-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 3px 0;
-            border-bottom: 1px dotted #dcd6d0;
-        }
+        .rack-slot {
+            height: 12px;
+            background: #333;
+            width: 90%;
+            margin: 0 auto;
+            border: 1px solid #555;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 4px;
+        }
 
-        .alert-box {
-            background-color: #fcf8e3;
-            border: 1px solid #faebcc;
-            padding: 6px;
-            border-radius: 3px;
-            color: #8a6d3b;
-            font-size: 10px;
-        }
+        .rack-led {
+            width: 4px;
+            height: 4px;
+            background: #0288d1;
+            border-radius: 50%;
+        }
 
-        .standards-container {
-            background: #fff;
-            border: 1px solid #6e332e;
-            border-radius: 4px;
-            padding: 6px;
-            margin-top: 2px;
-        }
+        .tech-specs {
+            font-size: 9px;
+            line-height: 1.4;
+            text-align: left;
+            width: 100%;
+            color: #222;
+            background: #fff;
+            padding: 6px;
+            border-radius: 3px;
+            border: 1px solid #ccc;
+        }
 
-        .standards-list {
-            padding-left: 5px;
-            color: #222;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            list-style: none;
-        }
+        .plan-footer {
+            font-size: 10px;
+            color: #666;
+            margin-top: 6px;
+        }
 
-        .standards-list li {
-            font-size: 10px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
+        /* Right Sidebar: Summary */
+        .summary-sidebar {
+            grid-row: span 2;
+            font-size: 11px;
+            gap: 8px;
+            overflow-y: auto;
+        }
 
-        .standards-list li::before {
-            content: "✓";
-            color: #2e7d32;
-            font-weight: bold;
-        }
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 3px 0;
+            border-bottom: 1px dotted #dcd6d0;
+        }
 
-        /* Bottom Sections Container */
-        .bottom-row-container {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
+        .alert-box {
+            background-color: #fcf8e3;
+            border: 1px solid #faebcc;
+            padding: 8px;
+            border-radius: 3px;
+            color: #8a6d3b;
+        }
 
-        .bottom-panel {
-            background-color: #f4f1ee;
-            border: 1px solid #dcd6d0;
-            border-radius: 4px;
-            padding: 8px;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
+        /* Normas Reguladoras Expandidas e Maiores */
+        .standards-container {
+            background: #fff;
+            border: 1px solid #6e332e;
+            border-radius: 4px;
+            padding: 8px;
+            margin-top: 4px;
+        }
 
-        .topology-flow {
-            display: flex;
-            align-items: center;
-            justify-content: space-around;
-            background: #fff;
-            padding: 8px;
-            border: 1px solid #dcd6d0;
-            border-radius: 3px;
-            font-size: 9px;
-        }
+        .standards-list {
+            padding-left: 5px;
+            color: #222;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            list-style: none;
+        }
 
-        .topo-box {
-            background: #f4f1ee;
-            border: 1px solid #ccc;
-            padding: 4px 6px;
-            border-radius: 3px;
-        }
+        .standards-list li {
+            font-size: 11px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
 
-        .bottom-sectors {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 5px;
-        }
+        .standards-list li::before {
+            content: "✓";
+            color: #2e7d32;
+            font-weight: bold;
+        }
 
-        .sector-card {
-            background: #fff;
-            border: 1px solid #dcd6d0;
-            padding: 6px;
-            border-radius: 3px;
-            font-size: 10px;
-            border-left: 3px solid #6e332e;
-        }
+        /* Bottom Left: Topology */
+        .bottom-topology {
+            grid-column: 1;
+        }
 
-        .bottom-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
+        .topology-flow {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            background: #fff;
+            padding: 10px;
+            border: 1px solid #dcd6d0;
+            border-radius: 3px;
+        }
 
-        .action-btn {
-            background: #fff;
-            border: 1px solid #6e332e;
-            color: #6e332e;
-            padding: 8px;
-            border-radius: 3px;
-            font-weight: bold;
-            cursor: pointer;
-            text-align: center;
-            font-size: 11px;
-        }
+        .topo-box {
+            background: #f4f1ee;
+            border: 1px solid #ccc;
+            padding: 6px 12px;
+            border-radius: 3px;
+            font-size: 10px;
+        }
 
-        .action-btn.primary {
-            background: #6e332e;
-            color: #fff;
-        }
-    </style>
+        /* Bottom Middle: Environment Sectors */
+        .bottom-sectors {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5px;
+        }
+
+        .sector-card {
+            background: #fff;
+            border: 1px solid #dcd6d0;
+            padding: 8px;
+            border-radius: 3px;
+            font-size: 10px;
+            border-left: 3px solid #6e332e;
+        }
+
+        /* Bottom Right: Actions */
+        .bottom-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .action-btn {
+            background: #fff;
+            border: 1px solid #6e332e;
+            color: #6e332e;
+            padding: 8px;
+            border-radius: 3px;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .action-btn.primary {
+            background: #6e332e;
+            color: #fff;
+        }
+
+        .bottom-row-container {
+            grid-column: 1 / span 2;
+            display: grid;
+            grid-template-columns: 1.5fr 1.5fr 1fr;
+            gap: 8px;
+        }
+
+        .bottom-panel {
+            background-color: #f4f1ee;
+            border: 1px solid #dcd6d0;
+            border-radius: 4px;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+    </style>
 </head>
 <body>
 
-    <!-- Header -->
-    <header>
-        <div class="logo-area">
-            <div class="logo-icon">N</div>
-            <div class="logo-text">
-                <h1>Niemeyer</h1>
-                <span>Infraestrutura</span>
-            </div>
-        </div>
-        <div class="nav-right">
-            <span><strong>Prototipo</strong></span>
-            <span><span class="status-dot"></span> Salvo</span>
-            <button class="btn-export">⬇️</button>
-        </div>
-    </header>
+    <!-- Header -->
+    <header>
+        <div class="logo-area">
+            <div class="logo-icon">N</div>
+            <div class="logo-text">
+                <h1>Niemeyer</h1>
+                <span>Planejamento de Infraestrutura</span>
+            </div>
+        </div>
+        <nav class="nav-menu">
+            <a href="#" class="nav-item">📁 Projeto</a>
+            <a href="#" class="nav-item active">✏️ Editar</a>
+            <a href="#" class="nav-item">👁️ Visualizar</a>
+            <a href="#" class="nav-item">💻 Dispositivos</a>
+            <a href="#" class="nav-item">🛠️ Ferramentas</a>
+            <a href="#" class="nav-item">📊 Relatórios</a>
+        </nav>
+        <div class="nav-right">
+            <span>Projeto: <strong>Projeto Prototipo</strong></span>
+            <span><span class="status-dot"></span> Salvo</span>
+            <button class="btn-export">⬇️ Exportar</button>
+        </div>
+    </header>
 
-    <!-- Main Workspace Grid -->
-    <div class="workspace">
-        
-        <!-- Left Sidebar: Configurations -->
-        <div class="panel config-sidebar">
-            <div class="panel-title">Configurações do Projeto</div>
-            <span style="font-weight: bold; color: #444;">Dimensões da Sala</span>
-            
-            <div class="form-group">
-                <label>Largura (m)</label>
-                <input type="number" id="inputWidth" value="20" min="5" max="100">
-            </div>
-            <div class="form-group">
-                <label>Comprimento (m)</label>
-                <input type="number" id="inputLength" value="15" min="5" max="100">
-            </div>
-            <div class="form-group">
-                <label>Pé-direito (m)</label>
-                <input type="number" value="3">
-            </div>
+    <!-- Main Workspace Grid -->
+    <div class="workspace">
+        
+        <!-- Left Sidebar: Configurations -->
+        <div class="panel config-sidebar">
+            <div class="panel-title">Configurações do Projeto</div>
+            <span style="font-weight: bold; color: #444; margin-top: 4px;">Dimensões da Sala</span>
+            
+            <div class="form-group">
+                <label>Largura (m)</label>
+                <input type="number" id="inputWidth" value="20" min="5" max="100">
+            </div>
+            <div class="form-group">
+                <label>Comprimento (m)</label>
+                <input type="number" id="inputLength" value="15" min="5" max="100">
+            </div>
+            <div class="form-group">
+                <label>Pé-direito (m)</label>
+                <input type="number" value="3">
+            </div>
 
-            <span style="font-weight: bold; color: #444;">Gerenciar Estações</span>
-            <div class="station-controls">
-                <button class="btn-ctrl" id="btnAddStation">+ Adicionar</button>
-                <button class="btn-ctrl" id="btnRemoveStation">- Remover</button>
-            </div>
+            <span style="font-weight: bold; color: #444; margin-top: 4px;">Gerenciar Estações</span>
+            <div class="station-controls">
+                <button class="btn-ctrl" id="btnAddStation">+ Adicionar</button>
+                <button class="btn-ctrl" id="btnRemoveStation">- Remover</button>
+            </div>
 
-            <button class="btn-update" id="btnUpdateProject">Atualizar projeto ↻</button>
-        </div>
+            <span style="font-weight: bold; color: #444; margin-top: 8px;">Ambiente</span>
+            <div class="form-group">
+                <label>Laboratório</label>
+                <select>
+                    <option>Laboratório</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Setor selecionado</label>
+                <select>
+                    <option>Sala de aula</option>
+                </select>
+            </div>
 
-        <!-- Center Area: Physical Plan -->
-        <div class="center-area">
-            <div class="plan-header">
-                <span id="planTitle" style="font-weight: bold; color: #444; font-size: 10px;">PLANTA — 20m × 15m (300m²)</span>
-                <div class="plan-toolbar">
-                    <button class="tool-btn">📍 Sel.</button>
-                    <button class="tool-btn">✋ Mover</button>
-                    <button class="tool-btn" id="btnQuickRemove">- Est.</button>
-                    <button class="tool-btn" id="btnQuickAdd">+ Est.</button>
-                </div>
-            </div>
-            
-            <div class="canvas-container" id="canvasContainer">
-                <div class="blueprint-room" id="blueprintRoom">
-                    <span class="room-label">LABORATÓRIO</span>
-                    
-                    <canvas id="cablesCanvas"></canvas>
+            <button class="btn-update" id="btnUpdateProject">Atualizar projeto ↻</button>
+        </div>
 
-                    <div class="tech-room" id="techRoom">
-                        <div class="tech-title">SALA TÉCNICA</div>
-                        <div class="rack-cabinet">
-                            <div class="rack-slot"><div class="rack-led"></div><div class="rack-led"></div></div>
-                            <div class="rack-slot"><div class="rack-led"></div></div>
-                            <div class="rack-slot"><div class="rack-led"></div><div class="rack-led"></div></div>
-                            <div class="rack-slot"><div class="rack-led"></div></div>
-                        </div>
-                        <div class="tech-specs">
-                            <strong>HW:</strong><br>
-                            ▪ Roteador / Firewall<br>
-                            ▪ Switch 144p<br>
-                            ▪ 4 Servidores<br>
-                            ▪ Nobreak 3kVA
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="plan-footer">
-                Estações &bull; Access Point &bull; Cat6 &bull; Sala de aula
-            </div>
-        </div>
+        <!-- Center Area: Physical Plan -->
+        <div class="center-area">
+            <div class="plan-header">
+                <span id="planTitle" style="font-weight: bold; color: #444;">PLANTA FÍSICA — 20 m × 15 m (300 m²)</span>
+                <div class="plan-toolbar">
+                    <button class="tool-btn">📍 Selecionar</button>
+                    <button class="tool-btn">✋ Mover</button>
+                    <button class="tool-btn">🔗 Conectar</button>
+                    <button class="tool-btn" id="btnQuickRemove" title="Remover Estação">- Estação</button>
+                    <button class="tool-btn">100%</button>
+                    <button class="tool-btn" id="btnQuickAdd" title="Adicionar Estação">+ Estação</button>
+                </div>
+            </div>
+            
+            <div class="canvas-container" id="canvasContainer">
+                <div class="blueprint-room" id="blueprintRoom">
+                    <span class="room-label">LABORATÓRIO DE ESTAÇÕES</span>
+                    
+                    <!-- Canvas para linhas dos cabos conectando à sala técnica -->
+                    <canvas id="cablesCanvas"></canvas>
 
-        <!-- Right Sidebar: Summary -->
-        <div class="panel summary-sidebar">
-            <div class="panel-title">Resumo do Projeto</div>
-            
-            <div class="summary-row"><span>Área total</span><strong id="sumArea">300 m²</strong></div>
-            <div class="summary-row"><span>Área por estação</span><strong id="sumAreaPerStation">15.0 m²</strong></div>
-            <div class="summary-row"><span>Estações instaladas</span><strong id="sumStationCount">20 unidades</strong></div>
-            <div class="summary-row"><span>Servidores</span><strong>4 unidades</strong></div>
-            <div class="summary-row"><span>Access Points</span><strong>2 unidades</strong></div>
-            <div class="summary-row"><span>Pontos de rede</span><strong id="sumNetworkPoints">27 pontos</strong></div>
-            <div class="summary-row"><span>Switch</span><strong>144 portas</strong></div>
-            <div class="summary-row"><span>Cabo Cat6</span><strong id="sumCableLength">450 metros</strong></div>
+                    <!-- Sala Técnica em Maior Destaque -->
+                    <div class="tech-room" id="techRoom">
+                        <div class="tech-title">SALA TÉCNICA</div>
+                        <div class="rack-cabinet">
+                            <div class="rack-slot"><div class="rack-led"></div><div class="rack-led"></div></div>
+                            <div class="rack-slot"><div class="rack-led"></div></div>
+                            <div class="rack-slot"><div class="rack-led"></div><div class="rack-led"></div></div>
+                            <div class="rack-slot"><div class="rack-led"></div></div>
+                            <div class="rack-slot"><div class="rack-led"></div></div>
+                        </div>
+                        <div class="tech-specs">
+                            <strong>Equipamentos:</strong><br>
+                            ▪ Roteador / firewall<br>
+                            ▪ Switch 144 portas<br>
+                            ▪ Patch panel 144 portas<br>
+                            ▪ 4 servidor(es)<br>
+                            ▪ Nobreak 3kVA
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="plan-footer">
+                Estações com Computador &nbsp;&bull;&nbsp; Access Point &nbsp;&bull;&nbsp; Rack &nbsp;&bull;&nbsp; Cabo de rede Cat6 &nbsp;&bull;&nbsp; Setor: Sala de aula
+            </div>
+        </div>
 
-            <div class="panel-title" style="margin-top: 4px;">Análise</div>
-            <span style="font-size: 10px; line-height: 1.3;">
-                • Cobertura Wi-Fi: 100%<br>
-                • Portas do switch: OK
-            </span>
+        <!-- Right Sidebar: Summary -->
+        <div class="panel summary-sidebar">
+            <div class="panel-title">Resumo do Projeto</div>
+            
+            <div class="summary-row"><span>Área total</span><strong id="sumArea">300 m²</strong></div>
+            <div class="summary-row"><span>Área por estação</span><strong id="sumAreaPerStation">15.0 m² / estação</strong></div>
+            <div class="summary-row"><span>Estações instaladas</span><strong id="sumStationCount">20 unidades</strong></div>
+            <div class="summary-row"><span>Servidores recomendados</span><strong>4 unidades</strong></div>
+            <div class="summary-row"><span>Access Points recomendados</span><strong>2 unidades</strong></div>
+            <div class="summary-row"><span>Pontos de rede</span><strong id="sumNetworkPoints">27 pontos</strong></div>
+            <div class="summary-row"><span>Switch recomendado</span><strong>144 portas</strong></div>
+            <div class="summary-row"><span>Cabo Cat6 estimado</span><strong id="sumCableLength">450 metros</strong></div>
 
-            <div class="alert-box">
-                <span style="font-weight: bold; display: block; margin-bottom: 2px;">Alertas</span>
-                ✓ Projeto compatível com as dimensões.
-            </div>
+            <div class="panel-title" style="margin-top: 4px;">Análise do projeto</div>
+            <span style="font-size: 10px; line-height: 1.3;">
+                • Cobertura Wi-Fi: 100% da área<br>
+                • Portas do switch: Em conformidade
+            </span>
 
-            <div class="panel-title" style="margin-top: 4px;">Normas Reguladoras</div>
-            <div class="standards-container">
-                <ul class="standards-list">
-                    <li>ABNT NBR 14565</li>
-                    <li>ANSI/TIA-568.2-D</li>
-                    <li>ANSI/TIA-569-D</li>
-                    <li>ISO/IEC 11801</li>
-                </ul>
-            </div>
-        </div>
+            <div class="alert-box">
+                <span style="font-weight: bold; display: block; margin-bottom: 2px;">Erros e alertas</span>
+                ✓ Projeto compatível com as dimensões informadas.
+            </div>
 
-        <!-- Bottom Row Content -->
-        <div class="bottom-row-container">
-            
-            <div class="bottom-panel">
-                <div class="panel-title">Topologia</div>
-                <div class="topology-flow">
-                    <div class="topo-box">Internet</div>
-                    <span>→</span>
-                    <div class="topo-box">Firewall</div>
-                    <span>→</span>
-                    <div class="topo-box">Switch</div>
-                    <span>→</span>
-                    <div class="topo-box">Estações</div>
-                </div>
-            </div>
+            <!-- Normas Reguladoras Expandidas e Destacadas -->
+            <div class="panel-title" style="margin-top: 4px;">Normas Reguladoras</div>
+            <div class="standards-container">
+                <ul class="standards-list">
+                    <li>ABNT NBR 14565 (Cabeamento Estruturado)</li>
+                    <li>ANSI/TIA-568.2-D (Telecomunicações)</li>
+                    <li>ANSI/TIA-569-D (Espaços e Vias)</li>
+                    <li>ISO/IEC 11801 (Generic Cabling)</li>
+                </ul>
+            </div>
+        </div>
 
-            <div class="bottom-panel">
-                <div class="panel-title">Setores</div>
-                <div class="bottom-sectors">
-                    <div class="sector-card">Sala de aula</div>
-                    <div class="sector-card">Área de estações</div>
-                    <div class="sector-card">Recepção</div>
-                    <div class="sector-card">Sala técnica</div>
-                </div>
-            </div>
+        <!-- Bottom Row Content -->
+        <div class="bottom-row-container">
+            
+            <!-- Bottom Left: Topology -->
+            <div class="bottom-panel">
+                <div class="panel-title">Topologia e Conexões</div>
+                <div class="topology-flow">
+                    <div class="topo-box">Internet</div>
+                    <span>→</span>
+                    <div class="topo-box">Firewall</div>
+                    <span>→</span>
+                    <div class="topo-box">Switch</div>
+                    <span>→</span>
+                    <div class="topo-box">Estações</div>
+                </div>
+            </div>
 
-            <div class="bottom-panel bottom-actions">
-                <div class="panel-title">Ações</div>
-                <button class="action-btn primary"><a href="modelo-3d.html" style="text-decoration: none; color:white; display:block;">Modelo 3D</a></button>
-                <button class="action-btn">Solicitar revisão</button>
-            </div>
+            <!-- Bottom Middle: Environment Sectors -->
+            <div class="bottom-panel">
+                <div class="panel-title">Setores do Ambiente</div>
+                <div class="bottom-sectors">
+                    <div class="sector-card">Sala de aula</div>
+                    <div class="sector-card">Área de estações</div>
+                    <div class="sector-card">Recepção</div>
+                    <div class="sector-card">Sala técnica</div>
+                </div>
+            </div>
 
-        </div>
+            <!-- Bottom Right: Actions -->
+            <div class="bottom-panel bottom-actions">
+                <div class="panel-title">Ações</div>
+                <button class="action-btn primary"><a href="modelo-3d.html" style="text-decoration: none; color:white;">Modelo 3D</a></button>
+                <button class="action-btn">Solicitar revisão</button>
+                <span style="font-size: 9px; color: #666; text-align: center;">Altere as dimensões e o ambiente para recalcular o projeto.</span>
+            </div>
 
-    </div>
+        </div>
 
-    <script>
-        const blueprintRoom = document.getElementById('blueprintRoom');
-        const techRoom = document.getElementById('techRoom');
-        const canvas = document.getElementById('cablesCanvas');
-        const ctx = canvas.getContext('2d');
+    </div>
 
-        const inputWidth = document.getElementById('inputWidth');
-        const inputLength = document.getElementById('inputLength');
-        const btnUpdateProject = document.getElementById('btnUpdateProject');
-        const planTitle = document.getElementById('planTitle');
+    <script>
+        // Lógica de Interatividade do Blueprint
+        const blueprintRoom = document.getElementById('blueprintRoom');
+        const techRoom = document.getElementById('techRoom');
+        const canvas = document.getElementById('cablesCanvas');
+        const ctx = canvas.getContext('2d');
 
-        const sumArea = document.getElementById('sumArea');
-        const sumAreaPerStation = document.getElementById('sumAreaPerStation');
-        const sumStationCount = document.getElementById('sumStationCount');
-        const sumNetworkPoints = document.getElementById('sumNetworkPoints');
-        const sumCableLength = document.getElementById('sumCableLength');
-        const btnAddStation = document.getElementById('btnAddStation');
-        const btnRemoveStation = document.getElementById('btnRemoveStation');
-        const btnQuickAdd = document.getElementById('btnQuickAdd');
-        const btnQuickRemove = document.getElementById('btnQuickRemove');
+        const inputWidth = document.getElementById('inputWidth');
+        const inputLength = document.getElementById('inputLength');
+        const btnUpdateProject = document.getElementById('btnUpdateProject');
+        const planTitle = document.getElementById('planTitle');
 
-        let stationCount = 0;
-        let activeDragNode = null;
-        let dragOffsetX = 0;
-        let dragOffsetY = 0;
+        const sumArea = document.getElementById('sumArea');
+        const sumAreaPerStation = document.getElementById('sumAreaPerStation');
+        const sumStationCount = document.getElementById('sumStationCount');
+        const sumNetworkPoints = document.getElementById('sumNetworkPoints');
+        const sumCableLength = document.getElementById('sumCableLength');
 
-        function resizeCanvas() {
-            canvas.width = blueprintRoom.clientWidth;
-            canvas.height = blueprintRoom.clientHeight;
-            drawCables();
-        }
+        let stationCount = 0;
+        let activeDragNode = null;
+        let dragOffsetX = 0;
+        let dragOffsetY = 0;
 
-        function createStationElement(idNumber, x, y) {
-            const station = document.createElement('div');
-            station.className = 'station-node';
-            station.id = `station-${idNumber}`;
-            station.style.left = x + 'px';
-            station.style.top = y + 'px';
+        // Ajusta o tamanho do Canvas de linhas
+        function resizeCanvas() {
+            canvas.width = blueprintRoom.clientWidth;
+            canvas.height = blueprintRoom.clientHeight;
+            drawCables();
+        }
 
-            station.innerHTML = `
-                <div class="station-title">ESTAÇÃO ${String(idNumber).padStart(2, '0')}</div>
-                <div class="station-desk-setup">
-                    <div class="screen-keyboard-area">
-                        <div class="monitor-screen"></div>
-                        <div class="keyboard"></div>
-                    </div>
-                    <div class="mouse-area">
-                        <div class="mousepad">
-                            <div class="mouse"></div>
-                        </div>
-                    </div>
-                    <div class="pc-case">
-                        <div class="pc-power-led"></div>
-                        <div class="pc-drive"></div>
-                    </div>
-                </div>
-            `;
+        // Criar elemento visual da Estação com componentes detalhados
+        function createStationElement(idNumber, x, y) {
+            const station = document.createElement('div');
+            station.className = 'station-node';
+            station.id = `station-${idNumber}`;
+            station.style.left = x + 'px';
+            station.style.top = y + 'px';
 
-            station.addEventListener('touchstart', (e) => {
-                activeDragNode = station;
-                const touch = e.touches[0];
-                const rect = station.getBoundingClientRect();
-                dragOffsetX = touch.clientX - rect.left;
-                dragOffsetY = touch.clientY - rect.top;
-                e.stopPropagation();
-            }, {passive: true});
+            station.innerHTML = `
+                <div class="station-title">ESTAÇÃO ${String(idNumber).padStart(2, '0')}</div>
+                <div class="station-desk-setup">
+                    <div class="screen-keyboard-area">
+                        <div class="monitor-screen"></div>
+                        <div class="keyboard"></div>
+                    </div>
+                    <div class="mouse-area">
+                        <div class="mousepad">
+                            <div class="mouse"></div>
+                        </div>
+                    </div>
+                    <div class="pc-case">
+                        <div class="pc-power-led"></div>
+                        <div class="pc-drive"></div>
+                    </div>
+                </div>
+            `;
 
-            station.addEventListener('mousedown', (e) => {
-                activeDragNode = station;
-                const rect = station.getBoundingClientRect();
-                dragOffsetX = e.clientX - rect.left;
-                dragOffsetY = e.clientY - rect.top;
-                e.stopPropagation();
-            });
+            // Eventos para Arrastar e Soltar (Móvel Individualmente)
+            station.addEventListener('mousedown', (e) => {
+                activeDragNode = station;
+                const rect = station.getBoundingClientRect();
+                dragOffsetX = e.clientX - rect.left;
+                dragOffsetY = e.clientY - rect.top;
+                e.stopPropagation();
+            });
 
-            return station;
-        }
+            return station;
+        }
 
-        function addStation() {
-            stationCount++;
-            const roomRect = blueprintRoom.getBoundingClientRect();
-            
-            const cols = 3;
-            const index = stationCount - 1;
-            const col = index % cols;
-            const row = Math.floor(index / cols);
+        // Adicionar nova Estação
+        function addStation() {
+            stationCount++;
+            const roomRect = blueprintRoom.getBoundingClientRect();
+            
+            // Posição inicial organizando em grade
+            const cols = 4;
+            const index = stationCount - 1;
+            const col = index % cols;
+            const row = Math.floor(index / cols);
 
-            let posX = 15 + col * 75;
-            let posY = 25 + row * 55;
+            let posX = 20 + col * 85;
+            let posY = 35 + row * 65;
 
-            if (posX > roomRect.width * 0.6) {
-                posX = 15 + (Math.random() * 50);
-            }
-            if (posY > roomRect.height - 60) {
-                posY = roomRect.height - 70;
-            }
+            // Evitar criar fora dos limites da sala
+            if (posX > roomRect.width * 0.7) {
+                posX = 20 + (Math.random() * 100);
+            }
+            if (posY > roomRect.height - 70) {
+                posY = roomRect.height - 80;
+            }
 
-            const elem = createStationElement(stationCount, posX, posY);
-            blueprintRoom.appendChild(elem);
-            updateCalculations();
-            drawCables();
-        }
+            const elem = createStationElement(stationCount, posX, posY);
+            blueprintRoom.appendChild(elem);
+            updateCalculations();
+            drawCables();
+        }
 
-        function removeStation() {
-            if (stationCount > 0) {
-                const lastNode = document.getElementById(`station-${stationCount}`);
-                if (lastNode) {
-                    lastNode.remove();
-                }
-                stationCount--;
-                updateCalculations();
-                drawCables();
-            }
-        }
+        // Remover última Estação
+        function removeStation() {
+            if (stationCount > 0) {
+                const lastNode = document.getElementById(`station-${stationCount}`);
+                if (lastNode) {
+                    lastNode.remove();
+                }
+                stationCount--;
+                updateCalculations();
+                drawCables();
+            }
+        }
 
-        function drawCables() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            const techRect = techRoom.getBoundingClientRect();
-            const roomRect = blueprintRoom.getBoundingClientRect();
+        // Desenhar Cabos de Conexão das Estações até a Sala Técnica
+        function drawCables() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const techRect = techRoom.getBoundingClientRect();
+            const roomRect = blueprintRoom.getBoundingClientRect();
 
-            const techX = techRect.left - roomRect.left;
-            const techY = techRect.top - roomRect.top + (techRect.height / 2);
+            // Ponto de entrada dos cabos na Sala Técnica
+            const techX = techRect.left - roomRect.left;
+            const techY = techRect.top - roomRect.top + (techRect.height / 2);
 
-            let totalCableMeters = 0;
-            const nodes = document.querySelectorAll('.station-node');
+            let totalCableMeters = 0;
+            const nodes = document.querySelectorAll('.station-node');
 
-            nodes.forEach(node => {
-                const nodeRect = node.getBoundingClientRect();
-                const nodeX = (nodeRect.left - roomRect.left) + (nodeRect.width / 2);
-                const nodeY = (nodeRect.top - roomRect.top) + (nodeRect.height / 2);
+            nodes.forEach(node => {
+                const nodeRect = node.getBoundingClientRect();
+                const nodeX = (nodeRect.left - roomRect.left) + (nodeRect.width / 2);
+                const nodeY = (nodeRect.top - roomRect.top) + (nodeRect.height / 2);
 
-                ctx.beginPath();
-                ctx.moveTo(nodeX, nodeY);
-                
-                const controlX = (nodeX + techX) / 2;
-                ctx.quadraticCurveTo(controlX, nodeY, techX, techY);
-                
-                ctx.strokeStyle = '#6e332e';
-                ctx.lineWidth = 1.5;
-                ctx.setLineDash([4, 2]);
-                ctx.stroke();
+                // Desenha cabo com curva
+                ctx.beginPath();
+                ctx.moveTo(nodeX, nodeY);
+                
+                // Ponto de controle da curva
+                const controlX = (nodeX + techX) / 2;
+                ctx.quadraticCurveTo(controlX, nodeY, techX, techY);
+                
+                ctx.strokeStyle = '#6e332e';
+                ctx.lineWidth = 1.5;
+                ctx.setLineDash([4, 2]);
+                ctx.stroke();
 
-                const distPx = Math.hypot(techX - nodeX, techY - nodeY);
-                totalCableMeters += (distPx * 0.15) + 5;
-            });
+                // Calcular distância aproximada de cabo (escala pixel -> metro)
+                const distPx = Math.hypot(techX - nodeX, techY - nodeY);
+                totalCableMeters += (distPx * 0.15) + 5; // Margem de sobra
+            });
 
-            sumCableLength.textContent = `${Math.round(totalCableMeters)} metros`;
-        }
+            sumCableLength.textContent = `${Math.round(totalCableMeters)} metros`;
+        }
 
-        function moveHandler(clientX, clientY) {
-            if (activeDragNode) {
-                const roomRect = blueprintRoom.getBoundingClientRect();
-                let x = clientX - roomRect.left - dragOffsetX;
-                let y = clientY - roomRect.top - dragOffsetY;
+        // Movimentação global do mouse
+        document.addEventListener('mousemove', (e) => {
+            if (activeDragNode) {
+                const roomRect = blueprintRoom.getBoundingClientRect();
+                let x = e.clientX - roomRect.left - dragOffsetX;
+                let y = e.clientY - roomRect.top - dragOffsetY;
 
-                const maxX = roomRect.width - activeDragNode.offsetWidth - (roomRect.width * 0.32);
-                const maxY = roomRect.height - activeDragNode.offsetHeight - 10;
+                // Limite das bordas
+                const maxX = roomRect.width - activeDragNode.offsetWidth - (roomRect.width * 0.23);
+                const maxY = roomRect.height - activeDragNode.offsetHeight - 10;
 
-                x = Math.max(5, Math.min(x, maxX));
-                y = Math.max(5, Math.min(y, maxY));
+                x = Math.max(10, Math.min(x, maxX));
+                y = Math.max(10, Math.min(y, maxY));
 
-                activeDragNode.style.left = x + 'px';
-                activeDragNode.style.top = y + 'px';
+                activeDragNode.style.left = x + 'px';
+                activeDragNode.style.top = y + 'px';
 
-                drawCables();
-            }
-        }
+                drawCables();
+            }
+        });
 
-        document.addEventListener('touchmove', (e) => {
-            if (activeDragNode && e.touches.length > 0) {
-                moveHandler(e.touches[0].clientX, e.touches[0].clientY);
-            }
-        }, {passive: true});
+        document.addEventListener('mouseup', () => {
+            activeDragNode = null;
+        });
 
-        document.addEventListener('mousemove', (e) => {
-            moveHandler(e.clientX, e.clientY);
-        });
+        // Recalcular métricas de área e estações
+        function updateCalculations() {
+            const width = parseFloat(inputWidth.value) || 0;
+            const length = parseFloat(inputLength.value) || 0;
+            const area = width * length;
 
-        document.addEventListener('touchend', () => { activeDragNode = null; });
-        document.addEventListener('mouseup', () => { activeDragNode = null; });
+            planTitle.textContent = `PLANTA FÍSICA — ${width} m × ${length} m (${area} m²)`;
+            sumArea.textContent = `${area} m²`;
+            sumStationCount.textContent = `${stationCount} unidades`;
+            sumNetworkPoints.textContent = `${stationCount + 7} pontos`;
 
-        function updateCalculations() {
-            const width = parseFloat(inputWidth.value) || 0;
-            const length = parseFloat(inputLength.value) || 0;
-            const area = width * length;
-
-            planTitle.textContent = `PLANTA — ${width}m × ${length}m (${area}m²)`;
-            sumArea.textContent = `${area} m²`;
-            sumStationCount.textContent = `${stationCount} unidades`;
-            sumNetworkPoints.textContent = `${stationCount + 7} pontos`;
-
-            if (stationCount > 0) {
-                sumAreaPerStation.textContent = `${(area / stationCount).toFixed(1)} m²`;
-            } else {
-                sumAreaPerStation.textContent = `0 m²`;
-            }
-        }
-
-        btnAddStation.addEventListener('click', addStation);
-        btnRemoveStation.addEventListener('click', removeStation);
-        btnQuickAdd.addEventListener('click', addStation);
-        btnQuickRemove.addEventListener('click', removeStation);
-        btnUpdateProject.addEventListener('click', updateCalculations);
-        window.addEventListener('resize', resizeCanvas);
-
-        window.onload = () => {
-            for(let i = 0; i < 10; i++) {
-                addStation();
-            }
-            resizeCanvas();
-        };
-    </script>
-</body>
-</html>
+            if (stationCount > 0) {
+                sumAreaPerStation.textContent = `${(area / stationCount).to
