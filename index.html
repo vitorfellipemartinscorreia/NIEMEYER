@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -8,7 +9,14 @@
 <style>
 * {
 box-sizing: border-box;
-@@ -18,8 +18,8 @@
+margin: 0;
+padding: 0;
+font-family: Arial, sans-serif;
+}
+
+body {
+background-color: #e6e2df;
+color: #333;
 font-size: 12px;
 display: flex;
 flex-direction: column;
@@ -19,7 +27,7 @@ flex-direction: column;
 }
 
 /* Top Navbar */
-@@ -29,67 +29,54 @@
+@@ -29,1003 +29,923 @@
 display: flex;
 align-items: center;
 justify-content: space-between;
@@ -103,7 +111,9 @@ align-items: center;
 background-color: #2e7d32;
 border-radius: 50%;
 display: inline-block;
-@@ -99,21 +86,20 @@
+}
+
+.btn-export {
 background-color: #6e332e;
 color: white;
 border: none;
@@ -132,7 +142,10 @@ flex: 1;
 }
 
 /* Panels Common Style */
-@@ -124,7 +110,7 @@
+.panel {
+background-color: #f4f1ee;
+border: 1px solid #dcd6d0;
+border-radius: 4px;
 padding: 10px;
 display: flex;
 flex-direction: column;
@@ -141,7 +154,12 @@ flex-direction: column;
 }
 
 .panel-title {
-@@ -137,16 +123,15 @@
+font-size: 11px;
+font-weight: bold;
+color: #444;
+border-bottom: 1px solid #dcd6d0;
+padding-bottom: 4px;
+text-transform: uppercase;
 letter-spacing: 0.5px;
 }
 
@@ -161,7 +179,8 @@ flex-direction: column;
 }
 
 .form-group label {
-@@ -155,45 +140,43 @@
+font-size: 11px;
+color: #555;
 }
 
 .form-group input, .form-group select {
@@ -216,7 +235,15 @@ font-weight: bold;
 }
 
 /* Center Area: Physical Plan */
-@@ -209,28 +192,30 @@
+.center-area {
+background-color: #f4f1ee;
+border: 1px solid #dcd6d0;
+border-radius: 4px;
+display: flex;
+flex-direction: column;
+padding: 8px;
+position: relative;
+}
 
 .plan-header {
 display: flex;
@@ -252,7 +279,8 @@ user-select: none;
 background-color: #fff;
 border: 1px dashed #ccc;
 position: relative;
-@@ -239,26 +224,27 @@
+background-image: radial-gradient(#d3d3d3 1px, transparent 1px);
+background-size: 15px 15px;
 display: flex;
 justify-content: center;
 align-items: center;
@@ -285,7 +313,19 @@ font-weight: bold;
 color: #555;
 letter-spacing: 0.5px;
 z-index: 2;
-@@ -278,12 +264,12 @@
+}
+
+/* Overlay Canvas para desenhar Cabos de Rede */
+#cablesCanvas {
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+pointer-events: none;
+z-index: 1;
+}
+
 /* Estações Realistas Desenho CSS */
 .station-node {
 position: absolute;
@@ -301,7 +341,8 @@ border-radius: 4px;
 cursor: move;
 user-select: none;
 z-index: 3;
-@@ -292,16 +278,10 @@
+box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+display: flex;
 flex-direction: column;
 justify-content: space-between;
 align-items: center;
@@ -319,7 +360,9 @@ align-items: center;
 font-weight: bold;
 color: #6e332e;
 text-align: center;
-@@ -311,40 +291,35 @@
+line-height: 1;
+margin-bottom: 1px;
+}
 
 .station-desk-setup {
 width: 100%;
@@ -367,7 +410,8 @@ margin-top: 2px;
 background: #999;
 border-radius: 1px;
 display: flex;
-@@ -353,75 +328,68 @@
+justify-content: center;
+align-items: center;
 }
 
 .mouse {
@@ -461,7 +505,9 @@ background: #f0e6e0;
 border-radius: 3px;
 border: 1px solid #6e332e;
 text-align: center;
-@@ -431,60 +399,57 @@
+width: 100%;
+}
+
 .rack-cabinet {
 background: #1e1e1e;
 width: 100%;
@@ -533,7 +579,12 @@ font-size: 11px;
 }
 
 .summary-row {
-@@ -497,35 +462,35 @@
+display: flex;
+justify-content: space-between;
+padding: 3px 0;
+border-bottom: 1px dotted #dcd6d0;
+}
+
 .alert-box {
 background-color: #fcf8e3;
 border: 1px solid #faebcc;
@@ -576,7 +627,8 @@ align-items: center;
 }
 
 .standards-list li::before {
-@@ -534,30 +499,41 @@
+content: "✓";
+color: #2e7d32;
 font-weight: bold;
 }
 
@@ -625,7 +677,9 @@ border-radius: 3px;
 .bottom-sectors {
 display: grid;
 grid-template-columns: 1fr 1fr;
-@@ -567,18 +543,16 @@
+gap: 5px;
+}
+
 .sector-card {
 background: #fff;
 border: 1px solid #dcd6d0;
@@ -646,7 +700,11 @@ flex-direction: column;
 }
 
 .action-btn {
-@@ -590,29 +564,13 @@
+background: #fff;
+border: 1px solid #6e332e;
+color: #6e332e;
+padding: 8px;
+border-radius: 3px;
 font-weight: bold;
 cursor: pointer;
 text-align: center;
@@ -677,7 +735,10 @@ color: #fff;
 </style>
 </head>
 <body>
-@@ -623,21 +581,13 @@
+
+<!-- Header -->
+<header>
+<div class="logo-area">
 <div class="logo-icon">N</div>
 <div class="logo-text">
 <h1>Niemeyer</h1>
@@ -702,7 +763,9 @@ color: #fff;
 </div>
 </header>
 
-@@ -647,7 +597,7 @@ <h1>Niemeyer</h1>
+<!-- Main Workspace Grid -->
+<div class="workspace">
+
 <!-- Left Sidebar: Configurations -->
 <div class="panel config-sidebar">
 <div class="panel-title">Configurações do Projeto</div>
@@ -711,7 +774,14 @@ color: #fff;
 
 <div class="form-group">
 <label>Largura (m)</label>
-@@ -662,74 +612,54 @@ <h1>Niemeyer</h1>
+<input type="number" id="inputWidth" value="20" min="5" max="100">
+</div>
+<div class="form-group">
+<label>Comprimento (m)</label>
+<input type="number" id="inputLength" value="15" min="5" max="100">
+</div>
+<div class="form-group">
+<label>Pé-direito (m)</label>
 <input type="number" value="3">
 </div>
 
@@ -797,7 +867,8 @@ color: #fff;
 </div>
 </div>
 
-@@ -738,43 +668,41 @@ <h1>Niemeyer</h1>
+<!-- Right Sidebar: Summary -->
+<div class="panel summary-sidebar">
 <div class="panel-title">Resumo do Projeto</div>
 
 <div class="summary-row"><span>Área total</span><strong id="sumArea">300 m²</strong></div>
@@ -856,7 +927,11 @@ color: #fff;
 <div class="topology-flow">
 <div class="topo-box">Internet</div>
 <span>→</span>
-@@ -786,9 +714,8 @@ <h1>Niemeyer</h1>
+<div class="topo-box">Firewall</div>
+<span>→</span>
+<div class="topo-box">Switch</div>
+<span>→</span>
+<div class="topo-box">Estações</div>
 </div>
 </div>
 
@@ -867,7 +942,8 @@ color: #fff;
 <div class="bottom-sectors">
 <div class="sector-card">Sala de aula</div>
 <div class="sector-card">Área de estações</div>
-@@ -797,20 +724,17 @@ <h1>Niemeyer</h1>
+<div class="sector-card">Recepção</div>
+<div class="sector-card">Sala técnica</div>
 </div>
 </div>
 
@@ -889,7 +965,15 @@ color: #fff;
 const blueprintRoom = document.getElementById('blueprintRoom');
 const techRoom = document.getElementById('techRoom');
 const canvas = document.getElementById('cablesCanvas');
-@@ -826,20 +750,22 @@ <h1>Niemeyer</h1>
+const ctx = canvas.getContext('2d');
+
+const inputWidth = document.getElementById('inputWidth');
+const inputLength = document.getElementById('inputLength');
+const btnUpdateProject = document.getElementById('btnUpdateProject');
+const planTitle = document.getElementById('planTitle');
+
+const sumArea = document.getElementById('sumArea');
+const sumAreaPerStation = document.getElementById('sumAreaPerStation');
 const sumStationCount = document.getElementById('sumStationCount');
 const sumNetworkPoints = document.getElementById('sumNetworkPoints');
 const sumCableLength = document.getElementById('sumCableLength');
@@ -914,7 +998,26 @@ drawCables();
 function createStationElement(idNumber, x, y) {
 const station = document.createElement('div');
 station.className = 'station-node';
-@@ -866,7 +792,15 @@ <h1>Niemeyer</h1>
+station.id = `station-${idNumber}`;
+station.style.left = x + 'px';
+station.style.top = y + 'px';
+
+station.innerHTML = `
+               <div class="station-title">ESTAÇÃO ${String(idNumber).padStart(2, '0')}</div>
+               <div class="station-desk-setup">
+                   <div class="screen-keyboard-area">
+                       <div class="monitor-screen"></div>
+                       <div class="keyboard"></div>
+                   </div>
+                   <div class="mouse-area">
+                       <div class="mousepad">
+                           <div class="mouse"></div>
+                       </div>
+                   </div>
+                   <div class="pc-case">
+                       <div class="pc-power-led"></div>
+                       <div class="pc-drive"></div>
+                   </div>
                </div>
            `;
 
@@ -931,7 +1034,11 @@ station.className = 'station-node';
 station.addEventListener('mousedown', (e) => {
 activeDragNode = station;
 const rect = station.getBoundingClientRect();
-@@ -878,26 +812,23 @@ <h1>Niemeyer</h1>
+dragOffsetX = e.clientX - rect.left;
+dragOffsetY = e.clientY - rect.top;
+e.stopPropagation();
+});
+
 return station;
 }
 
@@ -965,7 +1072,8 @@ const row = Math.floor(index / cols);
 }
 
 const elem = createStationElement(stationCount, posX, posY);
-@@ -906,7 +837,6 @@ <h1>Niemeyer</h1>
+blueprintRoom.appendChild(elem);
+updateCalculations();
 drawCables();
 }
 
@@ -973,7 +1081,12 @@ drawCables();
 function removeStation() {
 if (stationCount > 0) {
 const lastNode = document.getElementById(`station-${stationCount}`);
-@@ -919,14 +849,12 @@ <h1>Niemeyer</h1>
+if (lastNode) {
+lastNode.remove();
+}
+stationCount--;
+updateCalculations();
+drawCables();
 }
 }
 
@@ -988,7 +1101,11 @@ const roomRect = blueprintRoom.getBoundingClientRect();
 const techX = techRect.left - roomRect.left;
 const techY = techRect.top - roomRect.top + (techRect.height / 2);
 
-@@ -938,11 +866,9 @@ <h1>Niemeyer</h1>
+let totalCableMeters = 0;
+const nodes = document.querySelectorAll('.station-node');
+
+nodes.forEach(node => {
+const nodeRect = node.getBoundingClientRect();
 const nodeX = (nodeRect.left - roomRect.left) + (nodeRect.width / 2);
 const nodeY = (nodeRect.top - roomRect.top) + (nodeRect.height / 2);
 
@@ -1000,7 +1117,8 @@ ctx.moveTo(nodeX, nodeY);
 const controlX = (nodeX + techX) / 2;
 ctx.quadraticCurveTo(controlX, nodeY, techX, techY);
 
-@@ -951,81 +877,75 @@ <h1>Niemeyer</h1>
+ctx.strokeStyle = '#6e332e';
+ctx.lineWidth = 1.5;
 ctx.setLineDash([4, 2]);
 ctx.stroke();
 
