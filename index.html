@@ -1,999 +1,1115 @@
-<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Niemeyer - Planejamento de Infraestrutura</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-        }
-
-        body {
-            background-color: #e6e2df;
-            color: #333;
-            font-size: 12px;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        /* Top Navbar */
-        header {
-            background-color: #fff;
-            border-bottom: 1px solid #ccc;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 8px 16px;
-            height: 45px;
-        }
-
-        .logo-area {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .logo-icon {
-            background-color: #6e332e;
-            color: #fff;
-            padding: 6px;
-            font-weight: bold;
-            border-radius: 3px;
-        }
-
-        .logo-text h1 {
-            font-size: 14px;
-            color: #2c2c2c;
-            letter-spacing: 0.5px;
-        }
-
-        .logo-text span {
-            font-size: 9px;
-            color: #666;
-        }
-
-        .nav-menu {
-            display: flex;
-            gap: 20px;
-        }
-
-        .nav-item {
-            text-decoration: none;
-            color: #444;
-            font-size: 11px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            padding: 4px 8px;
-            border-radius: 3px;
-        }
-
-        .nav-item.active {
-            background-color: #f0e6e0;
-            color: #6e332e;
-            font-weight: bold;
-        }
-
-        .nav-right {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            font-size: 11px;
-        }
-
-        .status-dot {
-            height: 8px;
-            width: 8px;
-            background-color: #2e7d32;
-            border-radius: 50%;
-            display: inline-block;
-        }
-
-        .btn-export {
-            background-color: #6e332e;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 3px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        /* Main Workspace */
-        .workspace {
-            display: grid;
-            grid-template-columns: 240px 1fr 240px;
-            grid-template-rows: 1fr 140px;
-            flex: 1;
-            gap: 8px;
-            padding: 8px;
-            overflow: hidden;
-        }
-
-        /* Panels Common Style */
-        .panel {
-            background-color: #f4f1ee;
-            border: 1px solid #dcd6d0;
-            border-radius: 4px;
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .panel-title {
-            font-size: 11px;
-            font-weight: bold;
-            color: #444;
-            border-bottom: 1px solid #dcd6d0;
-            padding-bottom: 4px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        /* Left Sidebar: Configurations */
-        .config-sidebar {
-            grid-row: span 2;
-            gap: 12px;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .form-group label {
-            font-size: 11px;
-            color: #555;
-        }
-
-        .form-group input, .form-group select {
-            padding: 6px;
-            border: 1px solid #ccc;
-            border-radius: 3px;
-            background: #fff;
-            font-size: 11px;
-        }
-
-        .station-controls {
-            display: flex;
-            gap: 6px;
-            margin-top: 4px;
-        }
-
-        .btn-ctrl {
-            flex: 1;
-            background-color: #6e332e;
-            color: white;
-            border: none;
-            padding: 6px;
-            border-radius: 3px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 12px;
-        }
-
-        .btn-ctrl:hover, .btn-update:hover {
-            opacity: 0.9;
-        }
-
-        .btn-update {
-            background-color: #6e332e;
-            color: white;
-            border: none;
-            padding: 8px;
-            border-radius: 3px;
-            cursor: pointer;
-            text-align: center;
-            font-weight: bold;
-            margin-top: auto;
-        }
-
-        /* Center Area: Physical Plan */
-        .center-area {
-            background-color: #f4f1ee;
-            border: 1px solid #dcd6d0;
-            border-radius: 4px;
-            display: flex;
-            flex-direction: column;
-            padding: 8px;
-            position: relative;
-        }
-
-        .plan-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .plan-toolbar {
-            display: flex;
-            gap: 4px;
-        }
-
-        .tool-btn {
-            background: #fff;
-            border: 1px solid #ccc;
-            padding: 4px 8px;
-            border-radius: 3px;
-            cursor: pointer;
-            font-size: 11px;
-            user-select: none;
-        }
-
-        .canvas-container {
-            flex: 1;
-            background-color: #fff;
-            border: 1px dashed #ccc;
-            position: relative;
-            background-image: radial-gradient(#d3d3d3 1px, transparent 1px);
-            background-size: 15px 15px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-        }
-
-        /* Simulated Blueprint Rooms */
-        .blueprint-room {
-            border: 2px solid #333;
-            width: 90%;
-            height: 90%;
-            position: relative;
-            background: #fbf9f7;
-            padding: 15px;
-            overflow: hidden;
-        }
-
-        .room-label {
-            position: absolute;
-            top: 5px;
-            left: 10px;
-            font-weight: bold;
-            font-size: 11px;
-            color: #555;
-            letter-spacing: 0.5px;
-            z-index: 2;
-        }
-
-        /* Overlay Canvas para desenhar Cabos de Rede */
-        #cablesCanvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        /* Estações Realistas Desenho CSS */
-        .station-node {
-            position: absolute;
-            width: 72px;
-            height: 52px;
-            background: #d8cfc4;
-            border: 2px solid #6e332e;
-            border-radius: 4px;
-            padding: 3px;
-            cursor: move;
-            user-select: none;
-            z-index: 3;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-            transition: box-shadow 0.1s;
-        }
-
-        .station-node:active {
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-            z-index: 10;
-        }
-
-        .station-title {
-            font-size: 7px;
-            font-weight: bold;
-            color: #6e332e;
-            text-align: center;
-            line-height: 1;
-            margin-bottom: 1px;
-        }
-
-        .station-desk-setup {
-            width: 100%;
-            height: 38px;
-            background: #f0eae1;
-            border: 1px solid #b5a495;
-            border-radius: 2px;
-            position: relative;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            padding: 2px;
-        }
-
-        /* Componentes de HW realistas */
-        .monitor-screen {
-            width: 26px;
-            height: 6px;
-            background: #222;
-            border: 1px solid #000;
-            border-radius: 1px;
-            box-shadow: 0 0 2px rgba(0,255,255,0.3);
-        }
-
-        .keyboard {
-            width: 28px;
-            height: 10px;
-            background: #333;
-            border-radius: 1px;
-            margin-top: 2px;
-            background-image: radial-gradient(#666 30%, transparent 30%);
-            background-size: 3px 3px;
-        }
-
-        .mousepad {
-            width: 8px;
-            height: 10px;
-            background: #999;
-            border-radius: 1px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .mouse {
-            width: 4px;
-            height: 6px;
-            background: #222;
-            border-radius: 2px;
-        }
-
-        .pc-case {
-            width: 10px;
-            height: 28px;
-            background: #1a1a1a;
-            border: 1px solid #444;
-            border-radius: 1px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            padding-top: 2px;
-            gap: 2px;
-        }
-
-        .pc-power-led {
-            width: 3px;
-            height: 3px;
-            background: #00ff00;
-            border-radius: 50%;
-        }
-
-        .pc-drive {
-            width: 6px;
-            height: 2px;
-            background: #444;
-        }
-
-        .screen-keyboard-area {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .mouse-area {
-            display: flex;
-            align-items: center;
-        }
-
-        /* Sala Técnica Expandida e Mais Visível */
-        .tech-room {
-            position: absolute;
-            right: 10px;
-            top: 10px;
-            bottom: 10px;
-            border: 2px solid #6e332e;
-            width: 22%;
-            background: #e1d8d0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            padding: 12px 8px;
-            gap: 12px;
-            z-index: 2;
-            box-shadow: -2px 0 6px rgba(0,0,0,0.05);
-        }
-
-        .tech-title {
-            font-size: 11px;
-            font-weight: bold;
-            color: #6e332e;
-            background: #f0e6e0;
-            padding: 4px 8px;
-            border-radius: 3px;
-            border: 1px solid #6e332e;
-            text-align: center;
-            width: 100%;
-        }
-
-        .rack-cabinet {
-            background: #1e1e1e;
-            width: 100%;
-            max-width: 90px;
-            flex: 1;
-            border-radius: 3px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-around;
-            padding: 8px 4px;
-            border: 2px solid #444;
-            box-shadow: inset 0 0 5px #000;
-        }
-
-        .rack-slot {
-            height: 12px;
-            background: #333;
-            width: 90%;
-            margin: 0 auto;
-            border: 1px solid #555;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 4px;
-        }
-
-        .rack-led {
-            width: 4px;
-            height: 4px;
-            background: #0288d1;
-            border-radius: 50%;
-        }
-
-        .tech-specs {
-            font-size: 9px;
-            line-height: 1.4;
-            text-align: left;
-            width: 100%;
-            color: #222;
-            background: #fff;
-            padding: 6px;
-            border-radius: 3px;
-            border: 1px solid #ccc;
-        }
-
-        .plan-footer {
-            font-size: 10px;
-            color: #666;
-            margin-top: 6px;
-        }
-
-        /* Right Sidebar: Summary */
-        .summary-sidebar {
-            grid-row: span 2;
-            font-size: 11px;
-            gap: 8px;
-            overflow-y: auto;
-        }
-
-        .summary-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 3px 0;
-            border-bottom: 1px dotted #dcd6d0;
-        }
-
-        .alert-box {
-            background-color: #fcf8e3;
-            border: 1px solid #faebcc;
-            padding: 8px;
-            border-radius: 3px;
-            color: #8a6d3b;
-        }
-
-        /* Normas Reguladoras Expandidas e Maiores */
-        .standards-container {
-            background: #fff;
-            border: 1px solid #6e332e;
-            border-radius: 4px;
-            padding: 8px;
-            margin-top: 4px;
-        }
-
-        .standards-list {
-            padding-left: 5px;
-            color: #222;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            list-style: none;
-        }
-
-        .standards-list li {
-            font-size: 11px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .standards-list li::before {
-            content: "✓";
-            color: #2e7d32;
-            font-weight: bold;
-        }
-
-        /* Bottom Left: Topology */
-        .bottom-topology {
-            grid-column: 1;
-        }
-
-        .topology-flow {
-            display: flex;
-            align-items: center;
-            justify-content: space-around;
-            background: #fff;
-            padding: 10px;
-            border: 1px solid #dcd6d0;
-            border-radius: 3px;
-        }
-
-        .topo-box {
-            background: #f4f1ee;
-            border: 1px solid #ccc;
-            padding: 6px 12px;
-            border-radius: 3px;
-            font-size: 10px;
-        }
-
-        /* Bottom Middle: Environment Sectors */
-        .bottom-sectors {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 5px;
-        }
-
-        .sector-card {
-            background: #fff;
-            border: 1px solid #dcd6d0;
-            padding: 8px;
-            border-radius: 3px;
-            font-size: 10px;
-            border-left: 3px solid #6e332e;
-        }
-
-        /* Bottom Right: Actions */
-        .bottom-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            justify-content: center;
-        }
-
-        .action-btn {
-            background: #fff;
-            border: 1px solid #6e332e;
-            color: #6e332e;
-            padding: 8px;
-            border-radius: 3px;
-            font-weight: bold;
-            cursor: pointer;
-            text-align: center;
-        }
-
-        .action-btn.primary {
-            background: #6e332e;
-            color: #fff;
-        }
-
-        .bottom-row-container {
-            grid-column: 1 / span 2;
-            display: grid;
-            grid-template-columns: 1.5fr 1.5fr 1fr;
-            gap: 8px;
-        }
-
-        .bottom-panel {
-            background-color: #f4f1ee;
-            border: 1px solid #dcd6d0;
-            border-radius: 4px;
-            padding: 8px;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-    </style>
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Niemeyer - Planejamento de Infraestrutura</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Niemeyer - Planejamento de Infraestrutura (Mobile)</title>
+<style>
+* {
+box-sizing: border-box;
+@@ -18,8 +18,8 @@
+font-size: 12px;
+display: flex;
+flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            min-height: 100vh;
+            overflow-x: hidden;
+}
+
+/* Top Navbar */
+@@ -29,67 +29,54 @@
+display: flex;
+align-items: center;
+justify-content: space-between;
+            padding: 8px 16px;
+            height: 45px;
+            padding: 8px 12px;
+            height: 50px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+}
+
+.logo-area {
+display: flex;
+align-items: center;
+            gap: 10px;
+            gap: 8px;
+}
+
+.logo-icon {
+background-color: #6e332e;
+color: #fff;
+            padding: 6px;
+            padding: 5px 8px;
+font-weight: bold;
+border-radius: 3px;
+            font-size: 12px;
+}
+
+.logo-text h1 {
+            font-size: 14px;
+            font-size: 13px;
+color: #2c2c2c;
+letter-spacing: 0.5px;
+}
+
+.logo-text span {
+            font-size: 9px;
+            font-size: 8px;
+color: #666;
+            display: block;
+}
+
+.nav-menu {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-item {
+            text-decoration: none;
+            color: #444;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 8px;
+            border-radius: 3px;
+        }
+
+        .nav-item.active {
+            background-color: #f0e6e0;
+            color: #6e332e;
+            font-weight: bold;
+            display: none; /* Oculto no mobile para economizar espaço, adaptável via menu se necessário */
+}
+
+.nav-right {
+display: flex;
+align-items: center;
+            gap: 15px;
+            font-size: 11px;
+            gap: 10px;
+            font-size: 10px;
+}
+
+.status-dot {
+            height: 8px;
+            width: 8px;
+            height: 6px;
+            width: 6px;
+background-color: #2e7d32;
+border-radius: 50%;
+display: inline-block;
+@@ -99,21 +86,20 @@
+background-color: #6e332e;
+color: white;
+border: none;
+            padding: 6px 12px;
+            padding: 5px 8px;
+border-radius: 3px;
+cursor: pointer;
+font-weight: bold;
+            font-size: 10px;
+}
+
+        /* Main Workspace */
+        /* Main Workspace - Mobile Stacked Grid */
+.workspace {
+            display: grid;
+            grid-template-columns: 240px 1fr 240px;
+            grid-template-rows: 1fr 140px;
+            display: flex;
+            flex-direction: column;
+flex: 1;
+            gap: 8px;
+            padding: 8px;
+            overflow: hidden;
+            gap: 10px;
+            padding: 10px;
+}
+
+/* Panels Common Style */
+@@ -124,7 +110,7 @@
+padding: 10px;
+display: flex;
+flex-direction: column;
+            gap: 10px;
+            gap: 8px;
+}
+
+.panel-title {
+@@ -137,16 +123,15 @@
+letter-spacing: 0.5px;
+}
+
+        /* Left Sidebar: Configurations */
+        /* Configurations Sidebar */
+.config-sidebar {
+            grid-row: span 2;
+            gap: 12px;
+            gap: 10px;
+}
+
+.form-group {
+display: flex;
+flex-direction: column;
+            gap: 4px;
+            gap: 3px;
+}
+
+.form-group label {
+@@ -155,45 +140,43 @@
+}
+
+.form-group input, .form-group select {
+            padding: 6px;
+            padding: 8px;
+border: 1px solid #ccc;
+border-radius: 3px;
+background: #fff;
+            font-size: 11px;
+            font-size: 12px;
+            width: 100%;
+}
+
+.station-controls {
+display: flex;
+gap: 6px;
+            margin-top: 4px;
+            margin-top: 2px;
+}
+
+.btn-ctrl {
+flex: 1;
+background-color: #6e332e;
+color: white;
+border: none;
+            padding: 6px;
+            padding: 8px;
+border-radius: 3px;
+cursor: pointer;
+font-weight: bold;
+            font-size: 12px;
+        }
+
+        .btn-ctrl:hover, .btn-update:hover {
+            opacity: 0.9;
+            font-size: 11px;
+}
+
+.btn-update {
+background-color: #6e332e;
+color: white;
+border: none;
+            padding: 8px;
+            padding: 10px;
+border-radius: 3px;
+cursor: pointer;
+text-align: center;
+font-weight: bold;
+            margin-top: auto;
+            font-size: 11px;
+            margin-top: 4px;
+}
+
+/* Center Area: Physical Plan */
+@@ -209,28 +192,30 @@
+
+.plan-header {
+display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-direction: column;
+            gap: 6px;
+margin-bottom: 8px;
+}
+
+.plan-toolbar {
+display: flex;
+gap: 4px;
+            flex-wrap: wrap;
+}
+
+.tool-btn {
+background: #fff;
+border: 1px solid #ccc;
+            padding: 4px 8px;
+            padding: 6px 10px;
+border-radius: 3px;
+cursor: pointer;
+            font-size: 11px;
+            font-size: 10px;
+user-select: none;
+}
+
+.canvas-container {
+            flex: 1;
+            width: 100%;
+            height: 350px;
+background-color: #fff;
+border: 1px dashed #ccc;
+position: relative;
+@@ -239,26 +224,27 @@
+display: flex;
+justify-content: center;
+align-items: center;
+            overflow: hidden;
+            overflow: auto;
+}
+
+/* Simulated Blueprint Rooms */
+.blueprint-room {
+border: 2px solid #333;
+            width: 90%;
+            height: 90%;
+            width: 100%;
+            min-width: 450px;
+            height: 100%;
+            min-height: 330px;
+position: relative;
+background: #fbf9f7;
+padding: 15px;
+            overflow: hidden;
+}
+
+.room-label {
+position: absolute;
+top: 5px;
+left: 10px;
+font-weight: bold;
+            font-size: 11px;
+            font-size: 10px;
+color: #555;
+letter-spacing: 0.5px;
+z-index: 2;
+@@ -278,12 +264,12 @@
+/* Estações Realistas Desenho CSS */
+.station-node {
+position: absolute;
+            width: 72px;
+            height: 52px;
+            width: 65px;
+            height: 48px;
+background: #d8cfc4;
+border: 2px solid #6e332e;
+border-radius: 4px;
+            padding: 3px;
+            padding: 2px;
+cursor: move;
+user-select: none;
+z-index: 3;
+@@ -292,16 +278,10 @@
+flex-direction: column;
+justify-content: space-between;
+align-items: center;
+            transition: box-shadow 0.1s;
+        }
+
+        .station-node:active {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            z-index: 10;
+}
+
+.station-title {
+            font-size: 7px;
+            font-size: 6px;
+font-weight: bold;
+color: #6e332e;
+text-align: center;
+@@ -311,40 +291,35 @@
+
+.station-desk-setup {
+width: 100%;
+            height: 38px;
+            height: 34px;
+background: #f0eae1;
+border: 1px solid #b5a495;
+border-radius: 2px;
+            position: relative;
+display: flex;
+justify-content: space-around;
+align-items: center;
+padding: 2px;
+}
+
+        /* Componentes de HW realistas */
+.monitor-screen {
+            width: 26px;
+            height: 6px;
+            width: 22px;
+            height: 5px;
+background: #222;
+border: 1px solid #000;
+border-radius: 1px;
+            box-shadow: 0 0 2px rgba(0,255,255,0.3);
+}
+
+.keyboard {
+            width: 28px;
+            height: 10px;
+            width: 24px;
+            height: 8px;
+background: #333;
+border-radius: 1px;
+margin-top: 2px;
+            background-image: radial-gradient(#666 30%, transparent 30%);
+            background-size: 3px 3px;
+}
+
+.mousepad {
+            width: 8px;
+            height: 10px;
+            width: 6px;
+            height: 8px;
+background: #999;
+border-radius: 1px;
+display: flex;
+@@ -353,75 +328,68 @@
+}
+
+.mouse {
+            width: 4px;
+            height: 6px;
+            width: 3px;
+            height: 5px;
+background: #222;
+border-radius: 2px;
+}
+
+.pc-case {
+            width: 10px;
+            height: 28px;
+            width: 8px;
+            height: 24px;
+background: #1a1a1a;
+border: 1px solid #444;
+border-radius: 1px;
+display: flex;
+flex-direction: column;
+align-items: center;
+            justify-content: flex-start;
+padding-top: 2px;
+gap: 2px;
+}
+
+.pc-power-led {
+            width: 3px;
+            height: 3px;
+            width: 2px;
+            height: 2px;
+background: #00ff00;
+border-radius: 50%;
+}
+
+.pc-drive {
+            width: 6px;
+            height: 2px;
+            width: 5px;
+            height: 1px;
+background: #444;
+}
+
+        .screen-keyboard-area {
+        .screen-keyboard-area, .mouse-area {
+display: flex;
+flex-direction: column;
+align-items: center;
+}
+
+        .mouse-area {
+            display: flex;
+            align-items: center;
+        }
+
+        /* Sala Técnica Expandida e Mais Visível */
+        /* Sala Técnica */
+.tech-room {
+position: absolute;
+            right: 10px;
+            top: 10px;
+            bottom: 10px;
+            right: 8px;
+            top: 8px;
+            bottom: 8px;
+border: 2px solid #6e332e;
+            width: 22%;
+            width: 32%;
+background: #e1d8d0;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: flex-start;
+            padding: 12px 8px;
+            gap: 12px;
+            padding: 8px 4px;
+            gap: 8px;
+z-index: 2;
+            box-shadow: -2px 0 6px rgba(0,0,0,0.05);
+}
+
+.tech-title {
+            font-size: 11px;
+            font-size: 9px;
+font-weight: bold;
+color: #6e332e;
+background: #f0e6e0;
+            padding: 4px 8px;
+            padding: 3px 6px;
+border-radius: 3px;
+border: 1px solid #6e332e;
+text-align: center;
+@@ -431,60 +399,57 @@
+.rack-cabinet {
+background: #1e1e1e;
+width: 100%;
+            max-width: 90px;
+flex: 1;
+border-radius: 3px;
+display: flex;
+flex-direction: column;
+justify-content: space-around;
+            padding: 8px 4px;
+            padding: 4px 2px;
+border: 2px solid #444;
+            box-shadow: inset 0 0 5px #000;
+}
+
+.rack-slot {
+            height: 12px;
+            height: 10px;
+background: #333;
+width: 90%;
+margin: 0 auto;
+border: 1px solid #555;
+display: flex;
+align-items: center;
+justify-content: space-between;
+            padding: 0 4px;
+            padding: 0 2px;
+}
+
+.rack-led {
+            width: 4px;
+            height: 4px;
+            width: 3px;
+            height: 3px;
+background: #0288d1;
+border-radius: 50%;
+}
+
+.tech-specs {
+            font-size: 9px;
+            line-height: 1.4;
+            font-size: 8px;
+            line-height: 1.3;
+text-align: left;
+width: 100%;
+color: #222;
+background: #fff;
+            padding: 6px;
+            padding: 4px;
+border-radius: 3px;
+border: 1px solid #ccc;
+}
+
+.plan-footer {
+            font-size: 10px;
+            font-size: 9px;
+color: #666;
+margin-top: 6px;
+            text-align: center;
+}
+
+/* Right Sidebar: Summary */
+.summary-sidebar {
+            grid-row: span 2;
+font-size: 11px;
+            gap: 8px;
+            overflow-y: auto;
+            gap: 6px;
+}
+
+.summary-row {
+@@ -497,35 +462,35 @@
+.alert-box {
+background-color: #fcf8e3;
+border: 1px solid #faebcc;
+            padding: 8px;
+            padding: 6px;
+border-radius: 3px;
+color: #8a6d3b;
+            font-size: 10px;
+}
+
+        /* Normas Reguladoras Expandidas e Maiores */
+.standards-container {
+background: #fff;
+border: 1px solid #6e332e;
+border-radius: 4px;
+            padding: 8px;
+            margin-top: 4px;
+            padding: 6px;
+            margin-top: 2px;
+}
+
+.standards-list {
+padding-left: 5px;
+color: #222;
+display: flex;
+flex-direction: column;
+            gap: 6px;
+            gap: 4px;
+list-style: none;
+}
+
+.standards-list li {
+            font-size: 11px;
+            font-size: 10px;
+font-weight: bold;
+display: flex;
+align-items: center;
+            gap: 6px;
+            gap: 4px;
+}
+
+.standards-list li::before {
+@@ -534,30 +499,41 @@
+font-weight: bold;
+}
+
+        /* Bottom Left: Topology */
+        .bottom-topology {
+            grid-column: 1;
+        /* Bottom Sections Container */
+        .bottom-row-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .bottom-panel {
+            background-color: #f4f1ee;
+            border: 1px solid #dcd6d0;
+            border-radius: 4px;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+}
+
+.topology-flow {
+display: flex;
+align-items: center;
+justify-content: space-around;
+background: #fff;
+            padding: 10px;
+            padding: 8px;
+border: 1px solid #dcd6d0;
+border-radius: 3px;
+            font-size: 9px;
+}
+
+.topo-box {
+background: #f4f1ee;
+border: 1px solid #ccc;
+            padding: 6px 12px;
+            padding: 4px 6px;
+border-radius: 3px;
+            font-size: 10px;
+}
+
+        /* Bottom Middle: Environment Sectors */
+.bottom-sectors {
+display: grid;
+grid-template-columns: 1fr 1fr;
+@@ -567,18 +543,16 @@
+.sector-card {
+background: #fff;
+border: 1px solid #dcd6d0;
+            padding: 8px;
+            padding: 6px;
+border-radius: 3px;
+font-size: 10px;
+border-left: 3px solid #6e332e;
+}
+
+        /* Bottom Right: Actions */
+.bottom-actions {
+display: flex;
+flex-direction: column;
+            gap: 8px;
+            justify-content: center;
+            gap: 6px;
+}
+
+.action-btn {
+@@ -590,29 +564,13 @@
+font-weight: bold;
+cursor: pointer;
+text-align: center;
+            font-size: 11px;
+}
+
+.action-btn.primary {
+background: #6e332e;
+color: #fff;
+}
+
+        .bottom-row-container {
+            grid-column: 1 / span 2;
+            display: grid;
+            grid-template-columns: 1.5fr 1.5fr 1fr;
+            gap: 8px;
+        }
+
+        .bottom-panel {
+            background-color: #f4f1ee;
+            border: 1px solid #dcd6d0;
+            border-radius: 4px;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+</style>
 </head>
 <body>
+@@ -623,21 +581,13 @@
+<div class="logo-icon">N</div>
+<div class="logo-text">
+<h1>Niemeyer</h1>
+                <span>Planejamento de Infraestrutura</span>
+                <span>Infraestrutura</span>
+</div>
+</div>
+        <nav class="nav-menu">
+            <a href="#" class="nav-item">📁 Projeto</a>
+            <a href="#" class="nav-item active">✏️ Editar</a>
+            <a href="#" class="nav-item">👁️ Visualizar</a>
+            <a href="#" class="nav-item">💻 Dispositivos</a>
+            <a href="#" class="nav-item">🛠️ Ferramentas</a>
+            <a href="#" class="nav-item">📊 Relatórios</a>
+        </nav>
+<div class="nav-right">
+            <span>Projeto: <strong>Projeto Prototipo</strong></span>
+            <span><strong>Prototipo</strong></span>
+<span><span class="status-dot"></span> Salvo</span>
+            <button class="btn-export">⬇️ Exportar</button>
+            <button class="btn-export">⬇️</button>
+</div>
+</header>
 
-    <!-- Header -->
-    <header>
-        <div class="logo-area">
-            <div class="logo-icon">N</div>
-            <div class="logo-text">
-                <h1>Niemeyer</h1>
-                <span>Planejamento de Infraestrutura</span>
-            </div>
-        </div>
-        <nav class="nav-menu">
-            <a href="#" class="nav-item">📁 Projeto</a>
-            <a href="#" class="nav-item active">✏️ Editar</a>
-            <a href="#" class="nav-item">👁️ Visualizar</a>
-            <a href="#" class="nav-item">💻 Dispositivos</a>
-            <a href="#" class="nav-item">🛠️ Ferramentas</a>
-            <a href="#" class="nav-item">📊 Relatórios</a>
-        </nav>
-        <div class="nav-right">
-            <span>Projeto: <strong>Projeto Prototipo</strong></span>
-            <span><span class="status-dot"></span> Salvo</span>
-            <button class="btn-export">⬇️ Exportar</button>
-        </div>
-    </header>
+@@ -647,7 +597,7 @@ <h1>Niemeyer</h1>
+<!-- Left Sidebar: Configurations -->
+<div class="panel config-sidebar">
+<div class="panel-title">Configurações do Projeto</div>
+            <span style="font-weight: bold; color: #444; margin-top: 4px;">Dimensões da Sala</span>
+            <span style="font-weight: bold; color: #444;">Dimensões da Sala</span>
 
-    <!-- Main Workspace Grid -->
-    <div class="workspace">
-        
-        <!-- Left Sidebar: Configurations -->
-        <div class="panel config-sidebar">
-            <div class="panel-title">Configurações do Projeto</div>
-            <span style="font-weight: bold; color: #444; margin-top: 4px;">Dimensões da Sala</span>
-            
-            <div class="form-group">
-                <label>Largura (m)</label>
-                <input type="number" id="inputWidth" value="20" min="5" max="100">
-            </div>
-            <div class="form-group">
-                <label>Comprimento (m)</label>
-                <input type="number" id="inputLength" value="15" min="5" max="100">
-            </div>
-            <div class="form-group">
-                <label>Pé-direito (m)</label>
-                <input type="number" value="3">
-            </div>
+<div class="form-group">
+<label>Largura (m)</label>
+@@ -662,74 +612,54 @@ <h1>Niemeyer</h1>
+<input type="number" value="3">
+</div>
 
-            <span style="font-weight: bold; color: #444; margin-top: 4px;">Gerenciar Estações</span>
-            <div class="station-controls">
-                <button class="btn-ctrl" id="btnAddStation">+ Adicionar</button>
-                <button class="btn-ctrl" id="btnRemoveStation">- Remover</button>
-            </div>
+            <span style="font-weight: bold; color: #444; margin-top: 4px;">Gerenciar Estações</span>
+            <span style="font-weight: bold; color: #444;">Gerenciar Estações</span>
+<div class="station-controls">
+<button class="btn-ctrl" id="btnAddStation">+ Adicionar</button>
+<button class="btn-ctrl" id="btnRemoveStation">- Remover</button>
+</div>
 
-            <span style="font-weight: bold; color: #444; margin-top: 8px;">Ambiente</span>
-            <div class="form-group">
-                <label>Laboratório</label>
-                <select>
-                    <option>Laboratório</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Setor selecionado</label>
-                <select>
-                    <option>Sala de aula</option>
-                </select>
-            </div>
+            <span style="font-weight: bold; color: #444; margin-top: 8px;">Ambiente</span>
+            <div class="form-group">
+                <label>Laboratório</label>
+                <select>
+                    <option>Laboratório</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Setor selecionado</label>
+                <select>
+                    <option>Sala de aula</option>
+                </select>
+            </div>
 
-            <button class="btn-update" id="btnUpdateProject">Atualizar projeto ↻</button>
-        </div>
+<button class="btn-update" id="btnUpdateProject">Atualizar projeto ↻</button>
+</div>
 
-        <!-- Center Area: Physical Plan -->
-        <div class="center-area">
-            <div class="plan-header">
-                <span id="planTitle" style="font-weight: bold; color: #444;">PLANTA FÍSICA — 20 m × 15 m (300 m²)</span>
-                <div class="plan-toolbar">
-                    <button class="tool-btn">📍 Selecionar</button>
-                    <button class="tool-btn">✋ Mover</button>
-                    <button class="tool-btn">🔗 Conectar</button>
-                    <button class="tool-btn" id="btnQuickRemove" title="Remover Estação">- Estação</button>
-                    <button class="tool-btn">100%</button>
-                    <button class="tool-btn" id="btnQuickAdd" title="Adicionar Estação">+ Estação</button>
-                </div>
-            </div>
-            
-            <div class="canvas-container" id="canvasContainer">
-                <div class="blueprint-room" id="blueprintRoom">
-                    <span class="room-label">LABORATÓRIO DE ESTAÇÕES</span>
-                    
-                    <!-- Canvas para linhas dos cabos conectando à sala técnica -->
-                    <canvas id="cablesCanvas"></canvas>
+<!-- Center Area: Physical Plan -->
+<div class="center-area">
+<div class="plan-header">
+                <span id="planTitle" style="font-weight: bold; color: #444;">PLANTA FÍSICA — 20 m × 15 m (300 m²)</span>
+                <span id="planTitle" style="font-weight: bold; color: #444; font-size: 10px;">PLANTA — 20m × 15m (300m²)</span>
+<div class="plan-toolbar">
+                    <button class="tool-btn">📍 Selecionar</button>
+                    <button class="tool-btn">📍 Sel.</button>
+<button class="tool-btn">✋ Mover</button>
+                    <button class="tool-btn">🔗 Conectar</button>
+                    <button class="tool-btn" id="btnQuickRemove" title="Remover Estação">- Estação</button>
+                    <button class="tool-btn">100%</button>
+                    <button class="tool-btn" id="btnQuickAdd" title="Adicionar Estação">+ Estação</button>
+                    <button class="tool-btn" id="btnQuickRemove">- Est.</button>
+                    <button class="tool-btn" id="btnQuickAdd">+ Est.</button>
+</div>
+</div>
 
-                    <!-- Sala Técnica em Maior Destaque -->
-                    <div class="tech-room" id="techRoom">
-                        <div class="tech-title">SALA TÉCNICA</div>
-                        <div class="rack-cabinet">
-                            <div class="rack-slot"><div class="rack-led"></div><div class="rack-led"></div></div>
-                            <div class="rack-slot"><div class="rack-led"></div></div>
-                            <div class="rack-slot"><div class="rack-led"></div><div class="rack-led"></div></div>
-                            <div class="rack-slot"><div class="rack-led"></div></div>
-                            <div class="rack-slot"><div class="rack-led"></div></div>
-                        </div>
-                        <div class="tech-specs">
-                            <strong>Equipamentos:</strong><br>
-                            ▪ Roteador / firewall<br>
-                            ▪ Switch 144 portas<br>
-                            ▪ Patch panel 144 portas<br>
-                            ▪ 4 servidor(es)<br>
-                            ▪ Nobreak 3kVA
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="plan-footer">
-                Estações com Computador &nbsp;&bull;&nbsp; Access Point &nbsp;&bull;&nbsp; Rack &nbsp;&bull;&nbsp; Cabo de rede Cat6 &nbsp;&bull;&nbsp; Setor: Sala de aula
-            </div>
-        </div>
+<div class="canvas-container" id="canvasContainer">
+<div class="blueprint-room" id="blueprintRoom">
+                    <span class="room-label">LABORATÓRIO DE ESTAÇÕES</span>
+                    <span class="room-label">LABORATÓRIO</span>
 
-        <!-- Right Sidebar: Summary -->
-        <div class="panel summary-sidebar">
-            <div class="panel-title">Resumo do Projeto</div>
-            
-            <div class="summary-row"><span>Área total</span><strong id="sumArea">300 m²</strong></div>
-            <div class="summary-row"><span>Área por estação</span><strong id="sumAreaPerStation">15.0 m² / estação</strong></div>
-            <div class="summary-row"><span>Estações instaladas</span><strong id="sumStationCount">20 unidades</strong></div>
-            <div class="summary-row"><span>Servidores recomendados</span><strong>4 unidades</strong></div>
-            <div class="summary-row"><span>Access Points recomendados</span><strong>2 unidades</strong></div>
-            <div class="summary-row"><span>Pontos de rede</span><strong id="sumNetworkPoints">27 pontos</strong></div>
-            <div class="summary-row"><span>Switch recomendado</span><strong>144 portas</strong></div>
-            <div class="summary-row"><span>Cabo Cat6 estimado</span><strong id="sumCableLength">450 metros</strong></div>
+                    <!-- Canvas para linhas dos cabos conectando à sala técnica -->
+<canvas id="cablesCanvas"></canvas>
 
-            <div class="panel-title" style="margin-top: 4px;">Análise do projeto</div>
-            <span style="font-size: 10px; line-height: 1.3;">
-                • Cobertura Wi-Fi: 100% da área<br>
-                • Portas do switch: Em conformidade
-            </span>
+                    <!-- Sala Técnica em Maior Destaque -->
+<div class="tech-room" id="techRoom">
+<div class="tech-title">SALA TÉCNICA</div>
+<div class="rack-cabinet">
+<div class="rack-slot"><div class="rack-led"></div><div class="rack-led"></div></div>
+<div class="rack-slot"><div class="rack-led"></div></div>
+<div class="rack-slot"><div class="rack-led"></div><div class="rack-led"></div></div>
+<div class="rack-slot"><div class="rack-led"></div></div>
+                            <div class="rack-slot"><div class="rack-led"></div></div>
+</div>
+<div class="tech-specs">
+                            <strong>Equipamentos:</strong><br>
+                            ▪ Roteador / firewall<br>
+                            ▪ Switch 144 portas<br>
+                            ▪ Patch panel 144 portas<br>
+                            ▪ 4 servidor(es)<br>
+                            <strong>HW:</strong><br>
+                            ▪ Roteador / Firewall<br>
+                            ▪ Switch 144p<br>
+                            ▪ 4 Servidores<br>
+▪ Nobreak 3kVA
+</div>
+</div>
+</div>
+</div>
 
-            <div class="alert-box">
-                <span style="font-weight: bold; display: block; margin-bottom: 2px;">Erros e alertas</span>
-                ✓ Projeto compatível com as dimensões informadas.
-            </div>
+<div class="plan-footer">
+                Estações com Computador &nbsp;&bull;&nbsp; Access Point &nbsp;&bull;&nbsp; Rack &nbsp;&bull;&nbsp; Cabo de rede Cat6 &nbsp;&bull;&nbsp; Setor: Sala de aula
+                Estações &bull; Access Point &bull; Cat6 &bull; Sala de aula
+</div>
+</div>
 
-            <!-- Normas Reguladoras Expandidas e Destacadas -->
-            <div class="panel-title" style="margin-top: 4px;">Normas Reguladoras</div>
-            <div class="standards-container">
-                <ul class="standards-list">
-                    <li>ABNT NBR 14565 (Cabeamento Estruturado)</li>
-                    <li>ANSI/TIA-568.2-D (Telecomunicações)</li>
-                    <li>ANSI/TIA-569-D (Espaços e Vias)</li>
-                    <li>ISO/IEC 11801 (Generic Cabling)</li>
-                </ul>
-            </div>
-        </div>
+@@ -738,43 +668,41 @@ <h1>Niemeyer</h1>
+<div class="panel-title">Resumo do Projeto</div>
 
-        <!-- Bottom Row Content -->
-        <div class="bottom-row-container">
-            
-            <!-- Bottom Left: Topology -->
-            <div class="bottom-panel">
-                <div class="panel-title">Topologia e Conexões</div>
-                <div class="topology-flow">
-                    <div class="topo-box">Internet</div>
-                    <span>→</span>
-                    <div class="topo-box">Firewall</div>
-                    <span>→</span>
-                    <div class="topo-box">Switch</div>
-                    <span>→</span>
-                    <div class="topo-box">Estações</div>
-                </div>
-            </div>
+<div class="summary-row"><span>Área total</span><strong id="sumArea">300 m²</strong></div>
+            <div class="summary-row"><span>Área por estação</span><strong id="sumAreaPerStation">15.0 m² / estação</strong></div>
+            <div class="summary-row"><span>Área por estação</span><strong id="sumAreaPerStation">15.0 m²</strong></div>
+<div class="summary-row"><span>Estações instaladas</span><strong id="sumStationCount">20 unidades</strong></div>
+            <div class="summary-row"><span>Servidores recomendados</span><strong>4 unidades</strong></div>
+            <div class="summary-row"><span>Access Points recomendados</span><strong>2 unidades</strong></div>
+            <div class="summary-row"><span>Servidores</span><strong>4 unidades</strong></div>
+            <div class="summary-row"><span>Access Points</span><strong>2 unidades</strong></div>
+<div class="summary-row"><span>Pontos de rede</span><strong id="sumNetworkPoints">27 pontos</strong></div>
+            <div class="summary-row"><span>Switch recomendado</span><strong>144 portas</strong></div>
+            <div class="summary-row"><span>Cabo Cat6 estimado</span><strong id="sumCableLength">450 metros</strong></div>
+            <div class="summary-row"><span>Switch</span><strong>144 portas</strong></div>
+            <div class="summary-row"><span>Cabo Cat6</span><strong id="sumCableLength">450 metros</strong></div>
 
-            <!-- Bottom Middle: Environment Sectors -->
-            <div class="bottom-panel">
-                <div class="panel-title">Setores do Ambiente</div>
-                <div class="bottom-sectors">
-                    <div class="sector-card">Sala de aula</div>
-                    <div class="sector-card">Área de estações</div>
-                    <div class="sector-card">Recepção</div>
-                    <div class="sector-card">Sala técnica</div>
-                </div>
-            </div>
+            <div class="panel-title" style="margin-top: 4px;">Análise do projeto</div>
+            <div class="panel-title" style="margin-top: 4px;">Análise</div>
+<span style="font-size: 10px; line-height: 1.3;">
+                • Cobertura Wi-Fi: 100% da área<br>
+                • Portas do switch: Em conformidade
+                • Cobertura Wi-Fi: 100%<br>
+                • Portas do switch: OK
+</span>
 
-            <!-- Bottom Right: Actions -->
-            <div class="bottom-panel bottom-actions">
-                <div class="panel-title">Ações</div>
-                <button class="action-btn primary"><a href="modelo-3d.html" style="text-decoration: none; color:white;">Modelo 3D</a></button>
-                <button class="action-btn">Solicitar revisão</button>
-                <span style="font-size: 9px; color: #666; text-align: center;">Altere as dimensões e o ambiente para recalcular o projeto.</span>
-            </div>
+<div class="alert-box">
+                <span style="font-weight: bold; display: block; margin-bottom: 2px;">Erros e alertas</span>
+                ✓ Projeto compatível com as dimensões informadas.
+                <span style="font-weight: bold; display: block; margin-bottom: 2px;">Alertas</span>
+                ✓ Projeto compatível com as dimensões.
+</div>
 
-        </div>
+            <!-- Normas Reguladoras Expandidas e Destacadas -->
+<div class="panel-title" style="margin-top: 4px;">Normas Reguladoras</div>
+<div class="standards-container">
+<ul class="standards-list">
+                    <li>ABNT NBR 14565 (Cabeamento Estruturado)</li>
+                    <li>ANSI/TIA-568.2-D (Telecomunicações)</li>
+                    <li>ANSI/TIA-569-D (Espaços e Vias)</li>
+                    <li>ISO/IEC 11801 (Generic Cabling)</li>
+                    <li>ABNT NBR 14565</li>
+                    <li>ANSI/TIA-568.2-D</li>
+                    <li>ANSI/TIA-569-D</li>
+                    <li>ISO/IEC 11801</li>
+</ul>
+</div>
+</div>
 
-    </div>
+<!-- Bottom Row Content -->
+<div class="bottom-row-container">
 
-    <script>
-        // Lógica de Interatividade do Blueprint
-        const blueprintRoom = document.getElementById('blueprintRoom');
-        const techRoom = document.getElementById('techRoom');
-        const canvas = document.getElementById('cablesCanvas');
-        const ctx = canvas.getContext('2d');
+            <!-- Bottom Left: Topology -->
+<div class="bottom-panel">
+                <div class="panel-title">Topologia e Conexões</div>
+                <div class="panel-title">Topologia</div>
+<div class="topology-flow">
+<div class="topo-box">Internet</div>
+<span>→</span>
+@@ -786,9 +714,8 @@ <h1>Niemeyer</h1>
+</div>
+</div>
 
-        const inputWidth = document.getElementById('inputWidth');
-        const inputLength = document.getElementById('inputLength');
-        const btnUpdateProject = document.getElementById('btnUpdateProject');
-        const planTitle = document.getElementById('planTitle');
+            <!-- Bottom Middle: Environment Sectors -->
+<div class="bottom-panel">
+                <div class="panel-title">Setores do Ambiente</div>
+                <div class="panel-title">Setores</div>
+<div class="bottom-sectors">
+<div class="sector-card">Sala de aula</div>
+<div class="sector-card">Área de estações</div>
+@@ -797,20 +724,17 @@ <h1>Niemeyer</h1>
+</div>
+</div>
 
-        const sumArea = document.getElementById('sumArea');
-        const sumAreaPerStation = document.getElementById('sumAreaPerStation');
-        const sumStationCount = document.getElementById('sumStationCount');
-        const sumNetworkPoints = document.getElementById('sumNetworkPoints');
-        const sumCableLength = document.getElementById('sumCableLength');
+            <!-- Bottom Right: Actions -->
+<div class="bottom-panel bottom-actions">
+<div class="panel-title">Ações</div>
+                <button class="action-btn primary"><a href="modelo-3d.html" style="text-decoration: none; color:white;">Modelo 3D</a></button>
+                <button class="action-btn primary"><a href="modelo-3d.html" style="text-decoration: none; color:white; display:block;">Modelo 3D</a></button>
+<button class="action-btn">Solicitar revisão</button>
+                <span style="font-size: 9px; color: #666; text-align: center;">Altere as dimensões e o ambiente para recalcular o projeto.</span>
+</div>
 
-        let stationCount = 0;
-        let activeDragNode = null;
-        let dragOffsetX = 0;
-        let dragOffsetY = 0;
+</div>
 
-        // Ajusta o tamanho do Canvas de linhas
-        function resizeCanvas() {
-            canvas.width = blueprintRoom.clientWidth;
-            canvas.height = blueprintRoom.clientHeight;
-            drawCables();
-        }
+</div>
 
-        // Criar elemento visual da Estação com componentes detalhados
-        function createStationElement(idNumber, x, y) {
-            const station = document.createElement('div');
-            station.className = 'station-node';
-            station.id = `station-${idNumber}`;
-            station.style.left = x + 'px';
-            station.style.top = y + 'px';
+<script>
+        // Lógica de Interatividade do Blueprint
+const blueprintRoom = document.getElementById('blueprintRoom');
+const techRoom = document.getElementById('techRoom');
+const canvas = document.getElementById('cablesCanvas');
+@@ -826,20 +750,22 @@ <h1>Niemeyer</h1>
+const sumStationCount = document.getElementById('sumStationCount');
+const sumNetworkPoints = document.getElementById('sumNetworkPoints');
+const sumCableLength = document.getElementById('sumCableLength');
+        const btnAddStation = document.getElementById('btnAddStation');
+        const btnRemoveStation = document.getElementById('btnRemoveStation');
+        const btnQuickAdd = document.getElementById('btnQuickAdd');
+        const btnQuickRemove = document.getElementById('btnQuickRemove');
 
-            station.innerHTML = `
-                <div class="station-title">ESTAÇÃO ${String(idNumber).padStart(2, '0')}</div>
-                <div class="station-desk-setup">
-                    <div class="screen-keyboard-area">
-                        <div class="monitor-screen"></div>
-                        <div class="keyboard"></div>
-                    </div>
-                    <div class="mouse-area">
-                        <div class="mousepad">
-                            <div class="mouse"></div>
-                        </div>
-                    </div>
-                    <div class="pc-case">
-                        <div class="pc-power-led"></div>
-                        <div class="pc-drive"></div>
-                    </div>
-                </div>
-            `;
+let stationCount = 0;
+let activeDragNode = null;
+let dragOffsetX = 0;
+let dragOffsetY = 0;
 
-            // Eventos para Arrastar e Soltar (Móvel Individualmente)
-            station.addEventListener('mousedown', (e) => {
-                activeDragNode = station;
-                const rect = station.getBoundingClientRect();
-                dragOffsetX = e.clientX - rect.left;
-                dragOffsetY = e.clientY - rect.top;
-                e.stopPropagation();
-            });
+        // Ajusta o tamanho do Canvas de linhas
+function resizeCanvas() {
+canvas.width = blueprintRoom.clientWidth;
+canvas.height = blueprintRoom.clientHeight;
+drawCables();
+}
 
-            return station;
-        }
+        // Criar elemento visual da Estação com componentes detalhados
+function createStationElement(idNumber, x, y) {
+const station = document.createElement('div');
+station.className = 'station-node';
+@@ -866,7 +792,15 @@ <h1>Niemeyer</h1>
+               </div>
+           `;
 
-        // Adicionar nova Estação
-        function addStation() {
-            stationCount++;
-            const roomRect = blueprintRoom.getBoundingClientRect();
-            
-            // Posição inicial organizando em grade
-            const cols = 4;
-            const index = stationCount - 1;
-            const col = index % cols;
-            const row = Math.floor(index / cols);
+            // Eventos para Arrastar e Soltar (Móvel Individualmente)
+            station.addEventListener('touchstart', (e) => {
+                activeDragNode = station;
+                const touch = e.touches[0];
+                const rect = station.getBoundingClientRect();
+                dragOffsetX = touch.clientX - rect.left;
+                dragOffsetY = touch.clientY - rect.top;
+                e.stopPropagation();
+            }, {passive: true});
 
-            let posX = 20 + col * 85;
-            let posY = 35 + row * 65;
+station.addEventListener('mousedown', (e) => {
+activeDragNode = station;
+const rect = station.getBoundingClientRect();
+@@ -878,26 +812,23 @@ <h1>Niemeyer</h1>
+return station;
+}
 
-            // Evitar criar fora dos limites da sala
-            if (posX > roomRect.width * 0.7) {
-                posX = 20 + (Math.random() * 100);
-            }
-            if (posY > roomRect.height - 70) {
-                posY = roomRect.height - 80;
-            }
+        // Adicionar nova Estação
+function addStation() {
+stationCount++;
+const roomRect = blueprintRoom.getBoundingClientRect();
 
-            const elem = createStationElement(stationCount, posX, posY);
-            blueprintRoom.appendChild(elem);
-            updateCalculations();
-            drawCables();
-        }
+            // Posição inicial organizando em grade
+            const cols = 4;
+            const cols = 3;
+const index = stationCount - 1;
+const col = index % cols;
+const row = Math.floor(index / cols);
 
-        // Remover última Estação
-        function removeStation() {
-            if (stationCount > 0) {
-                const lastNode = document.getElementById(`station-${stationCount}`);
-                if (lastNode) {
-                    lastNode.remove();
-                }
-                stationCount--;
-                updateCalculations();
-                drawCables();
-            }
-        }
+            let posX = 20 + col * 85;
+            let posY = 35 + row * 65;
+            let posX = 15 + col * 75;
+            let posY = 25 + row * 55;
 
-        // Desenhar Cabos de Conexão das Estações até a Sala Técnica
-        function drawCables() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            const techRect = techRoom.getBoundingClientRect();
-            const roomRect = blueprintRoom.getBoundingClientRect();
+            // Evitar criar fora dos limites da sala
+            if (posX > roomRect.width * 0.7) {
+                posX = 20 + (Math.random() * 100);
+            if (posX > roomRect.width * 0.6) {
+                posX = 15 + (Math.random() * 50);
+}
+            if (posY > roomRect.height - 70) {
+                posY = roomRect.height - 80;
+            if (posY > roomRect.height - 60) {
+                posY = roomRect.height - 70;
+}
 
-            // Ponto de entrada dos cabos na Sala Técnica
-            const techX = techRect.left - roomRect.left;
-            const techY = techRect.top - roomRect.top + (techRect.height / 2);
+const elem = createStationElement(stationCount, posX, posY);
+@@ -906,7 +837,6 @@ <h1>Niemeyer</h1>
+drawCables();
+}
 
-            let totalCableMeters = 0;
-            const nodes = document.querySelectorAll('.station-node');
+        // Remover última Estação
+function removeStation() {
+if (stationCount > 0) {
+const lastNode = document.getElementById(`station-${stationCount}`);
+@@ -919,14 +849,12 @@ <h1>Niemeyer</h1>
+}
+}
 
-            nodes.forEach(node => {
-                const nodeRect = node.getBoundingClientRect();
-                const nodeX = (nodeRect.left - roomRect.left) + (nodeRect.width / 2);
-                const nodeY = (nodeRect.top - roomRect.top) + (nodeRect.height / 2);
+        // Desenhar Cabos de Conexão das Estações até a Sala Técnica
+function drawCables() {
+ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-                // Desenha cabo com curva
-                ctx.beginPath();
-                ctx.moveTo(nodeX, nodeY);
-                
-                // Ponto de controle da curva
-                const controlX = (nodeX + techX) / 2;
-                ctx.quadraticCurveTo(controlX, nodeY, techX, techY);
-                
-                ctx.strokeStyle = '#6e332e';
-                ctx.lineWidth = 1.5;
-                ctx.setLineDash([4, 2]);
-                ctx.stroke();
+const techRect = techRoom.getBoundingClientRect();
+const roomRect = blueprintRoom.getBoundingClientRect();
 
-                // Calcular distância aproximada de cabo (escala pixel -> metro)
-                const distPx = Math.hypot(techX - nodeX, techY - nodeY);
-                totalCableMeters += (distPx * 0.15) + 5; // Margem de sobra
-            });
+            // Ponto de entrada dos cabos na Sala Técnica
+const techX = techRect.left - roomRect.left;
+const techY = techRect.top - roomRect.top + (techRect.height / 2);
 
-            sumCableLength.textContent = `${Math.round(totalCableMeters)} metros`;
-        }
+@@ -938,11 +866,9 @@ <h1>Niemeyer</h1>
+const nodeX = (nodeRect.left - roomRect.left) + (nodeRect.width / 2);
+const nodeY = (nodeRect.top - roomRect.top) + (nodeRect.height / 2);
 
-        // Movimentação global do mouse
-        document.addEventListener('mousemove', (e) => {
-            if (activeDragNode) {
-                const roomRect = blueprintRoom.getBoundingClientRect();
-                let x = e.clientX - roomRect.left - dragOffsetX;
-                let y = e.clientY - roomRect.top - dragOffsetY;
+                // Desenha cabo com curva
+ctx.beginPath();
+ctx.moveTo(nodeX, nodeY);
 
-                // Limite das bordas
-                const maxX = roomRect.width - activeDragNode.offsetWidth - (roomRect.width * 0.23);
-                const maxY = roomRect.height - activeDragNode.offsetHeight - 10;
+                // Ponto de controle da curva
+const controlX = (nodeX + techX) / 2;
+ctx.quadraticCurveTo(controlX, nodeY, techX, techY);
 
-                x = Math.max(10, Math.min(x, maxX));
-                y = Math.max(10, Math.min(y, maxY));
+@@ -951,81 +877,75 @@ <h1>Niemeyer</h1>
+ctx.setLineDash([4, 2]);
+ctx.stroke();
 
-                activeDragNode.style.left = x + 'px';
-                activeDragNode.style.top = y + 'px';
+                // Calcular distância aproximada de cabo (escala pixel -> metro)
+const distPx = Math.hypot(techX - nodeX, techY - nodeY);
+                totalCableMeters += (distPx * 0.15) + 5; // Margem de sobra
+                totalCableMeters += (distPx * 0.15) + 5;
+});
 
-                drawCables();
-            }
-        });
+sumCableLength.textContent = `${Math.round(totalCableMeters)} metros`;
+}
 
-        document.addEventListener('mouseup', () => {
-            activeDragNode = null;
-        });
+        // Movimentação global do mouse
+        document.addEventListener('mousemove', (e) => {
+        function moveHandler(clientX, clientY) {
+if (activeDragNode) {
+const roomRect = blueprintRoom.getBoundingClientRect();
+                let x = e.clientX - roomRect.left - dragOffsetX;
+                let y = e.clientY - roomRect.top - dragOffsetY;
+                let x = clientX - roomRect.left - dragOffsetX;
+                let y = clientY - roomRect.top - dragOffsetY;
 
-        // Recalcular métricas de área e estações
-        function updateCalculations() {
-            const width = parseFloat(inputWidth.value) || 0;
-            const length = parseFloat(inputLength.value) || 0;
-            const area = width * length;
+                // Limite das bordas
+                const maxX = roomRect.width - activeDragNode.offsetWidth - (roomRect.width * 0.23);
+                const maxX = roomRect.width - activeDragNode.offsetWidth - (roomRect.width * 0.32);
+const maxY = roomRect.height - activeDragNode.offsetHeight - 10;
 
-            planTitle.textContent = `PLANTA FÍSICA — ${width} m × ${length} m (${area} m²)`;
-            sumArea.textContent = `${area} m²`;
-            sumStationCount.textContent = `${stationCount} unidades`;
-            sumNetworkPoints.textContent = `${stationCount + 7} pontos`;
+                x = Math.max(10, Math.min(x, maxX));
+                y = Math.max(10, Math.min(y, maxY));
+                x = Math.max(5, Math.min(x, maxX));
+                y = Math.max(5, Math.min(y, maxY));
 
-            if (stationCount > 0) {
-                sumAreaPerStation.textContent = `${(area / stationCount).to
+activeDragNode.style.left = x + 'px';
+activeDragNode.style.top = y + 'px';
+
+drawCables();
+}
+        });
+        }
+
+        document.addEventListener('mouseup', () => {
+            activeDragNode = null;
+        document.addEventListener('touchmove', (e) => {
+            if (activeDragNode && e.touches.length > 0) {
+                moveHandler(e.touches[0].clientX, e.touches[0].clientY);
+            }
+        }, {passive: true});
+
+        document.addEventListener('mousemove', (e) => {
+            moveHandler(e.clientX, e.clientY);
+});
+
+        // Recalcular métricas de área e estações
+        document.addEventListener('touchend', () => { activeDragNode = null; });
+        document.addEventListener('mouseup', () => { activeDragNode = null; });
+
+function updateCalculations() {
+const width = parseFloat(inputWidth.value) || 0;
+const length = parseFloat(inputLength.value) || 0;
+const area = width * length;
+
+            planTitle.textContent = `PLANTA FÍSICA — ${width} m × ${length} m (${area} m²)`;
+            planTitle.textContent = `PLANTA — ${width}m × ${length}m (${area}m²)`;
+sumArea.textContent = `${area} m²`;
+sumStationCount.textContent = `${stationCount} unidades`;
+sumNetworkPoints.textContent = `${stationCount + 7} pontos`;
+
+if (stationCount > 0) {
+                sumAreaPerStation.textContent = `${(area / stationCount).toFixed(1)} m² / estação`;
+                sumAreaPerStation.textContent = `${(area / stationCount).toFixed(1)} m²`;
+} else {
+                sumAreaPerStation.textContent = `0 m² / estação`;
+                sumAreaPerStation.textContent = `0 m²`;
+}
+}
+
+        // Listeners dos Botões
+        document.getElementById('btnAddStation').addEventListener('click', addStation);
+        document.getElementById('btnRemoveStation').addEventListener('click', removeStation);
+        document.getElementById('btnQuickAdd').addEventListener('click', addStation);
+        document.getElementById('btnQuickRemove').addEventListener('click', removeStation);
+
+        btnUpdateProject.addEventListener('click', () => {
+            updateCalculations();
+            drawCables();
+        });
+
+        inputWidth.addEventListener('input', updateCalculations);
+        inputLength.addEventListener('input', updateCalculations);
+
+        // Inicialização
+        btnAddStation.addEventListener('click', addStation);
+        btnRemoveStation.addEventListener('click', removeStation);
+        btnQuickAdd.addEventListener('click', addStation);
+        btnQuickRemove.addEventListener('click', removeStation);
+        btnUpdateProject.addEventListener('click', updateCalculations);
+window.addEventListener('resize', resizeCanvas);
+
+        setTimeout(() => {
+            resizeCanvas();
+            // Criar 20 Estações Iniciais
+            for (let i = 0; i < 20; i++) {
+        window.onload = () => {
+            for(let i = 0; i < 10; i++) {
+addStation();
+}
+        }, 100);
+            resizeCanvas();
+        };
+</script>
+</body>
+</html>
